@@ -18,12 +18,15 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import DescriptionIcon from "@mui/icons-material/Description";
 import LayersIcon from "@mui/icons-material/Layers";
+import PeopleIcon from "@mui/icons-material/People"; // Icon cho Users
+import ManageUser from "./ManageUser"; // Import ManageUser
 
 const drawerWidth = 240;
 
 const NAVIGATION = [
   { title: "Dashboard", icon: <DashboardIcon /> },
   { title: "Orders", icon: <ShoppingCartIcon /> },
+  { title: "Users", icon: <PeopleIcon /> }, // Thêm mục Users
   { divider: true },
   { header: "Analytics" },
   { title: "Reports", icon: <BarChartIcon /> },
@@ -35,7 +38,7 @@ const NAVIGATION = [
 function DemoPageContent({ currentPage }) {
   return (
     <Box sx={{ p: 4, textAlign: "center" }}>
-      <Typography variant="h4">Dashboard content: {currentPage}</Typography>
+      <Typography variant="h4">Nội dung Dashboard: {currentPage}</Typography>
     </Box>
   );
 }
@@ -46,6 +49,15 @@ DemoPageContent.propTypes = {
 
 function DashboardLayoutBasic() {
   const [currentPage, setCurrentPage] = React.useState("Dashboard");
+
+  const renderContent = () => {
+    switch (currentPage) {
+      case "Users":
+        return <ManageUser />;
+      default:
+        return <DemoPageContent currentPage={currentPage} />;
+    }
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -86,6 +98,8 @@ function DashboardLayoutBasic() {
                   button
                   key={index}
                   onClick={() => setCurrentPage(item.title)}
+                  selected={currentPage === item.title} 
+                  disableGutters 
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.title} />
@@ -101,7 +115,7 @@ function DashboardLayoutBasic() {
         sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
       >
         <Toolbar />
-        <DemoPageContent currentPage={currentPage} />
+        {renderContent()}
       </Box>
     </Box>
   );
