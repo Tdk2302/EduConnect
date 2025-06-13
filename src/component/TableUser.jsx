@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactPaginate from "react-paginate";
-import './TableUser.css';
+import "./TableUser.scss";
 
 const TableUser = ({
   listUsers,
@@ -8,8 +8,8 @@ const TableUser = ({
   handleClickBtnView,
   handleClickBtnDelete,
   handleManageStudent,
-  handleManageNurse,
-  handleManageAccount
+  handleManageTeacher,
+  handleManageAccount,
 }) => {
   const itemsPerPage = 6;
   const [itemOffset, setItemOffset] = useState(0);
@@ -17,13 +17,14 @@ const TableUser = ({
   const [searchField, setSearchField] = useState("fullName");
   const [roleFilter, setRoleFilter] = useState("");
 
-
-  const filteredUsers = listUsers.filter( user => {
+  const filteredUsers = listUsers.filter((user) => {
     const searchValue = user[searchField]?.toString().toLowerCase() || "";
-    const matchesSearch = searchQuery ? searchValue.includes(searchQuery.toLowerCase()) : true;
+    const matchesSearch = searchQuery
+      ? searchValue.includes(searchQuery.toLowerCase())
+      : true;
     const matchesRole = roleFilter ? user.roles?.includes(roleFilter) : true;
     return matchesRole && matchesSearch;
-  })
+  });
 
   const endOffset = itemOffset + itemsPerPage;
   const currentUsers = filteredUsers.slice(itemOffset, endOffset);
@@ -41,10 +42,10 @@ const TableUser = ({
     handleManageStudent();
   };
 
-  const handleNurseClick = () => {
-    setRoleFilter("Nurse");
+  const handleTeacherClick = () => {
+    setRoleFilter("Teacher");
     setItemOffset(0); // Reset pagination
-    handleManageNurse();
+    handleManageTeacher();
   };
 
   const handleAccountClick = () => {
@@ -63,7 +64,11 @@ const TableUser = ({
               className="form-select me-2"
               value={searchField}
               onChange={(e) => setSearchField(e.target.value)}
-              style={{ maxWidth: "100px", fontSize: "0.9rem", padding: "0.2rem 0.5rem" }}
+              style={{
+                maxWidth: "100px",
+                fontSize: "0.9rem",
+                padding: "0.2rem 0.5rem",
+              }}
             >
               <option value="fullName">Name</option>
               <option value="roles">Role</option>
@@ -79,36 +84,36 @@ const TableUser = ({
                 setSearchQuery(e.target.value);
                 setItemOffset(0); // Reset pagination on search
               }}
-              style={{ maxWidth: "200px", fontSize: "0.9rem", padding: "0.2rem 0.5rem" }}
+              style={{
+                maxWidth: "200px",
+                fontSize: "0.9rem",
+                padding: "0.2rem 0.5rem",
+              }}
             />
           </div>
           <div className="d-flex gap-2">
             <button
               className="btn btn-light btn-sm square-btn me-2"
-              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
               onClick={handleStudentClick}
             >
-              <i className="fa fa-user-graduate" aria-hidden="true"></i> Manage Student
+              <i className="fa fa-user-graduate" aria-hidden="true"></i> Manage
+              Student
             </button>
             <button
               className="btn btn-light btn-sm square-btn me-2"
-              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-              onClick={handleNurseClick}
+              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
+              onClick={handleTeacherClick}
             >
-              <i className="fa fa-user-md" aria-hidden="true"></i> Manage Nurse
+              <i className="fa fa-user-md" aria-hidden="true"></i> Manage
+              Teacher
             </button>
             <button
               className="btn btn-light btn-sm square-btn me-2"
-              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-              onClick={handleAccountClick}
+              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
             >
-              <i className="fa fa-user-cog" aria-hidden="true"></i> Manage Account
-            </button>
-            <button
-              className="btn btn-light btn-sm square-btn me-2"
-              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
-            >
-              <i className="fa fa-plus-circle" aria-hidden="true"></i> Create User
+              <i className="fa fa-plus-circle" aria-hidden="true"></i> Create
+              User
             </button>
           </div>
         </div>
@@ -117,12 +122,24 @@ const TableUser = ({
             <table className="table table-hover table-bordered align-middle mb-0">
               <thead className="table-light">
                 <tr>
-                  <th scope="col" className="col-1 text-center">#</th>
-                  <th scope="col" className="col-3 text-center">Name</th>
-                  <th scope="col" className="col-2">Date Created</th>
-                  <th scope="col" className="col-2">Role</th>
-                  <th scope="col" className="col-2">Status</th>
-                  <th scope="col" className="col-2 text-center">Action</th>
+                  <th scope="col" className="col-1 text-center">
+                    #
+                  </th>
+                  <th scope="col" className="col-3 text-center">
+                    Name
+                  </th>
+                  <th scope="col" className="col-2">
+                    Date Created
+                  </th>
+                  <th scope="col" className="col-2">
+                    Role
+                  </th>
+                  <th scope="col" className="col-2">
+                    Status
+                  </th>
+                  <th scope="col" className="col-2 text-center">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -133,7 +150,9 @@ const TableUser = ({
                       <td className="text-center">
                         <div className="d-flex align-items-center">
                           <img
-                            src={item.avatar || "https://via.placeholder.com/40"}
+                            src={
+                              item.avatar || "https://via.placeholder.com/40"
+                            }
                             alt="avatar"
                             className="rounded-circle me-2"
                             style={{ width: "40px", height: "40px" }}
@@ -149,19 +168,26 @@ const TableUser = ({
                             item.status === "Active"
                               ? "bg-success"
                               : item.status === "Suspended"
-                              ? "bg-danger"
-                              : "bg-warning"
+                                ? "bg-danger"
+                                : "bg-warning"
                           }`}
                         >
                           {item.status || "N/A"}
                         </span>
                       </td>
                       <td className="text-center">
-                        <div className="d-flex gap-2 justify-content-center" role="group" aria-label="Action buttons">
+                        <div
+                          className="d-flex gap-2 justify-content-center"
+                          role="group"
+                          aria-label="Action buttons"
+                        >
                           <button
                             onClick={() => handleClickBtnView(item)}
                             className="btn btn-sm rounded-circle"
-                            style={{ backgroundColor: '#28a745', color: '#ffffff' }}
+                            style={{
+                              backgroundColor: "#28a745",
+                              color: "#ffffff",
+                            }}
                             title="View"
                           >
                             <i className="fas fa-eye"></i>

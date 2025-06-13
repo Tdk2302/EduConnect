@@ -16,10 +16,13 @@ import {
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import DescriptionIcon from "@mui/icons-material/Description";
-import LayersIcon from "@mui/icons-material/Layers";
-import PeopleIcon from "@mui/icons-material/People"; // Icon cho Users
-import ManageUser from "./ManageUser"; // Import ManageUser
+import PeopleIcon from "@mui/icons-material/People";
+import ManageUser from "./ManageUser";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
 
 const drawerWidth = 240;
 
@@ -30,9 +33,6 @@ const NAVIGATION = [
   { divider: true },
   { header: "Analytics" },
   { title: "Reports", icon: <BarChartIcon /> },
-  { title: "Sales", icon: <DescriptionIcon /> },
-  { title: "Traffic", icon: <DescriptionIcon /> },
-  { title: "Integrations", icon: <LayersIcon /> },
 ];
 
 function DemoPageContent({ currentPage }) {
@@ -49,6 +49,15 @@ DemoPageContent.propTypes = {
 
 function DashboardLayoutBasic() {
   const [currentPage, setCurrentPage] = React.useState("Dashboard");
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleSettingsClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const renderContent = () => {
     switch (currentPage) {
@@ -67,6 +76,24 @@ function DashboardLayoutBasic() {
           <Typography variant="h6" noWrap>
             Dashboard
           </Typography>
+          <IconButton
+            edge="end"
+            color="inherit"
+            onClick={handleSettingsClick}
+            sx={{ ml: "auto" }} // Align to the right
+          >
+            <FontAwesomeIcon icon={faGear} />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            sx={{ zIndex: 1300 }}
+          >
+            <MenuItem onClick={handleClose}>Profile</MenuItem>
+            <MenuItem onClick={handleClose}>Settings</MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
 
@@ -98,8 +125,8 @@ function DashboardLayoutBasic() {
                   button
                   key={index}
                   onClick={() => setCurrentPage(item.title)}
-                  selected={currentPage === item.title} 
-                  disableGutters 
+                  selected={currentPage === item.title}
+                  disableGutters
                 >
                   <ListItemIcon>{item.icon}</ListItemIcon>
                   <ListItemText primary={item.title} />
