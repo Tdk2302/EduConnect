@@ -14,9 +14,7 @@ const Router = () => {
       <Routes>
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
-        <Route path= "/dashboard" element={<Dashboard />} />
-        {/* <Route path="/forget-password" element={<ForgetPassword/>} />
-        <Route path="/reset-password" element={<ResetPassword/>} />        */}
+        <Route path= "/" element={<Dashboard />} />
       </Routes>
       <ToastContainer
         position="top-center"
