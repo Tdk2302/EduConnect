@@ -6,15 +6,14 @@ const postSignin = async (email, password) => {
     return axios.post(`${BASE_URL}/Auth/Login`, { email, password });
 };
 
-const postRegister = async (firstName, lastName, email, password, passwordConfirm, gender) => {
-  return axios.post(`https://localhost:7096/parent/registerUser`, {
-    firstName,
-    lastName,
-    email,
-    password,
-    passwordConfirm,
-    gender,
-  });
+const postRegister = async (firstName, lastName, email, password, studentIds) => {
+    return axios.post(`${BASE_URL}/Auth/Register`, {
+        firstName,
+        lastName,
+        email,
+        password,
+        studentIds,
+    });
 };
 
 const forgetPassword = async (email) => {

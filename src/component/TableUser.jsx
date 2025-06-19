@@ -9,7 +9,7 @@ const TableUser = ({
   handleClickBtnDelete,
   handleManageStudent,
   handleManageTeacher,
-  handleManageAccount,
+  // handleManageAccount,
 }) => {
   const itemsPerPage = 6;
   const [itemOffset, setItemOffset] = useState(0);
@@ -48,11 +48,11 @@ const TableUser = ({
     handleManageTeacher();
   };
 
-  const handleAccountClick = () => {
-    setRoleFilter(""); // Clear role filter to show all accounts
-    setItemOffset(0); // Reset pagination
-    handleManageAccount();
-  };
+  // const handleAccountClick = () => {
+  //   setRoleFilter(""); // Clear role filter to show all accounts
+  //   setItemOffset(0); // Reset pagination
+  //   handleManageAccount();
+  // };
 
   return (
     <>

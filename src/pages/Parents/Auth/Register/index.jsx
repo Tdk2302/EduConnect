@@ -1,5 +1,5 @@
-
-import { Form, Input, Button, Select, Typography, Row, Col } from "antd";
+import { Form, Input, Button, Select, Typography, Row, Col, Tag } from "antd";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postRegister } from "../../../../services/apiServices";
 import { toast } from "react-toastify";
@@ -11,36 +11,41 @@ const { Option } = Select;
 const Register = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [studentIds, setStudentIds] = useState([]);
+
+  const handleStudentIdChange = (value) => {
+    setStudentIds(value.split(',').map((id) => id.trim())); // Split by commas and trim spaces
+  };
 
   const handleRegister = async (values) => {
-  const { firstName, lastName, email, password, confirmPassword, gender } = values;
+    const { firstName, lastName, email, password, confirmPassword } = values;
 
-  // Validate email
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    toast.error('Invalid email!');
-    return;
-  }
+    // Validate email
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('Invalid email!');
+      return;
+    }
 
-  // Validate password
-  if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-    toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
-    return;
-  }
+    // Validate password
+    if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    toast.error('Passwords do not match!');
-    return;
-  }
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match!');
+      return;
+    }
 
-  try {
-    let response = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
-    console.log(response);
-    toast.success('Registration successful! Please check your email to confirm.');
-    navigate('/signin');
-  } catch (error) {
-    toast.error(error.response?.data?.message || 'An error occurred during registration!');
-  }
-};
+    try {
+      let response = await postRegister(firstName, lastName, email, password, studentIds);
+      console.log(response);
+      toast.success('Registration successful! Please check your email to confirm.');
+      navigate('/signin');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'An error occurred during registration!');
+    }
+  };
 
   return (
     <div className="register-bg">
@@ -57,16 +62,14 @@ const Register = () => {
           layout="vertical"
           className="register-form"
           onFinish={handleRegister}
-          initialValues={{ gender: 'Orther' }}
+          initialValues={{ gender: 'Other' }}
         >
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Form.Item
                 label="First Name"
                 name="firstName"
-                rules={[
-                  { required: true, message: "Please input your first name!" },
-                ]}
+                rules={[{ required: true, message: "Please input your first name!" }]}
               >
                 <Input size="large" placeholder="Enter your first name" />
               </Form.Item>
@@ -75,9 +78,7 @@ const Register = () => {
               <Form.Item
                 label="Last Name"
                 name="lastName"
-                rules={[
-                  { required: true, message: "Please input your last name!" },
-                ]}
+                rules={[{ required: true, message: "Please input your last name!" }]}
               >
                 <Input size="large" placeholder="Enter your last name" />
               </Form.Item>
@@ -89,29 +90,29 @@ const Register = () => {
               <Form.Item
                 label="Email"
                 name="email"
-                rules={[
-                  { required: true, message: "Please input your email!" },
-                  { type: "email", message: "Invalid email address!" },
-                ]}
+                rules={[{ required: true, message: "Please input your email!" }, { type: "email", message: "Invalid email address!" }]}
               >
-                <Input
-                  size="large"
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                />
+                <Input size="large" placeholder="Enter your email" autoComplete="email" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
               <Form.Item
-                label="Gender"
-                name="gender"
-                rules={[{ required: true, message: "Please select gender!" }]}
+                label="Student ID(s)"
+                name="studentid"
+                rules={[{ required: true, message: "Please enter at least one student ID!" }]}
               >
-                <Select size="large">
-                  <Option value={'Other'}>Other</Option>
-                  <Option value={'Male'}>Male</Option>
-                  <Option value={'Female'}>Female</Option>
-                </Select>
+                <Input
+                  size="large"
+                  placeholder="Enter student IDs, separated by commas"
+                  onChange={(e) => handleStudentIdChange(e.target.value)}
+                />
+                {studentIds.length > 0 && (
+                  <div className="student-ids-list">
+                    {studentIds.map((id, index) => (
+                      <Tag key={index} color="blue">{id}</Tag>
+                    ))}
+                  </div>
+                )}
               </Form.Item>
             </Col>
           </Row>
@@ -123,23 +124,13 @@ const Register = () => {
                 name="password"
                 rules={[
                   { required: true, message: "Please input your password!" },
-                  {
-                    min: 8,
-                    message: "Password must be at least 8 characters!",
-                  },
-                  {
-                    pattern: /[A-Z]/,
-                    message: "Must contain an uppercase letter!",
-                  },
+                  { min: 8, message: "Password must be at least 8 characters!" },
+                  { pattern: /[A-Z]/, message: "Must contain an uppercase letter!" },
                   { pattern: /[0-9]/, message: "Must contain a number!" },
                 ]}
                 hasFeedback
               >
-                <Input.Password
-                  size="large"
-                  placeholder="Enter your password"
-                  autoComplete="new-password"
-                />
+                <Input.Password size="large" placeholder="Enter your password" autoComplete="new-password" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
@@ -155,45 +146,25 @@ const Register = () => {
                       if (!value || getFieldValue("password") === value) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(
-                        new Error("Passwords do not match!")
-                      );
+                      return Promise.reject(new Error("Passwords do not match!"));
                     },
                   }),
                 ]}
               >
-                <Input.Password
-                  size="large"
-                  placeholder="Confirm your password"
-                  autoComplete="new-password"
-                />
+                <Input.Password size="large" placeholder="Confirm your password" autoComplete="new-password" />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              block
-              className="register-btn"
-            >
+            <Button type="primary" htmlType="submit" size="large" block className="register-btn">
               Register
             </Button>
           </Form.Item>
 
           <div className="register-header">
-            <Text type="secondary" className="register-header-text">
-              Already have an account?
-            </Text>
-            <Button
-              type="link"
-              className="register-signin-btn"
-              onClick={() => navigate("/signin")}
-            >
-              Sign in
-            </Button>
+            <Text type="secondary" className="register-header-text">Already have an account?</Text>
+            <Button type="link" className="register-signin-btn" onClick={() => navigate("/signin")}>Sign in</Button>
           </div>
 
           <div className="register-home">
