@@ -2,35 +2,41 @@ import React, { useState } from "react";
 import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { postSignin } from "../../../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css"; // For Antd v5
 
 const { Title, Text, Link } = Typography;
 
-export default function Signin() {
+const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  // Hàm xử lý đăng nhập
-  const handleSignin = (values) => {
+  const handleSignin = async (values) => {
     const { email, password } = values;
 
-    // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Invalid email!");
       return;
     }
 
-    // Validate password
     if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
       toast.error("Password must be at least 8 characters long, include a number and an uppercase letter!");
       return;
     }
 
-    // Nếu đăng nhập thành công (Giả lập)
-    toast.success("Sign in successful!");
-    navigate("/"); // Chuyển hướng tới trang chủ
+    try {
+      const response = await postSignin(email, password);
+      if (response?.success) {
+        toast.success("Sign in successful!");
+        navigate("/");
+      } else {
+        toast.error(response?.message || "Sign in failed!");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "An error occurred during sign in!");
+    }
   };
 
   return (
@@ -44,7 +50,6 @@ export default function Signin() {
         </Text>
 
         <Form layout="vertical" onFinish={handleSignin} className="signin-form">
-          {/* Email Input Field */}
           <Form.Item
             label="Email"
             name="email"
@@ -59,7 +64,6 @@ export default function Signin() {
             />
           </Form.Item>
 
-          {/* Password Input Field */}
           <Form.Item
             label="Password"
             name="password"
@@ -74,14 +78,12 @@ export default function Signin() {
             />
           </Form.Item>
 
-          {/* Forgot Password Link */}
           <div className="signin-forgot">
             <Link onClick={() => navigate("/forget-password")}>
               Forgot password?
             </Link>
           </div>
 
-          {/* Submit Button */}
           <Form.Item>
             <Button
               type="primary"
@@ -95,7 +97,6 @@ export default function Signin() {
           </Form.Item>
         </Form>
 
-        {/* Sign Up Link */}
         <div className="signin-header">
           <Text type="secondary" className="signin-header-text">
             Don't have an account?
@@ -109,14 +110,14 @@ export default function Signin() {
           </Button>
         </div>
 
-        {/* Divider */}
         <Divider plain>Or</Divider>
 
-        {/* Back to Home Page Link */}
         <div className="signin-home">
           <Link onClick={() => navigate("/")}>← Go To Home Page</Link>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Signin;
