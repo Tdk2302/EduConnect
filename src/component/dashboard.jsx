@@ -23,6 +23,7 @@ import { faGear } from "@fortawesome/free-solid-svg-icons";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
+import Footer from "./Footer";
 
 const drawerWidth = 240;
 
@@ -69,82 +70,85 @@ function DashboardLayoutBasic() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: 1201 }}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Dashboard
-          </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={handleSettingsClick}
-            sx={{ ml: "auto" }} // Align to the right
-          >
-            <FontAwesomeIcon icon={faGear} />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            sx={{ zIndex: 1300 }}
-          >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>Settings</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
+    <>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar position="fixed" sx={{ zIndex: 1201 }}>
+          <Toolbar>
+            <Typography variant="h6" noWrap>
+              Dashboard
+            </Typography>
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={handleSettingsClick}
+              sx={{ ml: "auto" }} // Align to the right
+            >
+              <FontAwesomeIcon icon={faGear} />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              sx={{ zIndex: 1300 }}
+            >
+              <MenuItem onClick={handleClose}>Profile</MenuItem>
+              <MenuItem onClick={handleClose}>Settings</MenuItem>
+              <MenuItem onClick={handleClose}>Logout</MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
 
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          [`& .MuiDrawer-paper`]: {
+        <Drawer
+          variant="permanent"
+          sx={{
             width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: "auto" }}>
-          <List>
-            {NAVIGATION.map((item, index) => {
-              if (item.divider) return <Divider key={index} />;
-              if (item.header)
+            [`& .MuiDrawer-paper`]: {
+              width: drawerWidth,
+              boxSizing: "border-box",
+            },
+          }}
+        >
+          <Toolbar />
+          <Box sx={{ overflow: "auto" }}>
+            <List>
+              {NAVIGATION.map((item, index) => {
+                if (item.divider) return <Divider key={index} />;
+                if (item.header)
+                  return (
+                    <ListItem key={index}>
+                      <Typography variant="caption" sx={{ ml: 2 }}>
+                        {item.header}
+                      </Typography>
+                    </ListItem>
+                  );
                 return (
-                  <ListItem key={index}>
-                    <Typography variant="caption" sx={{ ml: 2 }}>
-                      {item.header}
-                    </Typography>
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={() => setCurrentPage(item.title)}
+                    selected={currentPage === item.title}
+                    disableGutters
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.title} />
                   </ListItem>
                 );
-              return (
-                <ListItem
-                  button
-                  key={index}
-                  onClick={() => setCurrentPage(item.title)}
-                  selected={currentPage === item.title}
-                  disableGutters
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.title} />
-                </ListItem>
-              );
-            })}
-          </List>
-        </Box>
-      </Drawer>
+              })}
+            </List>
+          </Box>
+        </Drawer>
 
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
-      >
-        <Toolbar />
-        {renderContent()}
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, bgcolor: "background.default", p: 3 }}
+        >
+          <Toolbar />
+          {renderContent()}
+        </Box>
       </Box>
-    </Box>
+      <Footer />
+    </>
   );
 }
 

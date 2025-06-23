@@ -3,9 +3,11 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Register from "./pages/Parents/Auth/Register/index";
-import Signin from "./pages/Parents/Auth/Signin/index";
-import Dashboard from "./component/dashboard";
+import Register from "./pages/Parents/Auth/Register/Register";
+import Signin from "./pages/Parents/Auth/Signin/Singin";
+import Dashboard from "./component/Dashboard";
+import Homepage from "./pages/Parents/Auth/Teacher/Homepage";
+import ProfileUser from "./component/ProfileUser";
 
 const Router = () => {
   return (
@@ -15,6 +17,8 @@ const Router = () => {
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/homepage" element={<Homepage />} />
+        <Route path="/profile" element={<ProfileUser />} />
         {/* <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />        */}
       </Routes>
