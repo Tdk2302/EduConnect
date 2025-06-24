@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Register from "./pages/Parents/Auth/Register/index";
 import Signin from "./pages/Parents/Auth/Signin/index";
 import Dashboard from "./component/dashboard";
+import TeacherMainLayout from "./pages/Teachers/TeacherMainLayout";
 
 const Router = () => {
   return (
@@ -15,6 +16,7 @@ const Router = () => {
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/teacher" element={<TeacherMainLayout />} />
         {/* <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />        */}
       </Routes>
