@@ -18,11 +18,9 @@
     "@mui/icons-material": "^7.1.1",
     "@mui/material": "^7.1.1",
     "@mui/toolpad": "^0.1.51",
-    "@mui/x-date-pickers": "^8.5.3",
     "antd": "^5.25.4",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
-    "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -33,7 +31,6 @@
     "react-pro-sidebar": "^0.7.1",
     "react-router-dom": "^6.3.0",
     "react-toastify": "^9.0.7",
-    "recharts": "^3.0.0",
     "vite-frontend": "file:"
   },
   "devDependencies": {
