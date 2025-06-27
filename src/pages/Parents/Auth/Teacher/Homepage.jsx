@@ -26,6 +26,7 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Footer from "../../../../component/Footer";
 
 const StyledButton = styled(Button)({
   borderRadius: "25px",
@@ -486,6 +487,7 @@ const Homepage = () => {
           </Container>
         </Box>
       </Box>
+      <Footer />
     </>
   );
 };

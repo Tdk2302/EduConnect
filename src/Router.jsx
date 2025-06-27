@@ -5,7 +5,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Register from "./pages/Parents/Auth/Register/Register";
 import Signin from "./pages/Parents/Auth/Signin/Singin";
-import Dashboard from "./component/Dashboard";
+import Dashboard from "./component/dashboard";
 import Homepage from "./pages/Parents/Auth/Teacher/Homepage";
 import ProfileUser from "./component/ProfileUser";
 
@@ -13,7 +13,7 @@ const Router = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/homepage" replace />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
