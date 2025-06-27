@@ -3,9 +3,17 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+<<<<<<< HEAD
 import Register from "./pages/Parents/Auth/Register/Register";
 import Signin from "./pages/Parents/Auth/Signin/Singin";
 import Dashboard from "./component/dashboard";
+=======
+
+import Register from "./pages/Parents/Auth/Register/index";
+import Signin from "./pages/Parents/Auth/Signin/index";
+import Dashboard from "./component/dashboard";
+import TeacherMainLayout from "./pages/Teachers/TeacherMainLayout";
+>>>>>>> ac93af1da7d581259c4de7a4c7675461af208498
 import Homepage from "./pages/Parents/Auth/Teacher/Homepage";
 import ProfileUser from "./component/ProfileUser";
 
@@ -17,6 +25,7 @@ const Router = () => {
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/teacher" element={<TeacherMainLayout />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/profile" element={<ProfileUser />} />
         {/* <Route path="/forget-password" element={<ForgetPassword/>} />
