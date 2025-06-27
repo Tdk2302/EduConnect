@@ -1,36 +1,37 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = 'https://localhost:7064/api';
+const BASE_URL = "https://localhost:7064/api";
 
 const postSignin = async (email, password) => {
-    return axios.post(`${BASE_URL}/Auth/Login`, { email, password });
+  return axios.post(`${BASE_URL}/Auth/Login`, { email, password });
 };
 
-const postRegister = async (firstName, lastName, email, password, studentIds) => {
-    return axios.post(`${BASE_URL}/Auth/Register`, {
-        firstName,
-        lastName,
-        email,
-        password,
-        studentIds,
-    });
+const postRegister = async (
+  firstName,
+  lastName,
+  email,
+  password,
+  studentIds
+) => {
+  return axios.post(`${BASE_URL}/Auth/Register`, {
+    firstName,
+    lastName,
+    email,
+    password,
+    studentIds,
+  });
 };
 
 const forgetPassword = async (email) => {
-    return axios.post(`${BASE_URL}/Auth/forgot-password`, { email });
+  return axios.post(`${BASE_URL}/Auth/forgot-password`, { email });
 };
 
 const resetPassword = async ({ email, token, newPassword }) => {
-    return axios.post(`${BASE_URL}/Auth/reset-password`, {
-        email,
-        token,
-        newPassword
-    });
+  return axios.post(`${BASE_URL}/Auth/reset-password`, {
+    email,
+    token,
+    newPassword,
+  });
 };
 
-export {
-    postSignin,
-    postRegister,
-    forgetPassword,
-    resetPassword
-};
+export { postSignin, postRegister, forgetPassword, resetPassword };

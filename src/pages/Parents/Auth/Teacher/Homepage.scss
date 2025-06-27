@@ -1,0 +1,241 @@
+@use "sass:color";
+
+$primary-color: #14448b;
+$secondary-color: #d7e6fb;
+$text-color: #111827;
+$white: #ffffff;
+
+.homepage {
+  .hero-section {
+    background-color: $primary-color;
+    color: $white;
+    padding: 80px 0;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+
+    .hero-title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      line-height: 1.2;
+
+      .highlight {
+        color: $secondary-color;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 20px;
+      margin-bottom: 32px;
+      opacity: 0.9;
+    }
+
+    .signup-button {
+      background-color: $white;
+      color: $primary-color;
+      margin-right: 16px;
+      font-weight: 600;
+
+      &:hover {
+        background-color: color.adjust($white, $lightness: -5%);
+      }
+    }
+
+    .school-button {
+      color: $white;
+      border-color: $white;
+
+      &:hover {
+        background-color: rgba($white, 0.1);
+      }
+    }
+
+    .partners {
+      margin-top: 48px;
+
+      .partner-logos {
+        display: flex;
+        gap: 24px;
+        margin-top: 16px;
+        align-items: center;
+      }
+    }
+
+    .chat-preview {
+      position: relative;
+      height: 500px;
+      background: rgba($white, 0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+  }
+
+  .features-section {
+    padding: 80px 0;
+    background-color: $white;
+
+    .stats {
+      text-align: center;
+      padding: 24px;
+
+      h3 {
+        color: $primary-color;
+        font-size: 42px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+    }
+
+    .feature-card {
+      height: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba($primary-color, 0.1);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-title {
+        color: $primary-color;
+        margin-bottom: 16px;
+      }
+    }
+  }
+
+  .success-section {
+    padding: 80px 0;
+    background-color: $secondary-color;
+
+    .stats-container {
+      display: flex;
+      gap: 48px;
+      margin-top: 32px;
+
+      .stat-item {
+        h3 {
+          color: $primary-color;
+          font-size: 36px;
+          font-weight: 700;
+          margin-bottom: 8px;
+        }
+      }
+    }
+  }
+
+  .testimonials-section {
+    padding: 80px 0;
+    background-color: $white;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .testimonial-card {
+      height: 100%;
+      border-radius: 16px;
+      padding: 24px;
+      background-color: $secondary-color;
+
+      .rating {
+        margin-top: 16px;
+        display: flex;
+        gap: 4px;
+      }
+    }
+  }
+
+  .faq-section {
+    padding: 80px 0;
+    background-color: $white;
+    margin-top: 64px;
+
+    .custom-accordion {
+      background: #fff;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      .MuiAccordionSummary-root {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #000;
+        min-height: 64px;
+        border-bottom: 1.5px solid #7c3aed;
+        &.Mui-expanded {
+          font-weight: 800;
+          border-bottom: none;
+        }
+      }
+      .MuiAccordionDetails-root {
+        font-size: 1rem;
+        color: #222;
+        background: #fff;
+        border-radius: 0 0 20px 20px;
+      }
+      .MuiSvgIcon-root {
+        color: #7c3aed;
+      }
+    }
+  }
+
+  .cta-section {
+    padding: 48px 0;
+    background-color: $primary-color;
+    color: $white;
+    text-align: center;
+
+    h4 {
+      margin-bottom: 24px;
+    }
+
+    button {
+      background-color: $white;
+      color: $primary-color;
+      font-weight: 600;
+      padding: 12px 32px;
+
+      &:hover {
+        background-color: color.adjust($white, $lightness: -5%);
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 960px) {
+  .homepage {
+    .hero-section {
+      padding: 40px 0;
+
+      .hero-title {
+        font-size: 36px;
+      }
+
+      .hero-subtitle {
+        font-size: 18px;
+      }
+
+      .chat-preview {
+        height: 400px;
+        margin-top: 40px;
+      }
+    }
+
+    .features-section,
+    .success-section,
+    .testimonials-section,
+    .faq-section {
+      padding: 40px 0;
+    }
+
+    .success-section {
+      .stats-container {
+        flex-direction: column;
+        gap: 24px;
+      }
+    }
+  }
+}

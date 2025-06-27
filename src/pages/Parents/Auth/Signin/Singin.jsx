@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { postSignin } from "../../../../services/apiServices";
+import { setAccessToken } from "../../../../services/handleStorageApi";
 import "./Signin.css";
 import "antd/dist/reset.css"; // For Antd v5
 
@@ -21,21 +22,30 @@ const Signin = () => {
       return;
     }
 
-    if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-      toast.error("Password must be at least 8 characters long, include a number and an uppercase letter!");
+    if (
+      !password ||
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password)
+    ) {
+      toast.error(
+        "Password must be at least 8 characters long, include a number and an uppercase letter!"
+      );
       return;
     }
 
     try {
       const response = await postSignin(email, password);
-      if (response?.success) {
+      if (response.status === 200) {
         toast.success("Sign in successful!");
-        navigate("/");
+        setAccessToken(response.data.token);
+        navigate("/homepage");
       } else {
+        console.log(response);
         toast.error(response?.message || "Sign in failed!");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "An error occurred during sign in!");
+      toast.error(error?.response?.data?.message || "Wrong email or password!");
     }
   };
 
@@ -53,7 +63,13 @@ const Signin = () => {
           <Form.Item
             label="Email"
             name="email"
-            rules={[{ required: true, type: "email", message: "Please enter your email!" }]}
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: "Please enter your email!",
+              },
+            ]}
           >
             <Input
               value={email}
@@ -113,7 +129,7 @@ const Signin = () => {
         <Divider plain>Or</Divider>
 
         <div className="signin-home">
-          <Link onClick={() => navigate("/")}>← Go To Home Page</Link>
+          <Link onClick={() => navigate("/homepage")}>← Go To Home Page</Link>
         </div>
       </div>
     </div>
