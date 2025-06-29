@@ -4,15 +4,16 @@ import SideBar from "./SideBar";
 import ChatBox from "./ChatBox";
 import NotificationDashboard from "./NotificationBox";
 import TeacherSchedulePage from "./TeacherSchedulePage";
+import ReportCreate from "./ReportCreate";
 import "./TeacherMainLayout.css"
 
 export default function TeacherMainLayout() {
   const [selected, setSelected] = useState("notify");
 
   let content;
-  if (selected === "chat") content = <ChatBox />;
-  else if (selected === "notify") content = <NotificationDashboard />;
-  else content = <TeacherSchedulePage />;
+  if (selected === "notify") content = <NotificationDashboard />;
+  else if (selected === "schedule") content = <TeacherSchedulePage />;
+  else content = <ReportCreate />;
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
