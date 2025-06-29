@@ -167,6 +167,9 @@ export default function NotificationDashboard() {
     }));
   }, [dailyData]);
 
+  // Only show the first class (homeroom teacher's class)
+  const homeroomClass = dailyData.classes.length > 0 ? dailyData.classes[0] : null;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
       <Stack spacing={3}>
@@ -214,45 +217,21 @@ export default function NotificationDashboard() {
         )}
         
         {/* Main content area with Accordion restored */}
-        <Typography variant="h5" fontWeight={700}>Chi tiết từng lớp</Typography>
-        
-        {dailyData.classes.length > 0 ? (
-            dailyData.classes.map((classInfo, index) => (
-                <Accordion 
-                    key={classInfo.id} 
-                    defaultExpanded={index === 0}
-                    disableGutters
-                    elevation={0} 
-                    sx={{ 
-                        border: '1px solid', 
-                        borderColor: 'divider',
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        '&:before': {
-                            display: 'none',
-                        }
-                    }}
-                >
-                    <AccordionSummary 
-                        expandIcon={<ExpandMoreIcon />}
-                        sx={{ bgcolor: 'action.hover' }}
-                    >
-                        <Typography variant="h6" fontWeight="600">{classInfo.name}
-                            <Typography component="span" sx={{ color: 'text.secondary', ml: 2, fontWeight: 'normal' }}>- GVCN: {classInfo.teacher}</Typography>
-                        </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails sx={{ p: 0, borderTop: '1px solid', borderColor: 'divider' }}>
-                        <ClassDetailView classInfo={classInfo} />
-                    </AccordionDetails>
-                </Accordion>
-            ))
+        <Typography variant="h5" fontWeight={700}>Hoạt động & Thái độ học sinh trong ngày</Typography>
+        {homeroomClass ? (
+          <Paper key={homeroomClass.id} variant="outlined" sx={{ borderRadius: 3, background: '#EAF1FF', p: { xs: 2, md: 3 } }}>
+            <Typography variant="h6" fontWeight="600" sx={{ color: '#1F2937' }}>{homeroomClass.name}
+              <Typography component="span" sx={{ color: '#9CA3AF', ml: 2, fontWeight: 'normal' }}>- GVCN: {homeroomClass.teacher}</Typography>
+            </Typography>
+            <ClassDetailView classInfo={homeroomClass} />
+          </Paper>
         ) : (
-            <Paper variant="outlined" sx={{borderRadius: 3}}>
-                <Box textAlign="center" p={5}>
-                    <InfoIcon sx={{fontSize: 48, color: 'text.secondary'}}/>
-                    <Typography variant="h6" color="text.secondary">Không có thông báo nào trong ngày này.</Typography>
-                </Box>
-            </Paper>
+          <Paper variant="outlined" sx={{borderRadius: 3, background: '#EAF1FF'}}>
+            <Box textAlign="center" p={5}>
+              <InfoIcon sx={{fontSize: 48, color: '#9CA3AF'}}/>
+              <Typography variant="h6" color="#9CA3AF">Không có hoạt động nào trong ngày này.</Typography>
+            </Box>
+          </Paper>
         )}
       </Stack>
     </LocalizationProvider>

@@ -5,14 +5,15 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
 
 const NAV_ITEMS = [
-  { key: "chat", label: "ChatBox (A.I BOT)", icon: <ChatIcon /> },
   { key: "notify", label: "Thông Báo", icon: <NotificationsIcon /> },
   { key: "schedule", label: "Thời khóa biểu", icon: <CalendarMonthIcon /> },
+  { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },
 ];
 
 const USER = {
@@ -21,12 +22,11 @@ const USER = {
   avatar: "https://randomuser.me/api/portraits/men/32.jpg",
 };
 
-const MAIN_BLUE = "#2563eb"; // primary blue
-const NAVY = "#1e293b"; // dark blue-gray
-const LIGHT_BLUE = "#eaf1fb"; // light blue background
-const HOVER_BLUE = "#dbeafe"; // hover
-const TEXT_BLUE = "#2563eb";
-const TEXT_GRAY = "#64748b";
+const MAIN_BRAND = "#6D28D9"; // brand
+const BACKGROUND_BRAND = "#EAF1FF";
+const SECONDARY = "#E5E7EB";
+const TERTIARY = "#1F2937";
+const DARK_LIGHT = "#9CA3AF";
 
 export default function SideBar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
@@ -51,7 +51,7 @@ export default function SideBar({ selected, onSelect }) {
           boxSizing: 'border-box',
           position: 'static',
           border: 'none',
-          backgroundColor: '#eaf1fb',
+          backgroundColor: BACKGROUND_BRAND,
           overflowX: 'hidden',
         },
       })}
@@ -60,16 +60,16 @@ export default function SideBar({ selected, onSelect }) {
         {open && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <img src="https://marketplace.canva.com/EAGG4nPLU7w/4/0/1600w/canva-blue-%26-gold-circle-illustrative-education-logo-r2giuWawSvQ.jpg" alt="logo" style={{ width: 32, height: 32, borderRadius: '50%' }} />
-            <Typography variant="h6" sx={{ color: "#2563eb", fontWeight: 700, letterSpacing: 0.5, fontSize: 19 }}>
+            <Typography variant="h6" sx={{ color: MAIN_BRAND, fontWeight: 700, letterSpacing: 0.5, fontSize: 19 }}>
               EduConnect
             </Typography>
           </Box>
         )}
-        <IconButton onClick={() => setOpen((v) => !v)} size="small" sx={{ color: "#2563eb", background: "#dbeafe" }}>
+        <IconButton onClick={() => setOpen((v) => !v)} size="small" sx={{ color: MAIN_BRAND, background: SECONDARY }}>
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
       </Toolbar>
-      <Divider sx={{ borderColor: "#dbeafe" }} />
+      <Divider sx={{ borderColor: SECONDARY }} />
       <List sx={{ pt: 1, px: 1 }}>
         {NAV_ITEMS.map((item) => (
           <Tooltip key={item.key} title={!open ? item.label : ""} placement="right">
@@ -80,30 +80,30 @@ export default function SideBar({ selected, onSelect }) {
               sx={{
                 borderRadius: 2,
                 mb: 0.5,
-                color: selected === item.key ? "#fff" : TEXT_BLUE,
-                background: selected === item.key ? MAIN_BLUE : "transparent",
+                color: selected === item.key ? "#fff" : TERTIARY,
+                background: selected === item.key ? MAIN_BRAND : "transparent",
                 fontWeight: selected === item.key ? 700 : 500,
                 minHeight: 48,
                 justifyContent: open ? "initial" : "center",
                 px: open ? 2 : 1.5,
                 transition: "background 0.2s, color 0.2s",
-                "&:hover": { background: selected === item.key ? MAIN_BLUE : HOVER_BLUE },
+                "&:hover": { background: selected === item.key ? MAIN_BRAND : SECONDARY },
               }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 36, justifyContent: "center" }}>{item.icon}</ListItemIcon>
-              {open && <ListItemText primary={item.label} sx={{ ".MuiTypography-root": { fontSize: 15, fontWeight: 'inherit' } }} />}
+              <ListItemIcon sx={{ color: selected === item.key ? "#fff" : MAIN_BRAND, minWidth: 36, justifyContent: "center" }}>{item.icon}</ListItemIcon>
+              {open && <ListItemText primary={item.label} sx={{ ".MuiTypography-root": { fontSize: 15, fontWeight: 'inherit', color: selected === item.key ? "#fff" : DARK_LIGHT } }} />}
             </ListItem>
           </Tooltip>
         ))}
       </List>
       <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: "#dbeafe" }}>
+      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: SECONDARY }}>
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "flex-start" : "center" }}>
-          <Avatar src={USER.avatar} alt={USER.name} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BLUE}` }} />
+          <Avatar src={USER.avatar} alt={USER.name} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BRAND}` }} />
           {open && (
             <Box>
-              <Typography sx={{ fontWeight: 600, fontSize: 15, color: NAVY }}>{USER.name}</Typography>
-              <Typography sx={{ fontSize: 13, color: TEXT_GRAY }}>{USER.email}</Typography>
+              <Typography sx={{ fontWeight: 600, fontSize: 15, color: TERTIARY }}>{USER.name}</Typography>
+              <Typography sx={{ fontSize: 13, color: DARK_LIGHT }}>{USER.email}</Typography>
             </Box>
           )}
         </Box>
