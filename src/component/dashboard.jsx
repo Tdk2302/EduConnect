@@ -147,7 +147,6 @@ function DashboardLayoutBasic() {
           {renderContent()}
         </Box>
       </Box>
-      <Footer />
     </>
   );
 }

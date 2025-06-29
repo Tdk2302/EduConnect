@@ -1,5 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Typography, TextField, IconButton, Paper, Button, List, ListItem, ListItemText, Divider } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  IconButton,
+  Paper,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import "./ChatBox.css";
@@ -28,7 +39,7 @@ export default function ChatBox() {
       ],
     },
   ]);
-  const [selectedSession, setSelectedSession] = useState(0); 
+  const [selectedSession, setSelectedSession] = useState(0);
   const [messages, setMessages] = useState([...chatHistory[0].messages]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -48,9 +59,12 @@ export default function ChatBox() {
     setMessages(newMessages);
     setInput("");
     // Cập nhật vào lịch sử
-    setChatHistory(prev => {
+    setChatHistory((prev) => {
       const updated = [...prev];
-      updated[selectedSession] = { ...updated[selectedSession], messages: newMessages };
+      updated[selectedSession] = {
+        ...updated[selectedSession],
+        messages: newMessages,
+      };
       return updated;
     });
   };
@@ -72,8 +86,15 @@ export default function ChatBox() {
       {/* Sidebar lịch sử */}
       <Paper elevation={1} className="chatbox-sidebar">
         <Box className="chatbox-header">
-          <Typography variant="subtitle1" className="chatbox-header-title">Lịch sử</Typography>
-          <IconButton size="small" onClick={handleNewSession} className="chatbox-header-button" title="Cuộc trò chuyện mới">
+          <Typography variant="subtitle1" className="chatbox-header-title">
+            Lịch sử
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={handleNewSession}
+            className="chatbox-header-button"
+            title="Cuộc trò chuyện mới"
+          >
             <AddIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -87,17 +108,25 @@ export default function ChatBox() {
               onClick={() => setSelectedSession(idx)}
               className={`chatbox-list-item ${selectedSession === idx ? "selected" : ""}`}
             >
-              <ListItemText primary={session.name} primaryTypographyProps={{ fontSize: 15, fontWeight: 600 }} />
+              <ListItemText
+                primary={session.name}
+                primaryTypographyProps={{ fontSize: 15, fontWeight: 600 }}
+              />
             </ListItem>
           ))}
         </List>
       </Paper>
       {/* Khung chat chính */}
       <Paper elevation={2} className="chatbox-main">
-        <Typography variant="h6" className="chatbox-title">Chat với A.I BOT</Typography>
+        <Typography variant="h6" className="chatbox-title">
+          Chat với A.I BOT
+        </Typography>
         <Box className="chatbox-messages">
           {messages.map((msg, idx) => (
-            <Box key={idx} className={`chatbox-message ${msg.from === "user" ? "user" : "bot"}`}>
+            <Box
+              key={idx}
+              className={`chatbox-message ${msg.from === "user" ? "user" : "bot"}`}
+            >
               <Box
                 className={`chatbox-message-content ${msg.from === "user" ? "user" : "bot"}`}
               >
@@ -113,15 +142,19 @@ export default function ChatBox() {
             fullWidth
             placeholder="Nhập tin nhắn..."
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSend()}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
             className="chatbox-input-field"
           />
-          <IconButton color="primary" onClick={handleSend} className="chatbox-input-button">
+          <IconButton
+            color="primary"
+            onClick={handleSend}
+            className="chatbox-input-button"
+          >
             <SendIcon />
           </IconButton>
         </Box>
       </Paper>
     </Box>
   );
-} 
+}
