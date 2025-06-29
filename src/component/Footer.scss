@@ -1,0 +1,136 @@
+.footer {
+  background-color: #fff;
+  padding: 60px 0;
+  border-top: 1px solid #eee;
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+  }
+
+  .footer-section {
+    flex: 1;
+
+    h4 {
+      color: #333;
+      font-size: 18px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        margin-bottom: 12px;
+
+        a {
+          color: #666;
+          text-decoration: none;
+          font-size: 14px;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: #6c5ce7;
+          }
+        }
+      }
+    }
+  }
+
+  .company-info {
+    .logo {
+      font-size: 24px;
+      color: #6c5ce7;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+
+  .newsletter-form {
+    margin-top: 15px;
+
+    label {
+      display: block;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .email-input {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 14px;
+
+      &:focus {
+        outline: none;
+        border-color: #6c5ce7;
+      }
+    }
+
+    .send-button {
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #5a4bd1;
+      }
+    }
+  }
+
+  .copyright {
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .footer {
+    .footer-container {
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+
+    .footer-section {
+      flex: 0 0 calc(33.333% - 27px);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    .footer-container {
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .footer-section {
+      flex: 1 1 100%;
+    }
+  }
+}
