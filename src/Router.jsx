@@ -18,7 +18,7 @@ const Router = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/homepage" replace />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
