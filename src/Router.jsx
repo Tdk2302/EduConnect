@@ -1,10 +1,9 @@
-// import ForgetPassword from "@/pages/Customer/Auth/2FA/forgetPassword"
-// import ResetPassword from "@/pages/Customer/Auth/2FA/resetPassword"
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Register from "./pages/Parents/Auth/Register/Register";
-import Signin from "./pages/Parents/Auth/Signin/Singin";
+
+import Register from "./pages/Parents/Auth/Register/index";
+import Signin from "./pages/Parents/Auth/Signin/index";
 import Dashboard from "./component/dashboard";
 import Homepage from "./pages/Parents/Auth/HomePage/Homepage";
 import ProfileUser from "./component/ProfileUser";

@@ -18,14 +18,16 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
 
 const NAV_ITEMS = [
-  { key: "attendance", label: "Điểm danh", icon: <ChatIcon /> },
+  { key: "chat", label: "ChatBox (A.I BOT)", icon: <ChatIcon /> },
   { key: "notify", label: "Thông Báo", icon: <NotificationsIcon /> },
   { key: "schedule", label: "Thời khóa biểu", icon: <CalendarMonthIcon /> },
+  { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },
 ];
 
 const USER = {
@@ -34,12 +36,11 @@ const USER = {
   avatar: "https://randomuser.me/api/portraits/men/32.jpg",
 };
 
-const MAIN_BLUE = "#2563eb"; // primary blue
-const NAVY = "#1e293b"; // dark blue-gray
-const LIGHT_BLUE = "#eaf1fb"; // light blue background
-const HOVER_BLUE = "#dbeafe"; // hover
-const TEXT_BLUE = "#2563eb";
-const TEXT_GRAY = "#64748b";
+const MAIN_BRAND = "#6D28D9"; // brand
+const BACKGROUND_BRAND = "#EAF1FF";
+const SECONDARY = "#E5E7EB";
+const TERTIARY = "#1F2937";
+const DARK_LIGHT = "#9CA3AF";
 
 export default function SideBar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
@@ -104,7 +105,7 @@ export default function SideBar({ selected, onSelect }) {
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
       </Toolbar>
-      <Divider sx={{ borderColor: "#dbeafe" }} />
+      <Divider sx={{ borderColor: SECONDARY }} />
       <List sx={{ pt: 1, px: 1 }}>
         {NAV_ITEMS.map((item) => (
           <Tooltip
@@ -119,8 +120,8 @@ export default function SideBar({ selected, onSelect }) {
               sx={{
                 borderRadius: 2,
                 mb: 0.5,
-                color: selected === item.key ? "#fff" : TEXT_BLUE,
-                background: selected === item.key ? MAIN_BLUE : "transparent",
+                color: selected === item.key ? "#fff" : TERTIARY,
+                background: selected === item.key ? MAIN_BRAND : "transparent",
                 fontWeight: selected === item.key ? 700 : 500,
                 minHeight: 48,
                 justifyContent: open ? "initial" : "center",

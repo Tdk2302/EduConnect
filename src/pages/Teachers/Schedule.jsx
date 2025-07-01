@@ -1,9 +1,274 @@
 import React, { useState } from "react";
-import { Button, Select, Tooltip } from "antd";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Select, Tooltip, Modal } from "antd";
+import {
+  Box,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Chip,
+  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Stack,
+  Divider,
+  IconButton,
+} from "@mui/material";
+import {
+  LeftOutlined,
+  RightOutlined,
+  CloseOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  UserOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import "./Schedule.css";
 
 const { Option } = Select;
+
+// Mock student data for different classes
+const studentData = {
+  A1: [
+    {
+      id: 1,
+      name: "Nguyễn Văn An",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 2,
+      name: "Trần Thị Bình",
+      attendance: "absent",
+      note: "Nghỉ ốm",
+      evaluation: "",
+    },
+    {
+      id: 3,
+      name: "Lê Văn Cường",
+      attendance: "present",
+      note: "",
+      evaluation: "Học sinh chăm chỉ",
+    },
+    {
+      id: 4,
+      name: "Phạm Thị Dung",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 5,
+      name: "Hoàng Văn Em",
+      attendance: "late",
+      note: "Đi muộn 10 phút",
+      evaluation: "",
+    },
+  ],
+  B2: [
+    {
+      id: 1,
+      name: "Vũ Thị Phương",
+      attendance: "present",
+      note: "",
+      evaluation: "Tích cực phát biểu",
+    },
+    {
+      id: 2,
+      name: "Đặng Văn Quang",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 3,
+      name: "Bùi Thị Hoa",
+      attendance: "absent",
+      note: "Có việc gia đình",
+      evaluation: "",
+    },
+    {
+      id: 4,
+      name: "Ngô Văn Minh",
+      attendance: "present",
+      note: "",
+      evaluation: "Học sinh ngủ trong giờ",
+    },
+    {
+      id: 5,
+      name: "Lý Thị Lan",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+  ],
+  C3: [
+    {
+      id: 1,
+      name: "Đinh Văn Tuấn",
+      attendance: "present",
+      note: "",
+      evaluation: "Làm bài tập tốt",
+    },
+    {
+      id: 2,
+      name: "Tô Thị Mai",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 3,
+      name: "Hồ Văn Nam",
+      attendance: "late",
+      note: "Đi muộn 5 phút",
+      evaluation: "",
+    },
+    {
+      id: 4,
+      name: "Dương Thị Hương",
+      attendance: "present",
+      note: "",
+      evaluation: "Tích cực thảo luận",
+    },
+    {
+      id: 5,
+      name: "Võ Văn Thành",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+  ],
+  D4: [
+    {
+      id: 1,
+      name: "Lâm Thị Nga",
+      attendance: "present",
+      note: "",
+      evaluation: "Học sinh chăm chỉ",
+    },
+    {
+      id: 2,
+      name: "Trịnh Văn Sơn",
+      attendance: "absent",
+      note: "Nghỉ phép",
+      evaluation: "",
+    },
+    {
+      id: 3,
+      name: "Đoàn Thị Thảo",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 4,
+      name: "Huỳnh Văn Bình",
+      attendance: "present",
+      note: "",
+      evaluation: "Cần cải thiện thái độ",
+    },
+    {
+      id: 5,
+      name: "Nguyễn Thị Trang",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+  ],
+  E5: [
+    {
+      id: 1,
+      name: "Phan Văn Hùng",
+      attendance: "present",
+      note: "",
+      evaluation: "Tích cực phát biểu",
+    },
+    {
+      id: 2,
+      name: "Vương Thị Loan",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 3,
+      name: "Tăng Văn Dũng",
+      attendance: "late",
+      note: "Đi muộn 15 phút",
+      evaluation: "",
+    },
+    {
+      id: 4,
+      name: "Châu Thị Nhi",
+      attendance: "present",
+      note: "",
+      evaluation: "Học sinh ngủ trong giờ",
+    },
+    {
+      id: 5,
+      name: "Hà Văn Phúc",
+      attendance: "present",
+      note: "",
+      evaluation: "Làm bài tập tốt",
+    },
+  ],
+  F6: [
+    {
+      id: 1,
+      name: "Lý Văn Tâm",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+    {
+      id: 2,
+      name: "Trương Thị Vy",
+      attendance: "present",
+      note: "",
+      evaluation: "Học sinh chăm chỉ",
+    },
+    {
+      id: 3,
+      name: "Lê Văn Khải",
+      attendance: "absent",
+      note: "Nghỉ ốm",
+      evaluation: "",
+    },
+    {
+      id: 4,
+      name: "Nguyễn Thị Uyên",
+      attendance: "present",
+      note: "",
+      evaluation: "Tích cực thảo luận",
+    },
+    {
+      id: 5,
+      name: "Trần Văn Long",
+      attendance: "present",
+      note: "",
+      evaluation: "",
+    },
+  ],
+};
+
+// Predefined evaluation options
+const evaluationOptions = [
+  "Học sinh chăm chỉ",
+  "Tích cực phát biểu",
+  "Làm bài tập tốt",
+  "Tích cực thảo luận",
+  "Học sinh ngủ trong giờ",
+  "Cần cải thiện thái độ",
+  "Đi muộn thường xuyên",
+  "Không tập trung học tập",
+  "Có tiến bộ rõ rệt",
+  "Cần hỗ trợ thêm",
+];
 
 function getWeekDates(date) {
   const week = [];
@@ -91,6 +356,9 @@ const STATUS_COLORS = {
 const Schedule = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(getWeekDates(new Date()));
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [students, setStudents] = useState([]);
   const [scheduleData, setScheduleData] = useState({
     "Slot 1": {
       "16/06": {
@@ -354,6 +622,67 @@ const Schedule = () => {
       newData[slot][date].status = nextStatus[current] || "On-going";
       return newData;
     });
+  };
+
+  const handleCellClick = (slot, date, data) => {
+    if (data && data.class) {
+      setSelectedClass({ slot, date, ...data });
+      setStudents([...(studentData[data.class] || [])]);
+      setIsModalVisible(true);
+    } else {
+      // Toggle status for empty cells
+      handleAttendanceToggle(slot, date);
+    }
+  };
+
+  const handleAttendanceChange = (studentId, attendance) => {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === studentId ? { ...student, attendance } : student
+      )
+    );
+  };
+
+  const handleNoteChange = (studentId, note) => {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === studentId ? { ...student, note } : student
+      )
+    );
+  };
+
+  const handleEvaluationChange = (studentId, evaluation) => {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === studentId ? { ...student, evaluation } : student
+      )
+    );
+  };
+
+  const getAttendanceColor = (attendance) => {
+    switch (attendance) {
+      case "present":
+        return "#10B981";
+      case "absent":
+        return "#EF4444";
+      case "late":
+        return "#F59E0B";
+      default:
+        return "#9CA3AF";
+    }
+  };
+
+  const getAttendanceText = (attendance) => {
+    switch (attendance) {
+      case "present":
+        return "Có mặt";
+      case "absent":
+        return "Vắng";
+      case "late":
+        return "Muộn";
+      default:
+        return "Chưa điểm danh";
+    }
   };
 
   return (

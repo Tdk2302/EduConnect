@@ -370,6 +370,10 @@ export default function NotificationDashboard() {
     }));
   }, [dailyData]);
 
+  // Only show the first class (homeroom teacher's class)
+  const homeroomClass =
+    dailyData.classes.length > 0 ? dailyData.classes[0] : null;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
       <Stack spacing={3}>

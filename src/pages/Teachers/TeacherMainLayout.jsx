@@ -10,7 +10,7 @@ export default function TeacherMainLayout() {
   const [selected, setSelected] = useState("notify");
 
   let content;
-  if (selected === "attendance") content = <AttendancePage />;
+  if (selected === "chat") content = <ChatBox />;
   else if (selected === "notify") content = <NotificationDashboard />;
   else content = <TeacherSchedulePage />;
 

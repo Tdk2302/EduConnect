@@ -4,3 +4,27 @@ svg.recharts-surface {
 .css-v2woy3-MuiStack-root>:not(style)~:not(style) {
     margin-top: 16px!important;
 }
+
+/* NotificationBox.css - updated palette */
+.box-class-card {
+  background: #EAF1FF;
+  border-radius: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px #6D28D91a;
+  color: #1F2937;
+}
+.box-class-title {
+  color: #1F2937;
+  font-weight: 700;
+}
+.box-class-teacher {
+  color: #9CA3AF;
+  font-weight: 400;
+}
+.box-no-activity {
+  color: #9CA3AF;
+  background: #EAF1FF;
+  border-radius: 16px;
+  text-align: center;
+  padding: 32px 0;
+}

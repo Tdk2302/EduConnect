@@ -502,7 +502,7 @@ th.th-date {
 /* Office style schedule overrides - BLUE THEME */
 .schedule-container.office-style {
   font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
-  background: transparent;
+  background: #EAF1FF;
   padding: 0;
 }
 
@@ -510,7 +510,7 @@ th.th-date {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: #ffffff;
   color: #2563eb;
   border-radius: 10px;
   box-shadow: 0 1px 6px #dbeafe;
@@ -522,14 +522,15 @@ th.th-date {
   display: flex;
   align-items: center;
   gap: 12px;
+  color: #2563eb;
 }
 
 .schedule-select {
   width: 70px;
   font-size: 13px;
   border-radius: 6px;
-  border: 1px solid #dbeafe;
-  background: #f5faff;
+  border: 1px solid #E5E7EB;
+  background: #EAF1FF;
   color: #2563eb;
 }
 
@@ -541,9 +542,9 @@ th.th-date {
 }
 
 .schedule-header.office-header .right .nav-btn {
-  background: #eaf1fb;
+  background: #EAF1FF;
   color: #2563eb;
-  border: 1px solid #dbeafe;
+  border: 1px solid #E5E7EB;
   margin: 0 2px;
   border-radius: 6px;
   font-size: 15px;
@@ -551,12 +552,12 @@ th.th-date {
 }
 
 .schedule-header.office-header .right .nav-btn:hover {
-  background: #dbeafe;
+  background: #E5E7EB;
   color: #2563eb;
 }
 
 .schedule-content.office-content {
-  background: transparent;
+  background: #ffffff;
   border-radius: 12px;
   padding: 0;
   box-shadow: none;
@@ -570,7 +571,7 @@ th.th-date {
   border-spacing: 5px;
   min-width: 920px;
   table-layout: fixed;
-  background: #fff;
+  background: #ffffff;
 }
 
 .schedule-table.office-table th,
@@ -587,14 +588,15 @@ th.th-date {
   overflow: hidden;
   position: relative;
   border: 1px solid #e5e7eb;
-  background: #fff;
+  background: #ffffff;
   font-size: 14px;
   font-family: 'Segoe UI', Arial, sans-serif;
   border-radius: 6px;
+  color: #1F2937;
 }
 
 .th-slot, .td-slot, .office-slot {
-  background: #eaf1fb;
+  background: #EAF1FF;
   font-weight: 600;
   color: #2563eb;
   width: 64px;
@@ -614,7 +616,7 @@ th.th-date {
 }
 
 .th-date, .office-date {
-  background: #eaf1fb;
+  background: #EAF1FF;
   color: #2563eb;
   font-size: 13px;
   font-weight: 600;
@@ -622,8 +624,8 @@ th.th-date {
 }
 
 .today-header {
-  background: #dbeafe !important;
-  color: #2563eb !important;
+  background: #6D28D9 !important;
+  color: #ffffff !important;
   border-bottom: 3px solid #2563eb;
 }
 
@@ -636,7 +638,7 @@ th.th-date {
 }
 
 .today-cell {
-  background: #f0f6ff !important;
+  background: #E5E7EB !important;
 }
 
 .cell-office-main {
@@ -647,6 +649,7 @@ th.th-date {
   gap: 1px;
   padding: 4px 6px 2px 6px;
   min-width: 0;
+  color: #1F2937;
 }
 
 .cell-office-subject {
@@ -661,7 +664,7 @@ th.th-date {
 }
 
 .cell-office-code {
-  color: #3b82f6;
+  color: #6D28D9;
   font-size: 12px;
   font-weight: 500;
   margin-top: 0px;
@@ -669,7 +672,7 @@ th.th-date {
 }
 
 .cell-office-class {
-  color: #60a5fa;
+  color: #9CA3AF;
   font-size: 12px;
   font-weight: 500;
   margin-top: 0px;
@@ -689,13 +692,13 @@ th.th-date {
   font-size: 13px;
   font-weight: 600;
   margin-top: 2px;
-  background: #dbeafe;
+  background: #E5E7EB;
   color: #2563eb;
   border: none;
 }
 
 .nodata {
-  color: #b6c6e3;
+  color: #9CA3AF;
   font-size: 18px;
 }
 
