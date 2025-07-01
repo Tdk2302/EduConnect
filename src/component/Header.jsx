@@ -13,7 +13,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { getAccessToken, logoutUser } from "../services/handleStorageApi";
+import { getUserInfo, logoutUser } from "../services/handleStorageApi";
 
 const Logo = ({ navigate }) => (
   <Typography
@@ -34,11 +34,9 @@ const Logo = ({ navigate }) => (
 );
 
 const menuItems = [
-  { label: "Schedule" },
-  { label: "Chat Bot" },
-  { label: "Notifications" },
-  { label: "About Us" },
-  { label: "Contact Us" },
+  { label: "Schedule", path: "/student-schedule" },
+  { label: "Chat Bot", path: "/chatbot" },
+  { label: "Notifications", path: "/notifications" },
 ];
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -53,7 +51,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const isLoggedIn = !!getAccessToken();
+  const isLoggedIn = !!getUserInfo();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -100,7 +98,12 @@ const Header = () => {
                   },
                   cursor: "pointer",
                 }}
-                onClick={() => setActiveMenu(idx)}
+                onClick={() => {
+                  setActiveMenu(idx);
+                  if (item.path) {
+                    navigate(item.path);
+                  }
+                }}
               >
                 <Typography
                   sx={{
@@ -131,7 +134,7 @@ const Header = () => {
                 }}
                 onClick={() => navigate("/signin")}
               >
-                Login
+                Đăng nhập
               </StyledButton>
               <StyledButton
                 variant="contained"
@@ -144,7 +147,7 @@ const Header = () => {
                 }}
                 onClick={() => navigate("/register")}
               >
-                Register
+                Đăng kí
               </StyledButton>
             </>
           ) : (
@@ -170,7 +173,7 @@ const Header = () => {
                   }}
                   onClick={() => navigate("/profile")}
                 >
-                  Profile
+                  Hồ sơ
                 </MenuItem>
                 <MenuItem
                   sx={{
@@ -180,7 +183,7 @@ const Header = () => {
                   }}
                   onClick={handleMenuClose}
                 >
-                  Settings
+                  Cài đặt
                 </MenuItem>
                 <MenuItem
                   sx={{
@@ -190,7 +193,7 @@ const Header = () => {
                   }}
                   onClick={handleLogout}
                 >
-                  Logout
+                  Đăng xuất
                 </MenuItem>
               </Menu>
             </>

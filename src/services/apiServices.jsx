@@ -3,7 +3,11 @@ import axios from "axios";
 const BASE_URL = "https://localhost:7064/api";
 
 const postSignin = async (email, password) => {
-  return axios.post(`${BASE_URL}/Auth/Login`, { email, password });
+  return axios.post(
+    `${BASE_URL}/Auth/Login`,
+    { email, password },
+    { withCredentials: true }
+  );
 };
 
 const postRegister = async (
@@ -34,4 +38,18 @@ const resetPassword = async ({ email, token, newPassword }) => {
   });
 };
 
-export { postSignin, postRegister, forgetPassword, resetPassword };
+const putParentProfile = async (email, data) => {
+  // data: { phoneNumber, firstName, lastName, studentId }
+  return axios.put(
+    `${BASE_URL}/Parent/profile?email=${encodeURIComponent(email)}`,
+    data
+  );
+};
+
+export {
+  postSignin,
+  postRegister,
+  forgetPassword,
+  resetPassword,
+  putParentProfile,
+};

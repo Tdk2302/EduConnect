@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { postSignin } from "../../../../services/apiServices";
-import { setAccessToken } from "../../../../services/handleStorageApi";
+import { postSignin } from "../../services/apiServices";
+import { setUserInfo } from "../../services/handleStorageApi";
 import "./Signin.css";
-import "antd/dist/reset.css"; // For Antd v5
+import "antd/dist/reset.css";
 
 const { Title, Text, Link } = Typography;
 
@@ -38,10 +38,34 @@ const Signin = () => {
       const response = await postSignin(email, password);
       if (response.status === 200) {
         toast.success("Sign in successful!");
-        setAccessToken(response.data.token);
-        navigate("/homepage");
+
+        // Nếu backend trả về thông tin user, bạn có thể lưu lại, nếu không thì bỏ qua đoạn này
+        if (
+          response.data.userId &&
+          response.data.fullName &&
+          response.data.email &&
+          response.data.role
+        ) {
+          setUserInfo({
+            userId: response.data.userId,
+            fullName: response.data.fullName,
+            email: response.data.email,
+            role: response.data.role,
+          });
+        }
+
+        // Navigate based on role
+        const role = response.data.role;
+        if (role === "Parent") {
+          navigate("/homepage");
+        } else if (role === "Teacher") {
+          navigate("/teacher");
+        } else if (role === "Admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/homepage");
+        }
       } else {
-        console.log(response);
         toast.error(response?.message || "Sign in failed!");
       }
     } catch (error) {
