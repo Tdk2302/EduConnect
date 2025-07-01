@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Register from "./component/Register/Register";
 
 import Signin from "./component/Signin/Singin";
-import Dashboard from "./component/Dashboard.jsx";
+import Dashboard from "./pages/Admin/Dashboard";
 import TeacherMainLayout from "./pages/Teachers/Layout/TeacherMainLayout";
 import Homepage from "./pages/Parents/HomePage/Homepage";
 import ProfileUser from "./component/ProfileUser";
