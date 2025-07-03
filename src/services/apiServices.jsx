@@ -118,6 +118,17 @@ export const getTeacherDetail = async (userId, token) => {
   );
 };
 
+// Lấy danh sách lịch dạy của giáo viên
+export const getTeacherCourses = async (teacherId, token) => {
+  return axios.get(
+    `${BASE_URL}/Course/teacher/${teacherId}`,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
 export {
   postSignin,
   postRegister,
@@ -125,4 +136,6 @@ export {
   resetPassword,
   getAllAdminUsers,
   putChangeUserRole,
+  // getTeacherDetail,
+  // getTeacherCourses,
 };
