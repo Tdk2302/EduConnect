@@ -502,8 +502,10 @@ th.th-date {
 /* Office style schedule overrides - BLUE THEME */
 .schedule-container.office-style {
   font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
-  background: #EAF1FF;
-  padding: 0;
+  background: white!important;
+  padding: 14px!important;
+  box-shadow: 0 6px 32px 0 rgba(30, 64, 175, 0.10), 0 1.5px 6px 0 rgba(30, 64, 175, 0.08);
+  border-radius: 18px;
 }
 
 .schedule-header.office-header {
@@ -534,11 +536,15 @@ th.th-date {
   color: #2563eb;
 }
 
+.ant-select-selector{
+  padding: 0 8px!important;
+}
+
 .week-text {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  color: #2563eb;
+  color: white!important;
 }
 
 .schedule-header.office-header .right .nav-btn {
@@ -737,4 +743,22 @@ th.th-date {
   .cell-office-main {
     padding: 1px 1px 0 1px;
   }
+}
+
+td.td-slot.office-slot {
+    width: 175px !important;
+    min-width: 175px !important;
+    max-width: 175px !important;
+    height: 109px !important;
+    min-height: 109px !important;
+    max-height: 109px !important;
+    font-size: 18px;
+    vertical-align: middle;
+    text-align: center;
+    background: #f1f5fa;
+    color: #1e293b;
+    font-weight: 700;
+    border-right: 2px solid #3b82f6;
+    box-sizing: border-box;
+    overflow: hidden;
 }
