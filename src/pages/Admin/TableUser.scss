@@ -97,3 +97,73 @@ button.btn.btn-sm.btn-outline-danger.rounded-circle i {
 .css-ed5dlz {
   padding: 0 !important;
 }
+
+.table-user-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.MuiTableContainer-root {
+  border-radius: 18px !important;
+  box-shadow: 0 4px 24px 0 rgba(80,80,80,0.08) !important;
+  background: #fff !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  background: #f4f6fb !important;
+  font-weight: 800 !important;
+  color: #3a3a3a !important;
+  font-size: 16px !important;
+}
+
+.MuiTableRow-root {
+  transition: background 0.2s;
+}
+.MuiTableRow-root:hover {
+  background: #f0f4ff !important;
+}
+
+.MuiAvatar-root {
+  box-shadow: 0 2px 8px 0 rgba(80,80,80,0.10);
+}
+
+.MuiChip-root {
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.MuiIconButton-root {
+  border-radius: 8px !important;
+  transition: background 0.2s;
+}
+
+@media (max-width: 900px) {
+  .table-user-container {
+    padding: 8px 0;
+  }
+  .MuiTableCell-root {
+    font-size: 13px !important;
+    padding: 8px 4px !important;
+  }
+  .MuiAvatar-root {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+
+.css-v9f1ox-MuiTypography-root {
+  margin: 0;
+  font-family: none!important;
+  font-weight: 400;
+  font-size: 3rem;
+  line-height: 1.167;
+  letter-spacing: 0em;
+  font-weight: 900;
+  margin-bottom: 32px;
+  color: #4B1EFF;
+  letter-spacing: 1px;
+}
