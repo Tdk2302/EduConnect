@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import "./ProfileUser.scss";
 import Header from "./Header";
-import axios from "axios";
+import { updateParentProfile, getParentProfile } from "../services/apiServices";
+import { toast } from "react-toastify";
 
 const getUserFromStorage = () => {
   try {
@@ -13,13 +14,14 @@ const getUserFromStorage = () => {
   }
 };
 
-const BASE_URL = "https://localhost:7064/api";
-
 export default function ProfileUser() {
+  const user = getUserFromStorage();
   const [profile, setProfile] = useState({
-    fullName: "",
-    email: "",
-    role: "",
+    firstName: user.firstName,
+    lastName: user.lastName,
+    fullName: `${user.firstName} ${user.lastName}`,
+    email: user.email,
+    role: user.role,
     phone: "+84909090909",
     gender: "Male",
     dateOfBirth: "23/02/2000",
@@ -34,13 +36,12 @@ export default function ProfileUser() {
   const fileInputRef = React.useRef(null);
 
   useEffect(() => {
-    const user = getUserFromStorage();
-    setProfile((prev) => ({
-      ...prev,
-      fullName: user.fullName || "",
-      email: user.email || "",
-      role: user.role || "",
-    }));
+    async function fetchProfile() {
+      const data = await getParentProfile();
+      setProfile(data.data);
+      console.log(data.data);
+    }
+    fetchProfile();
   }, []);
 
   const handleEdit = () => {
@@ -50,18 +51,22 @@ export default function ProfileUser() {
   const handleSave = async () => {
     setIsEditing(false);
 
-    const data = {
-      phoneNumber: profile.phone,
-      firstName: profile.fullName.split(" ")[0] || "",
-      lastName: profile.fullName.split(" ").slice(1).join(" ") || "",
-      studentId: profile.studentId || "studentId",
-    };
-
+    const [firstName, ...lastNameArr] = profile.fullName.split(" ");
+    const lastName = lastNameArr.join(" ");
+    const formData = new FormData();
+    if (fileInputRef.current && fileInputRef.current.files[0]) {
+      formData.append("imageFile", fileInputRef.current.files[0]);
+    }
+    formData.append("PhoneNumber", profile.phone);
+    formData.append("FirstName", firstName || "");
+    formData.append("LastName", lastName || "");
     try {
-      await axios.put(
-        `${BASE_URL}/Parent/profile?email=${encodeURIComponent(profile.email)}`,
-        data
-      );
+      await updateParentProfile(formData);
+      const newProfile = await getParentProfile();
+      setProfile((prev) => ({
+        ...prev,
+        ...newProfile,
+      }));
       toast.success("Cập nhật thành công!");
     } catch (error) {
       toast.error("Có lỗi xảy ra khi cập nhật!");

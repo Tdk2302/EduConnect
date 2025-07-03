@@ -284,10 +284,11 @@ export default function Notifications() {
   };
 
   const fetchNotiDetail = (notiId) => {
+    console.log("notiId fetch:", notiId);
     setDetailLoading(true);
     const BASE_URL = "https://localhost:7064/api";
     axios
-      .get(`${BASE_URL}/Notification/${notiId}`)
+      .get(`${BASE_URL}/Report/${notiId}`)
       .then((res) => setNotiDetail(res.data))
       .catch(() => setNotiDetail(null))
       .finally(() => setDetailLoading(false));
@@ -329,17 +330,16 @@ export default function Notifications() {
 
   useEffect(() => {
     const BASE_URL = "https://localhost:7064/api";
-    const classId = "class01"; // Thay bằng classId thực tế nếu cần
+    const classId = "class01";
     setLoading(true);
     axios
-      .get(`${BASE_URL}/Notification`, { params: { classId } })
+      .get(`${BASE_URL}/Report`, { params: { classId } })
       .then((res) => {
-        // Map lại dữ liệu trả về từ API sang đúng cấu trúc notification
         const mapped = res.data.map((item) => ({
-          id: item.notiId || item.id,
+          id: item.reportId || item.id,
           title: item.title || "",
           content: item.description || "",
-          type: "announcement", // hoặc map theo logic của bạn
+          type: "report",
           priority: "medium",
           isRead: false,
           timestamp: new Date(),
