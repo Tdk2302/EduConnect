@@ -2,11 +2,11 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Register from "./pages/Parents/Auth/Register/Register";
-import Signin from "./pages/Parents/Auth/Signin/Singin";
-import Dashboard from "./component/dashboard";
-import TeacherMainLayout from "./pages/Teachers/TeacherMainLayout";
-import Homepage from "./pages/Parents/Auth/Teacher/Homepage";
+import Register from "./component/Register/Register";
+import Signin from "./component/Signin/Singin";
+import Dashboard from "./pages/Admin/Dashboard";
+import TeacherMainLayout from "./pages/Teachers/Layout/TeacherMainLayout";
+import Homepage from "./pages/Parents/HomePage/Homepage";
 import ProfileUser from "./component/ProfileUser";
 import ChatBotPage from "./pages/Parents/ChatBot/ChatBotPage";
 import ParentNotifications from "./pages/Parents/Notification/Notification";
