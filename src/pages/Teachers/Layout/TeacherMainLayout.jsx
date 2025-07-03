@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import SideBar from "./SideBar";
-import ChatBox from "./ChatBox";
-import NotificationDashboard from "./NotificationBox";
+
+import NotificationDashboard from "../Notification/NotificationBox";
 import TeacherSchedulePage from "./TeacherSchedulePage";
-import ReportCreate from "./ReportCreate";
-import "./TeacherMainLayout.css"
+import ReportCreate from "../Report/ReportCreate";
+import "./TeacherMainLayout.css";
 
 export default function TeacherMainLayout() {
   const [selected, setSelected] = useState("notify");
@@ -22,7 +22,7 @@ export default function TeacherMainLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          bgcolor: '#f4f6fa',
+          bgcolor: "#f4f6fa",
           height: "100vh",
           overflowY: "auto",
           p: 3,

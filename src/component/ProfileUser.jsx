@@ -1,26 +1,77 @@
 // src/component/ProfileUser.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ProfileUser.scss";
 import Header from "./Header";
+import axios from "axios";
 
-const initialProfile = {
-  firstName: "Leslie",
-  lastName: "Alexander",
-  email: "leslie@gmail.com",
-  phone: "+317-439-5139",
-  bio: "Customer Service Manager",
-  gender: "Female",
-  dateOfBirth: "1994-06-10",
-  nationalId: "629 555-0129 333-0127",
-  country: "United States",
-  city: "Los Angeles",
-  postalCode: "90001",
-  taxId: "BH28F55219",
-  avatar: "https://randomuser.me/api/portraits/women/1.jpg", // hoặc dùng ảnh local
+const getUserFromStorage = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    return user || {};
+  } catch {
+    return {};
+  }
 };
 
+const BASE_URL = "https://localhost:7064/api";
+
 export default function ProfileUser() {
-  const [profile, setProfile] = useState(initialProfile);
+  const [profile, setProfile] = useState({
+    fullName: "",
+    email: "",
+    role: "",
+    phone: "+84909090909",
+    gender: "Male",
+    dateOfBirth: "23/02/2000",
+    nationalId: "1234567890",
+    country: "Vietnam",
+    city: "Hanoi",
+    postalCode: "10000",
+    taxId: "",
+    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+  });
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    const user = getUserFromStorage();
+    setProfile((prev) => ({
+      ...prev,
+      fullName: user.fullName || "",
+      email: user.email || "",
+      role: user.role || "",
+    }));
+  }, []);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    setIsEditing(false);
+
+    const data = {
+      phoneNumber: profile.phone,
+      firstName: profile.fullName.split(" ")[0] || "",
+      lastName: profile.fullName.split(" ").slice(1).join(" ") || "",
+      studentId: profile.studentId || "studentId",
+    };
+
+    try {
+      await axios.put(
+        `${BASE_URL}/Parent/profile?email=${encodeURIComponent(profile.email)}`,
+        data
+      );
+      toast.success("Cập nhật thành công!");
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật!");
+      console.error(error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <>
@@ -29,66 +80,71 @@ export default function ProfileUser() {
         <div className="profile-sidebar">
           <h3>Cài đặt</h3>
           <ul>
-            <li className="active">Hồ sơ cá nhân</li>
-            <li>Bảo mật</li>
-            <li>Cài đặt</li>
+            <li className="active">My Profile</li>
+            <li>Security Options</li>
+            <li>Preferences</li>
           </ul>
         </div>
         <div className="profile-main">
           <div className="profile-header">
             <img src={profile.avatar} alt="avatar" className="profile-avatar" />
             <div>
-              <h2>
-                {profile.firstName} {profile.lastName}
-              </h2>
-              <p>{profile.bio}</p>
+              <h2>{profile.fullName}</h2>
             </div>
-            <button className="edit-btn">Sửa</button>
+            <button className="edit-btn">Edit</button>
           </div>
-          <h3>Chi tiết hồ sơ</h3>
+          <h3>Personal Details</h3>
           <div className="profile-details">
             <div>
-              <label>Tên</label>
+              <label>First Name</label>
               <input value={profile.firstName} readOnly />
             </div>
             <div>
-              <label>Họ</label>
+              <label>Last Name</label>
               <input value={profile.lastName} readOnly />
             </div>
             <div>
-              <label>Email</label>
+              <label>Email address</label>
               <input value={profile.email} readOnly />
             </div>
             <div>
-              <label>Số điện thoại</label>
+              <label>Phone</label>
               <input value={profile.phone} readOnly />
             </div>
             <div>
-              <label>Về tôi</label>
+              <label>Bio</label>
               <input value={profile.bio} readOnly />
             </div>
             <div>
-              <label>Giới tính</label>
+              <label>Gender</label>
               <input value={profile.gender} readOnly />
             </div>
             <div>
-              <label>Ngày sinh</label>
+              <label>Date of Birth</label>
               <input value={profile.dateOfBirth} readOnly />
             </div>
             <div>
-              <label>Số CMND</label>
+              <label>National ID</label>
               <input value={profile.nationalId} readOnly />
             </div>
           </div>
           <h3>Địa chỉ</h3>
           <div className="profile-details">
             <div>
-              <label>Quốc gia</label>
+              <label>Country</label>
               <input value={profile.country} readOnly />
             </div>
             <div>
-              <label>Thành phố</label>
+              <label>City/State</label>
               <input value={profile.city} readOnly />
+            </div>
+            <div>
+              <label>Postal Code</label>
+              <input value={profile.postalCode} readOnly />
+            </div>
+            <div>
+              <label>TAX ID</label>
+              <input value={profile.taxId} readOnly />
             </div>
           </div>
         </div>

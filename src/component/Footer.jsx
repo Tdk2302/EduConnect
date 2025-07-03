@@ -8,20 +8,18 @@ const Footer = () => {
         {/* Company Info Section */}
         <div className="footer-section">
           <div className="company-info">
-            <h3 className="logo">Satyamstudio</h3>
+            <h3 className="logo">EduConnect</h3>
             <p className="address">
               <i className="location-icon"></i>
-              8819 Ohio St. South Gate,
-              <br />
-              CA 90280
+              Hanoi, Vietnam
             </p>
             <p className="email">
               <i className="email-icon"></i>
-              Ourstudio@hello.com
+              EduConnect@hello.com
             </p>
             <p className="phone">
               <i className="phone-icon"></i>
-              +1 386-688-3295
+              +84 909 090 909
             </p>
           </div>
         </div>
@@ -31,22 +29,22 @@ const Footer = () => {
           <h4>Service</h4>
           <ul>
             <li>
-              <a href="#">Illustration</a>
+              <a href="#">Chat Bot</a>
             </li>
             <li>
-              <a href="#">Mobile Design</a>
+              <a href="#">Schedule</a>
             </li>
             <li>
-              <a href="#">Motion Graphic</a>
+              <a href="#">Notifications</a>
             </li>
             <li>
-              <a href="#">Web Design</a>
+              <a href="#">About Us</a>
+            </li>
+            <li>
+              <a href="#">Contact Us</a>
             </li>
             <li>
               <a href="#">Development</a>
-            </li>
-            <li>
-              <a href="#">SEO</a>
             </li>
           </ul>
         </div>
@@ -62,16 +60,13 @@ const Footer = () => {
               <a href="#">Features</a>
             </li>
             <li>
-              <a href="#">Our Team</a>
-            </li>
-            <li>
-              <a href="#">Portfolio</a>
-            </li>
-            <li>
-              <a href="#">Blog</a>
+              <a href="#">About Us</a>
             </li>
             <li>
               <a href="#">Contact Us</a>
+            </li>
+            <li>
+              <a href="#">Development</a>
             </li>
           </ul>
         </div>
@@ -81,22 +76,19 @@ const Footer = () => {
           <h4>Our Social Media</h4>
           <ul>
             <li>
-              <a href="#">Dribbble</a>
-            </li>
-            <li>
-              <a href="#">Behance</a>
-            </li>
-            <li>
-              <a href="#">Medium</a>
+              <a href="#">Facebook</a>
             </li>
             <li>
               <a href="#">Instagram</a>
             </li>
             <li>
-              <a href="#">Facebook</a>
+              <a href="#">Twitter</a>
             </li>
             <li>
-              <a href="#">Twitter</a>
+              <a href="#">LinkedIn</a>
+            </li>
+            <li>
+              <a href="#">Youtube</a>
             </li>
           </ul>
         </div>
@@ -114,7 +106,7 @@ const Footer = () => {
             />
             <button className="send-button">Send</button>
           </div>
-          <p className="copyright">Copyright Satyam Studio</p>
+          <p className="copyright">Copyright EduConnect</p>
         </div>
       </div>
     </footer>

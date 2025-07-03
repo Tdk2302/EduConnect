@@ -15,17 +15,18 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "./Homepage.scss";
-import Header from "../../../../component/Header";
-import heroImg from "../../../../assets/hero.jpeg";
-import chatDemoImg from "../../../../assets/chat-demo.jpeg";
-import teamImg from "../../../../assets/team.jpeg";
-import hp1 from "../../../../assets/HP1.png";
-import hp2 from "../../../../assets/HP2.jpeg";
-import hp3 from "../../../../assets/HP3.jpeg";
+import Header from "../../../component/Header";
+import heroImg from "../../../assets/hero.jpeg";
+import chatDemoImg from "../../../assets/chat-demo.jpeg";
+import teamImg from "../../../assets/team.jpeg";
+import hp1 from "../../../assets/HP1.png";
+import hp2 from "../../../assets/HP2.jpeg";
+import hp3 from "../../../assets/HP3.jpeg";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Footer from "../../../component/Footer";
 
 const StyledButton = styled(Button)({
   borderRadius: "25px",
@@ -47,16 +48,15 @@ const Homepage = () => {
             <Grid container spacing={4} alignItems="center">
               <Grid item xs={12} md={6}>
                 <Typography variant="h1" className="hero-title">
-                  Your <span className="highlight">AI-powered</span>
+                  <span className="highlight">AI-powered</span>
                   <br />
-                  Parent Support
+                  Hệ thống hỗ trợ
                   <br />
-                  Assistant
+                  phụ huynh
                 </Typography>
                 <Typography variant="body1" className="hero-subtitle">
-                  Get instant, personalized and guidance
+                  Nhận thông tin nhanh chóng, cá nhân hóa
                   <br />
-                  about your child's learning and progress
                 </Typography>
                 <Box mt={3}>
                   <StyledButton
@@ -72,7 +72,7 @@ const Homepage = () => {
                     className="school-button"
                     startIcon={<ArrowForwardIcon />}
                   >
-                    For School
+                    Cho Trường
                   </StyledButton>
                 </Box>
               </Grid>
@@ -96,19 +96,19 @@ const Homepage = () => {
               <Grid item xs={12} md={4}>
                 <Box className="stats" sx={{ textAlign: "center" }}>
                   <Typography variant="h3">8,500+</Typography>
-                  <Typography>Parents received learning reports</Typography>
+                  <Typography>Phụ huynh nhận được báo cáo học tập</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Box className="stats" sx={{ textAlign: "center" }}>
                   <Typography variant="h3">12,000+</Typography>
-                  <Typography>Questions answered by AI</Typography>
+                  <Typography>Câu hỏi được trả lời bởi AI</Typography>
                 </Box>
               </Grid>
               <Grid item xs={12} md={4}>
                 <Box className="stats" sx={{ textAlign: "center" }}>
                   <Typography variant="h3">98%</Typography>
-                  <Typography>AI support</Typography>
+                  <Typography>Hỗ trợ AI</Typography>
                 </Box>
               </Grid>
             </Grid>
@@ -125,7 +125,7 @@ const Homepage = () => {
               <Grid item xs={12} md={6}>
                 <Box className="key-features">
                   <Typography variant="subtitle2" color="error" sx={{ mb: 1 }}>
-                    Key Features
+                    Tính năng chính
                   </Typography>
                   <ul style={{ listStyle: "none", padding: 0 }}>
                     <li
@@ -145,10 +145,10 @@ const Homepage = () => {
                         ●
                       </span>
                       <span>
-                        <b>Personalized Feedback</b>
+                        <b>Báo cáo học tập cá nhân</b>
                         <br />
-                        Benefit from data-driven, custom feedback provided by
-                        our advanced AI algorithms.
+                        Nhận được báo cáo học tập cá nhân từ AI, dựa trên dữ
+                        liệu học tập của con bạn.
                       </span>
                     </li>
                     <li
@@ -168,10 +168,9 @@ const Homepage = () => {
                         ●
                       </span>
                       <span>
-                        <b>Insider Strategies</b>
+                        <b>Hỗ trợ AI</b>
                         <br />
-                        Discover insider strategies and practical advice for
-                        navigating every phase of the admissions journey
+                        Hỗ trợ AI giúp phụ huynh theo dõi học tập của con bạn
                       </span>
                     </li>
                     <li
@@ -191,10 +190,10 @@ const Homepage = () => {
                         ●
                       </span>
                       <span>
-                        <b>Community Q&A Forum</b>
+                        <b>Hệ thống hỏi đáp</b>
                         <br />
-                        Engage with other members in our interactive forum to
-                        collaboratively address your questions
+                        Tham gia vào diễn đàn hỏi đáp với các phụ huynh khác để
+                        giải đáp các câu hỏi của bạn
                       </span>
                     </li>
                     <li
@@ -214,10 +213,10 @@ const Homepage = () => {
                         ●
                       </span>
                       <span>
-                        <b>UK Admissions Test Question Bank</b>
+                        <b>Hệ thống hỏi đáp</b>
                         <br />
-                        Access an extensive collection of ad missions test
-                        questions for thorough preparation
+                        Tham gia vào diễn đàn hỏi đáp với các phụ huynh khác để
+                        giải đáp các câu hỏi của bạn
                       </span>
                     </li>
                   </ul>
@@ -236,15 +235,16 @@ const Homepage = () => {
                   variant="subtitle1"
                   sx={{ color: "#7C3AED", fontWeight: 700, mb: 1 }}
                 >
-                  Why TechEd?
+                  Tại sao chọn chúng tôi?
                 </Typography>
                 <Typography variant="h3" sx={{ fontWeight: 700, mb: 2 }}>
-                  Boost Your Admission
+                  Tăng tỷ lệ thành công
                   <br />
-                  Proven Success Rate:
+                  Tỷ lệ thành công đã được chứng minh:
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 4 }}>
-                  our students gain admission to their first-choice university.
+                  các học sinh của chúng tôi được nhận vào trường đại học mà họ
+                  muốn.
                 </Typography>
                 <Box
                   className="stats-container"
@@ -258,7 +258,7 @@ const Homepage = () => {
                       4x ↑
                     </Typography>
                     <Typography sx={{ fontWeight: 500 }}>
-                      Increase Chance
+                      Tăng khả năng
                     </Typography>
                   </Box>
                   <Box className="stat-item" sx={{ textAlign: "center" }}>
@@ -269,7 +269,7 @@ const Homepage = () => {
                       70% ↑
                     </Typography>
                     <Typography sx={{ fontWeight: 500 }}>
-                      Admission to top university
+                      Nhận vào trường đại học hàng đầu
                     </Typography>
                   </Box>
                 </Box>
@@ -294,7 +294,7 @@ const Homepage = () => {
                 variant="h4"
                 sx={{ fontWeight: 700, textAlign: "center", flex: 1 }}
               >
-                Testimonials
+                Đánh giá của phụ huynh
               </Typography>
               <Box
                 className="navigation-buttons"
@@ -368,7 +368,7 @@ const Homepage = () => {
                     >
                       <Box>
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          Rated 5/5 stars
+                          Đánh giá 5/5 sao
                         </Typography>
                         <Box sx={{ color: "#7C3AED" }}>
                           {Array.from({ length: 5 }).map((_, i) => (
@@ -383,7 +383,7 @@ const Homepage = () => {
                       </Box>
                       <Box sx={{ textAlign: "right" }}>
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          Verified Student
+                          Học sinh đã xác thực
                         </Typography>
                         <Box
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
@@ -391,7 +391,7 @@ const Homepage = () => {
                           <span style={{ color: "#7C3AED", fontSize: 16 }}>
                             ●
                           </span>
-                          <Typography variant="body2">2022 Batch</Typography>
+                          <Typography variant="body2">2022 Lớp</Typography>
                         </Box>
                       </Box>
                     </Box>
@@ -410,7 +410,7 @@ const Homepage = () => {
               align="center"
               sx={{ fontWeight: 700, mb: 4 }}
             >
-              FAQ
+              Câu hỏi thường gặp
             </Typography>
             <Box>
               {faqs.map((faq, index) => (
@@ -474,92 +474,73 @@ const Homepage = () => {
         <Box className="cta-section">
           <Container>
             <Typography variant="h4">
-              Access your AI university counselor now!
+              Truy cập công cụ hỗ trợ AI của chúng tôi ngay!
             </Typography>
             <StyledButton
               variant="contained"
               color="primary"
               endIcon={<ArrowForwardIosIcon />}
+              onClick={() => navigate("/register")}
             >
-              Sign up for free
+              Đăng ký miễn phí
             </StyledButton>
           </Container>
         </Box>
+        <Footer />
       </Box>
     </>
   );
 };
 
-const features = [
-  {
-    title: "Personalized Feedback",
-    description:
-      "Benefit from data-driven custom feedback provided by our experts",
-  },
-  {
-    title: "Insider Strategies",
-    description:
-      "Discover insider strategies and practical advice for navigating every phase of the admissions journey",
-  },
-  {
-    title: "Community Q&A Forum",
-    description:
-      "Engage with other members in our interactive forum to collaboratively address your questions",
-  },
-  {
-    title: "UK Admissions Test Question Bank",
-    description:
-      "Access an extensive collection of admission test questions for thorough preparation",
-  },
-];
-
 const testimonials = [
   {
-    name: "Enoch",
-    university: "Harvard University",
+    name: "Nguyễn Văn A",
+    university: "Trường Đại học Bách Khoa Hà Nội",
     content:
-      "Writing a university application essay is a lengthy process. I love talking efficiency without sacrificing depth.",
+      "Chúng tôi rất hài lòng về chất lượng dịch vụ của chúng tôi. Chúng tôi đã nhận được nhiều báo cáo học tập cá nhân và hỗ trợ AI rất hữu ích.",
   },
   {
-    name: "Nat",
-    university: "Duke University",
+    name: "Nguyễn Văn B",
+    university: "Trường Đại học Bách Khoa Hà Nội",
     content:
-      "TechEd program is highly effective because it guides you through each step of the admissions process.",
+      "Chúng tôi rất hài lòng về chất lượng dịch vụ của chúng tôi. Chúng tôi đã nhận được nhiều báo cáo học tập cá nhân và hỗ trợ AI rất hữu ích.",
   },
   {
-    name: "Isaac",
-    university: "University of Pennsylvania",
+    name: "Nguyễn Văn C",
+    university: "Trường Đại học Bách Khoa Hà Nội",
     content:
-      "The university application process can be overwhelming, but TechEd helped guide me through the process.",
+      "Chúng tôi rất hài lòng về chất lượng dịch vụ của chúng tôi. Chúng tôi đã nhận được nhiều báo cáo học tập cá nhân và hỗ trợ AI rất hữu ích.",
   },
 ];
 
 const faqs = [
   {
-    question: "How can I ask the AI about my child's academic performance?",
+    question: "Làm thế nào để tôi hỏi AI về hiệu suất học tập của con tôi?",
     answer:
-      "You can log in to the system, select the 'Ask AI' feature, and enter your questions about grades, progress, or any academic concerns. The AI will respond based on your child's latest learning data.",
-  },
-  {
-    question: "What can the AI help me track about my child?",
-    answer:
-      "The AI can provide information on grades, learning progress, subjects your child is struggling with, class attendance history, and suggest suitable support methods.",
-  },
-  {
-    question: "Can I receive regular reports on my child's academic status?",
-    answer:
-      "Yes. The system allows you to subscribe to weekly or monthly reports via email or in-app notifications.",
-  },
-  {
-    question: "Is my child's information kept confidential?",
-    answer:
-      "We are committed to keeping all student personal and academic information strictly confidential. Data is only used to support parents and is not shared with third parties.",
+      "Bạn có thể đăng nhập vào hệ thống, chọn tính năng 'Hỏi AI', và nhập các câu hỏi về điểm số, tiến trình học tập, hoặc bất kỳ vấn đề học tập nào. AI sẽ trả lời dựa trên dữ liệu học tập gần nhất của con bạn.",
   },
   {
     question:
-      "What should I do if the AI reports my child is struggling academically?",
+      "AI có thể giúp tôi theo dõi điểm số, tiến trình học tập, môn học nào mà con tôi đang gặp khó khăn, lịch sử điểm danh của con tôi, và đề xuất các phương pháp hỗ trợ phù hợp.",
     answer:
-      "You should contact the homeroom teacher or the school's counseling department for appropriate solutions. You can also ask the AI for additional learning support suggestions for your child.",
+      "AI có thể cung cấp thông tin về điểm số, tiến trình học tập, môn học nào mà con tôi đang gặp khó khăn, lịch sử điểm danh của con tôi, và đề xuất các phương pháp hỗ trợ phù hợp.",
+  },
+  {
+    question:
+      "Tôi có thể nhận được báo cáo học tập cá nhân hàng tuần hoặc hàng tháng không?",
+    answer:
+      "Có. Hệ thống cho phép bạn đăng ký nhận báo cáo học tập cá nhân hàng tuần hoặc hàng tháng qua email hoặc thông báo trong ứng dụng.",
+  },
+  {
+    question: "Thông tin của con tôi có được bảo mật không?",
+    answer:
+      "Chúng tôi cam kết bảo mật tất cả thông tin cá nhân và học tập của học sinh. Dữ liệu chỉ được sử dụng để hỗ trợ phụ huynh và không được chia sẻ với bên thứ ba.",
+  },
+  {
+    question:
+      "Tôi nên làm gì nếu AI báo cáo rằng con tôi đang gặp khó khăn trong học tập?",
+    answer:
+      "Bạn nên liên hệ với giáo viên chủ nhiệm hoặc phòng tư vấn của trường để tìm ra giải pháp phù hợp. Bạn cũng có thể hỏi AI về các gợi ý hỗ trợ học tập thêm cho con bạn.",
   },
 ];
 

@@ -4,22 +4,36 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Register from "./pages/Parents/Auth/Register/Register";
 import Signin from "./pages/Parents/Auth/Signin/Singin";
-import Dashboard from "./pages/Admin/Dashboard";
+import Dashboard from "./component/dashboard";
 import TeacherMainLayout from "./pages/Teachers/TeacherMainLayout";
 import Homepage from "./pages/Parents/Auth/Teacher/Homepage";
 import ProfileUser from "./component/ProfileUser";
+import ChatBotPage from "./pages/Parents/ChatBot/ChatBotPage";
+import ParentNotifications from "./pages/Parents/Notification/Notification";
+import TeacherNotifications from "./pages/Teachers/Notification/NotificationBox";
+import StudentSchedule from "./pages/Parents/Schedule/StudentSchedule";
+import TeacherSchedule from "./pages/Teachers/Schedule/TeacherSchedule";
 
 const Router = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/homepage" replace />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/teacher" element={<TeacherMainLayout />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/profile" element={<ProfileUser />} />
+        <Route path="/chatbot" element={<ChatBotPage />} />
+        <Route path="/notifications" element={<ParentNotifications />} />
+        <Route
+          path="/teacher-notifications"
+          element={<TeacherNotifications />}
+        />
+        <Route path="/student-schedule" element={<StudentSchedule />} />
+        <Route path="/teacher-schedule" element={<TeacherSchedule />} />
+
         {/* <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />        */}
       </Routes>
