@@ -23,7 +23,7 @@ import { faGear } from "@fortawesome/free-solid-svg-icons";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
-import Footer from "./Footer";
+import Footer from "../../component/Footer";
 
 const drawerWidth = 240;
 
@@ -147,7 +147,6 @@ function DashboardLayoutBasic() {
           {renderContent()}
         </Box>
       </Box>
-      <Footer />
     </>
   );
 }

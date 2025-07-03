@@ -27,11 +27,11 @@ export default function ProfileUser() {
       <Header />
       <div className="profile-container">
         <div className="profile-sidebar">
-          <h3>Settings</h3>
+          <h3>Cài đặt</h3>
           <ul>
-            <li className="active">My Profile</li>
-            <li>Security Options</li>
-            <li>Preferences</li>
+            <li className="active">Hồ sơ cá nhân</li>
+            <li>Bảo mật</li>
+            <li>Cài đặt</li>
           </ul>
         </div>
         <div className="profile-main">
@@ -43,60 +43,52 @@ export default function ProfileUser() {
               </h2>
               <p>{profile.bio}</p>
             </div>
-            <button className="edit-btn">Edit</button>
+            <button className="edit-btn">Sửa</button>
           </div>
-          <h3>Personal Details</h3>
+          <h3>Chi tiết hồ sơ</h3>
           <div className="profile-details">
             <div>
-              <label>First Name</label>
+              <label>Tên</label>
               <input value={profile.firstName} readOnly />
             </div>
             <div>
-              <label>Last Name</label>
+              <label>Họ</label>
               <input value={profile.lastName} readOnly />
             </div>
             <div>
-              <label>Email address</label>
+              <label>Email</label>
               <input value={profile.email} readOnly />
             </div>
             <div>
-              <label>Phone</label>
+              <label>Số điện thoại</label>
               <input value={profile.phone} readOnly />
             </div>
             <div>
-              <label>Bio</label>
+              <label>Về tôi</label>
               <input value={profile.bio} readOnly />
             </div>
             <div>
-              <label>Gender</label>
+              <label>Giới tính</label>
               <input value={profile.gender} readOnly />
             </div>
             <div>
-              <label>Date of Birth</label>
+              <label>Ngày sinh</label>
               <input value={profile.dateOfBirth} readOnly />
             </div>
             <div>
-              <label>National ID</label>
+              <label>Số CMND</label>
               <input value={profile.nationalId} readOnly />
             </div>
           </div>
-          <h3>Address</h3>
+          <h3>Địa chỉ</h3>
           <div className="profile-details">
             <div>
-              <label>Country</label>
+              <label>Quốc gia</label>
               <input value={profile.country} readOnly />
             </div>
             <div>
-              <label>City/State</label>
+              <label>Thành phố</label>
               <input value={profile.city} readOnly />
-            </div>
-            <div>
-              <label>Postal Code</label>
-              <input value={profile.postalCode} readOnly />
-            </div>
-            <div>
-              <label>TAX ID</label>
-              <input value={profile.taxId} readOnly />
             </div>
           </div>
         </div>
