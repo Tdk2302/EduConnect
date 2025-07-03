@@ -1,8 +1,8 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Register from "./component/Register/Register";
 
+import Register from "./component/Register/Register";
 import Signin from "./component/Signin/Singin";
 import TeacherMainLayout from "./pages/Teachers/Layout/TeacherMainLayout";
 import Homepage from "./pages/Parents/HomePage/Homepage";
@@ -47,7 +47,7 @@ const Router = () => {
         <Route
           path="/homepage"
           element={
-            <ProtectedRoute allowedRoles={["Parent", "Teacher"]}>
+            <ProtectedRoute allowedRoles={["Parent"]}>
               <Homepage />
             </ProtectedRoute>
           }

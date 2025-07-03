@@ -436,7 +436,7 @@ export default function NotificationDashboard() {
       for (const classId of form.selectedClasses) {
         const classInfo = classesData.find((c) => c.id === classId);
         const notificationData = {
-          teacherId: "id_giao_vien",
+          teacherId: "",
           title: form.title,
           description: form.description,
           classId: classInfo.id,

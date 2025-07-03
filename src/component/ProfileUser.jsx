@@ -31,6 +31,7 @@ export default function ProfileUser() {
     avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     const user = getUserFromStorage();
@@ -73,6 +74,17 @@ export default function ProfileUser() {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setProfile((prev) => ({ ...prev, avatar: ev.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -87,6 +99,36 @@ export default function ProfileUser() {
         <div className="profile-main">
           <div className="profile-header">
             <img src={profile.avatar} alt="avatar" className="profile-avatar" />
+            {isEditing && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                />
+                <button
+                  className="edit-btn small-btn"
+                  style={{
+                    marginTop: 8,
+                    padding: "4px 10px",
+                    fontSize: "0.9em",
+                  }}
+                  onClick={() =>
+                    fileInputRef.current && fileInputRef.current.click()
+                  }
+                >
+                  Cập Nhật Ảnh
+                </button>
+              </div>
+            )}
             <div>
               <h2>{profile.fullName}</h2>
             </div>
@@ -94,7 +136,7 @@ export default function ProfileUser() {
               className="edit-btn"
               onClick={isEditing ? () => setIsEditing(false) : handleEdit}
             >
-              {isEditing ? "Cancel" : "Edit"}
+              {isEditing ? "Hủy" : "Chỉnh sửa"}
             </button>
             {isEditing && (
               <button
@@ -102,7 +144,7 @@ export default function ProfileUser() {
                 onClick={handleSave}
                 style={{ marginLeft: 8 }}
               >
-                Save
+                Lưu
               </button>
             )}
           </div>

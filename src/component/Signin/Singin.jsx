@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { postSignin } from "../../services/apiServices";
 import { setUserInfo } from "../../services/handleStorageApi";
-import { jwtDecode } from "jwt-decode";
+import { postSignin } from "../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css";
 
@@ -36,33 +35,16 @@ const Signin = () => {
     }
 
     try {
-      const response = await postSignin(email, password);
+      const response = await postSignin(email, password, true);
       if (response.status === 200) {
-        toast.success("Sign in successful!");
-
-        // Nếu backend trả về accessToken, giải mã và lưu userInfo
-        let role;
-        if (response.data.accessToken) {
-          const userInfo = jwtDecode(response.data.accessToken);
-          setUserInfo(userInfo);
-          localStorage.setItem("accessToken", response.data.accessToken);
-          role = userInfo.role;
-        } else if (
-          response.data.userId &&
-          response.data.fullName &&
-          response.data.email &&
-          response.data.role
-        ) {
-          setUserInfo({
-            userId: response.data.userId,
-            fullName: response.data.fullName,
-            email: response.data.email,
-            role: response.data.role,
-          });
-          role = response.data.role;
-        }
-
-        // Navigate based on role
+        toast.success("Đăng nhập thành công!");
+        setUserInfo(
+          response.data.role,
+          response.data.fullName,
+          response.data.email
+        );
+        let role = response.data.role;
+        console.log(role);
         if (role === "Admin") {
           navigate("/admin");
         } else if (role === "Parent") {
@@ -73,10 +55,10 @@ const Signin = () => {
           navigate("/homepage");
         }
       } else {
-        toast.error(response?.message || "Sign in failed!");
+        toast.error(response?.message || "Đăng nhập thất bại!");
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Wrong email or password!");
+      toast.error(error?.response?.data?.message || "Đăng nhập thất bại!");
     }
   };
 
@@ -87,7 +69,7 @@ const Signin = () => {
           EduConnect
         </Title>
         <Text className="signin-welcome">
-          Welcome back! Please enter your details.
+          Chào mừng bạn đến với EduConnect! Vui lòng nhập thông tin của bạn.
         </Text>
 
         <Form layout="vertical" onFinish={handleSignin} className="signin-form">
@@ -127,7 +109,7 @@ const Signin = () => {
 
           <div className="signin-forgot">
             <Link onClick={() => navigate("/forget-password")}>
-              Forgot password?
+              Quên mật khẩu?
             </Link>
           </div>
 
@@ -139,28 +121,28 @@ const Signin = () => {
               block
               className="signin-btn"
             >
-              Sign In
+              Đăng nhập
             </Button>
           </Form.Item>
         </Form>
 
         <div className="signin-header">
           <Text type="secondary" className="signin-header-text">
-            Don't have an account?
+            Bạn chưa có tài khoản?
           </Text>
           <Button
             type="link"
             className="signin-signup-btn"
             onClick={() => navigate("/register")}
           >
-            Sign up
+            Đăng ký
           </Button>
         </div>
 
-        <Divider plain>Or</Divider>
+        <Divider plain>Hoặc</Divider>
 
         <div className="signin-home">
-          <Link onClick={() => navigate("/homepage")}>← Go To Home Page</Link>
+          <Link onClick={() => navigate("/homepage")}>← Quay về trang chủ</Link>
         </div>
       </div>
     </div>
