@@ -43,7 +43,8 @@ const Signin = () => {
           response.data.userId,
           response.data.role,
           response.data.fullName,
-          response.data.email
+          response.data.email,
+          response.data.token
         );
         let role = response.data.role;
         console.log(role);
@@ -64,6 +65,7 @@ const Signin = () => {
             .catch((err) => {
               console.error("Lỗi lấy teacherId:", err);
             });
+          navigate("/teacher");
         } else {
           navigate("/homepage");
         }

@@ -12,8 +12,6 @@ import {
   Avatar,
   Divider,
   Tooltip,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -21,7 +19,10 @@ import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { getUserInfo } from "../../../services/handleStorageApi";
+import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../../../services/handleStorageApi";
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
@@ -32,7 +33,7 @@ const NAV_ITEMS = [
   { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },
 ];
 
-const MAIN_BRAND = "#6D28D9";
+const MAIN_BRAND = "#6D28D9"; // brand
 const BACKGROUND_BRAND = "#EAF1FF";
 const SECONDARY = "#E5E7EB";
 const TERTIARY = "#1F2937";
@@ -41,6 +42,7 @@ const DARK_LIGHT = "#9CA3AF";
 export default function SideBar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
   const user = getUserInfo();
+  const navigate = useNavigate();
 
   return (
     <Drawer
@@ -53,6 +55,11 @@ export default function SideBar({ selected, onSelect }) {
           duration: theme.transitions.duration.enteringScreen,
         }),
         flexShrink: 0,
+        border: "none",
+        borderRadius: "18px 0 0 18px",
+        boxShadow:
+          "0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)",
+        background: "#fff",
         "& .MuiDrawer-paper": {
           width: open ? drawerWidth : collapsedWidth,
           transition: theme.transitions.create("width", {
@@ -62,7 +69,10 @@ export default function SideBar({ selected, onSelect }) {
           boxSizing: "border-box",
           position: "static",
           border: "none",
-          backgroundColor: BACKGROUND_BRAND,
+          borderRadius: "18px 0 0 18px",
+          boxShadow:
+            "0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)",
+          background: "#fff",
           overflowX: "hidden",
         },
       })}
@@ -155,12 +165,30 @@ export default function SideBar({ selected, onSelect }) {
         ))}
       </List>
       <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: SECONDARY }}>
+      <Box
+        sx={{
+          p: 2,
+          m: 1,
+          mb: 2,
+          borderRadius: 3,
+          background: "#fff",
+          boxShadow:
+            "0 4px 24px 0 rgba(30,64,175,0.10), 0 1.5px 6px 0 rgba(30,64,175,0.08)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: open ? "space-between" : "center",
+          minHeight: 70,
+          transition: "box-shadow 0.2s, background 0.2s",
+          position: "relative",
+          zIndex: 2,
+          ...(open ? {} : { alignItems: "center", justifyContent: "center" }),
+        }}
+      >
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: open ? "flex-start" : "center",
+            justifyContent: "center",
           }}
         >
           <Avatar
@@ -168,11 +196,15 @@ export default function SideBar({ selected, onSelect }) {
               user?.avatar || "https://randomuser.me/api/portraits/men/32.jpg"
             }
             alt={user?.fullName || "User"}
+            onClick={() => navigate("/profile")}
             sx={{
               width: 40,
               height: 40,
               mr: open ? 1.5 : 0,
               border: `2px solid ${MAIN_BRAND}`,
+              transition: "box-shadow 0.2s",
+              cursor: "pointer",
+              "&:hover": { boxShadow: "0 0 0 4px #e0e7ff" },
             }}
           />
           {open && (
@@ -186,43 +218,6 @@ export default function SideBar({ selected, onSelect }) {
                 {user?.email || ""}
               </Typography>
             </Box>
-          )}
-          {user?.role === "Teacher" && (
-            <>
-              <IconButton
-                size="small"
-                onClick={handleMenuClick}
-                sx={{ ml: open ? 1 : 0 }}
-              >
-                <ArrowDropDownIcon />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={openMenu}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-              >
-                <MenuItem onClick={handleProfile}>
-                  <ListItemIcon>
-                    <PersonIcon fontSize="small" />
-                  </ListItemIcon>
-                  Profile
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  <ListItemIcon>
-                    <LogoutIcon fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </>
           )}
         </Box>
         {open && (
