@@ -6,6 +6,7 @@ import { setUserInfo } from "../../services/handleStorageApi";
 import { postSignin } from "../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css";
+import axios from "axios";
 
 const { Title, Text, Link } = Typography;
 
@@ -41,7 +42,8 @@ const Signin = () => {
         setUserInfo(
           response.data.role,
           response.data.fullName,
-          response.data.email
+          response.data.email,
+          response.data.userId
         );
         let role = response.data.role;
         console.log(role);
@@ -51,6 +53,17 @@ const Signin = () => {
           navigate("/homepage");
         } else if (role === "Teacher") {
           navigate("/teacher");
+          axios
+            .get(`https://localhost:7064/api/Teacher/${response.data.userId}`)
+            .then((res) => {
+              const teacherId = res.data.teacherId || res.data.id;
+              if (teacherId) {
+                localStorage.setItem("teacherId", teacherId);
+              }
+            })
+            .catch((err) => {
+              console.error("Lỗi lấy teacherId:", err);
+            });
         } else {
           navigate("/homepage");
         }

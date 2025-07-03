@@ -11,8 +11,11 @@ export const logoutUser = () => {
   localStorage.removeItem("userInfo");
 };
 
-export const setUserInfo = (role, fullName, email) => {
-  localStorage.setItem("userInfo", JSON.stringify({ role, fullName, email }));
+export const setUserInfo = (role, fullName, email, userId) => {
+  localStorage.setItem(
+    "userInfo",
+    JSON.stringify({ role, fullName, email, userId })
+  );
 };
 
 export const getUserInfo = () => {
