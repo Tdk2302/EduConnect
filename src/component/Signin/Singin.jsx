@@ -40,10 +40,10 @@ const Signin = () => {
       if (response.status === 200) {
         toast.success("Đăng nhập thành công!");
         setUserInfo(
+          response.data.userId,
           response.data.role,
           response.data.fullName,
-          response.data.email,
-          response.data.userId
+          response.data.email
         );
         let role = response.data.role;
         console.log(role);
