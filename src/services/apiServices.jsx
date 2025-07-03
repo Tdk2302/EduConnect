@@ -1,55 +1,43 @@
-import axios from "axios";
+import axios from 'axios';
 
-const BASE_URL = "https://localhost:7064/api";
+const BASE_URL = 'https://localhost:7064/api';
 
 const postSignin = async (email, password) => {
-  return axios.post(
-    `${BASE_URL}/Auth/Login`,
-    { email, password },
-    { withCredentials: true }
-  );
+    return axios.post(`${BASE_URL}/Auth/login`, { email, password });
 };
 
-const postRegister = async (
-  firstName,
-  lastName,
-  email,
-  password,
-  studentIds
-) => {
-  return axios.post(`${BASE_URL}/Auth/Register`, {
+const postRegister = async (firstName, lastName, email, password, passwordConfirm, gender) => {
+  return axios.post(`https://localhost:7096/parent/registerUser`, {
     firstName,
     lastName,
     email,
     password,
-    studentIds,
+    passwordConfirm,
+    gender,
   });
 };
 
 const forgetPassword = async (email) => {
-  return axios.post(`${BASE_URL}/Auth/forgot-password`, { email });
+    return axios.post(`${BASE_URL}/Auth/forgot-password`, { email });
 };
 
 const resetPassword = async ({ email, token, newPassword }) => {
-  return axios.post(`${BASE_URL}/Auth/reset-password`, {
-    email,
-    token,
-    newPassword,
-  });
+    return axios.post(`${BASE_URL}/Auth/reset-password`, {
+        email,
+        token,
+        newPassword
+    });
 };
 
-const putParentProfile = async (email, data) => {
-  // data: { phoneNumber, firstName, lastName, studentId }
-  return axios.put(
-    `${BASE_URL}/Parent/profile?email=${encodeURIComponent(email)}`,
-    data
-  );
+// Thêm hàm lấy danh sách user cho admin
+const getAllAdminUsers = async () => {
+    return axios.get(`${BASE_URL}/Admin/User`);
 };
 
 export {
-  postSignin,
-  postRegister,
-  forgetPassword,
-  resetPassword,
-  putParentProfile,
+    postSignin,
+    postRegister,
+    forgetPassword,
+    resetPassword,
+    getAllAdminUsers
 };

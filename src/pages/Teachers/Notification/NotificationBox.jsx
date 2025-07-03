@@ -58,7 +58,7 @@ const yesterdayStr = format(subDays(today, 1), "yyyy-MM-dd");
 const twoDaysAgoStr = format(subDays(today, 2), "yyyy-MM-dd");
 
 // Expanded dummy data with dynamic dates - FIXED
-const allEvents = [
+let allEvents = [
   // Today's events
   {
     date: todayStr,
@@ -344,6 +344,23 @@ function ClassDetailView({ classInfo }) {
   );
 }
 
+export function ensureDemoEventForDate(dateStr) {
+  const hasEvent = allEvents.some(ev => ev.date === dateStr);
+  if (!hasEvent) {
+    // Tạo event demo cho tất cả classId trong classesData
+    allEvents = [
+      ...allEvents,
+      ...classesData.map(cls => ({
+        date: dateStr,
+        classId: cls.id,
+        type: "Report",
+        title: "Demo báo cáo cho ngày " + dateStr,
+        content: "Đây là dữ liệu demo tự động tạo cho ngày bạn chọn.",
+      }))
+    ];
+  }
+}
+
 export default function NotificationDashboard() {
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [notifications, setNotifications] = useState([]);
@@ -355,6 +372,9 @@ export default function NotificationDashboard() {
     selectedClasses: [],
   });
   const [sending, setSending] = useState(false);
+
+  // Always ensure demo data for selected date
+  ensureDemoEventForDate(format(selectedDate, "yyyy-MM-dd"));
 
   const dailyData = useMemo(() => {
     const dateStr = format(selectedDate, "yyyy-MM-dd");

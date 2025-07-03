@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { postSignin } from "../../services/apiServices";
 import { setUserInfo } from "../../services/handleStorageApi";
+import { jwtDecode } from "jwt-decode";
 import "./Signin.css";
 import "antd/dist/reset.css";
 
@@ -39,8 +40,14 @@ const Signin = () => {
       if (response.status === 200) {
         toast.success("Sign in successful!");
 
-        // Nếu backend trả về thông tin user, bạn có thể lưu lại, nếu không thì bỏ qua đoạn này
-        if (
+        // Nếu backend trả về accessToken, giải mã và lưu userInfo
+        let role;
+        if (response.data.accessToken) {
+          const userInfo = jwtDecode(response.data.accessToken);
+          setUserInfo(userInfo);
+          localStorage.setItem("accessToken", response.data.accessToken);
+          role = userInfo.role;
+        } else if (
           response.data.userId &&
           response.data.fullName &&
           response.data.email &&
@@ -52,16 +59,16 @@ const Signin = () => {
             email: response.data.email,
             role: response.data.role,
           });
+          role = response.data.role;
         }
 
         // Navigate based on role
-        const role = response.data.role;
-        if (role === "Parent") {
+        if (role === "Admin") {
+          navigate("/admin");
+        } else if (role === "Parent") {
           navigate("/homepage");
         } else if (role === "Teacher") {
           navigate("/teacher");
-        } else if (role === "Admin") {
-          navigate("/dashboard");
         } else {
           navigate("/homepage");
         }

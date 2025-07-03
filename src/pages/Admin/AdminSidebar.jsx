@@ -2,28 +2,25 @@ import React, { useState } from "react";
 import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography, IconButton, Avatar, Divider, Tooltip } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChatIcon from "@mui/icons-material/Chat";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import { getUserInfo } from "../../../services/handleStorageApi";
+import PeopleIcon from "@mui/icons-material/People";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { getUserInfo } from "../../services/handleStorageApi";
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
 
 const NAV_ITEMS = [
-  { key: "notify", label: "Thông Báo", icon: <NotificationsIcon /> },
-  { key: "schedule", label: "Thời khóa biểu", icon: <CalendarMonthIcon /> },
-  { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },
+  { key: "users", label: "Quản lý người dùng", icon: <PeopleIcon /> },
+  { key: "settings", label: "Cài đặt", icon: <SettingsIcon /> },
 ];
 
-const MAIN_BRAND = "#6D28D9"; // brand
+const MAIN_BRAND = "#6D28D9";
 const BACKGROUND_BRAND = "#EAF1FF";
 const SECONDARY = "#E5E7EB";
 const TERTIARY = "#1F2937";
 const DARK_LIGHT = "#9CA3AF";
 
-export default function SideBar({ selected, onSelect }) {
+export default function AdminSidebar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
   const user = getUserInfo();
 
@@ -38,6 +35,7 @@ export default function SideBar({ selected, onSelect }) {
           duration: theme.transitions.duration.enteringScreen,
         }),
         flexShrink: 0,
+        height: '100vh',
         '& .MuiDrawer-paper': {
           width: open ? drawerWidth : collapsedWidth,
           transition: theme.transitions.create('width', {
@@ -48,7 +46,10 @@ export default function SideBar({ selected, onSelect }) {
           position: 'static',
           border: 'none',
           backgroundColor: BACKGROUND_BRAND,
-          overflowX: 'hidden',
+          overflow: 'hidden',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
         },
       })}
     >
@@ -66,33 +67,34 @@ export default function SideBar({ selected, onSelect }) {
         </IconButton>
       </Toolbar>
       <Divider sx={{ borderColor: SECONDARY }} />
-      <List sx={{ pt: 1, px: 1 }}>
-        {NAV_ITEMS.map((item) => (
-          <Tooltip key={item.key} title={!open ? item.label : ""} placement="right">
-            <ListItem
-              button
-              selected={selected === item.key}
-              onClick={() => onSelect(item.key)}
-              sx={{
-                borderRadius: 2,
-                mb: 0.5,
-                color: selected === item.key ? "#fff" : TERTIARY,
-                background: selected === item.key ? MAIN_BRAND : "transparent",
-                fontWeight: selected === item.key ? 700 : 500,
-                minHeight: 48,
-                justifyContent: open ? "initial" : "center",
-                px: open ? 2 : 1.5,
-                transition: "background 0.2s, color 0.2s",
-                "&:hover": { background: selected === item.key ? MAIN_BRAND : SECONDARY },
-              }}
-            >
-              <ListItemIcon sx={{ color: selected === item.key ? "#fff" : MAIN_BRAND, minWidth: 36, justifyContent: "center" }}>{item.icon}</ListItemIcon>
-              {open && <ListItemText primary={item.label} sx={{ ".MuiTypography-root": { fontSize: 15, fontWeight: 'inherit', color: selected === item.key ? "#fff" : DARK_LIGHT } }} />}
-            </ListItem>
-          </Tooltip>
-        ))}
-      </List>
-      <Box sx={{ flexGrow: 1 }} />
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+        <List sx={{ pt: 1, px: 1 }}>
+          {NAV_ITEMS.map((item) => (
+            <Tooltip key={item.key} title={!open ? item.label : ""} placement="right">
+              <ListItem
+                button
+                selected={selected === item.key}
+                onClick={() => onSelect(item.key)}
+                sx={{
+                  borderRadius: 2,
+                  mb: 0.5,
+                  color: selected === item.key ? "#fff" : TERTIARY,
+                  background: selected === item.key ? MAIN_BRAND : "transparent",
+                  fontWeight: selected === item.key ? 700 : 500,
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: open ? 2 : 1.5,
+                  transition: "background 0.2s, color 0.2s",
+                  "&:hover": { background: selected === item.key ? MAIN_BRAND : SECONDARY },
+                }}
+              >
+                <ListItemIcon sx={{ color: selected === item.key ? "#fff" : MAIN_BRAND, minWidth: 36, justifyContent: "center" }}>{item.icon}</ListItemIcon>
+                {open && <ListItemText primary={item.label} sx={{ ".MuiTypography-root": { fontSize: 15, fontWeight: 'inherit', color: selected === item.key ? "#fff" : DARK_LIGHT } }} />}
+              </ListItem>
+            </Tooltip>
+          ))}
+        </List>
+      </Box>
       <Box sx={{ p: 2, m: 1, borderRadius: 2, background: SECONDARY }}>
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "flex-start" : "center" }}>
           <Avatar src={user?.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} alt={user?.fullName || "User"} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BRAND}` }} />

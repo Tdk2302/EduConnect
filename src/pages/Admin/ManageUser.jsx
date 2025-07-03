@@ -1,182 +1,125 @@
 import React, { useState, useEffect } from "react";
+import { Box, Typography, Paper, Button, Modal, TextField, Stack, Switch, FormControlLabel } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import TableUser from "./TableUser";
-import "./ManageUser.scss";
+import { getAllAdminUsers } from "../../services/apiServices";
 
-const ManageUser = () => {
-  const [listUsers, setListUser] = useState([]);
+const emptyUser = {
+  fullName: "",
+  role: "",
+  email: "",
+  phoneNumber: "",
+  isActive: true,
+  createAt: ""
+};
+
+export default function ManageUser() {
+  const [users, setUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
+  const [formData, setFormData] = useState(emptyUser);
+  const [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
-    fetchAllUsers();
+    getAllAdminUsers()
+      .then((res) => {
+        setUsers(res.data.map(u => ({ ...u, createAt: u.createAt || new Date().toISOString() })));
+      })
+      .catch(() => {
+        setUsers([]);
+      });
   }, []);
 
-  const fetchAllUsers = async () => {
-    const sampleUsers = [
-      {
-        id: 1,
-        fullName: "Nguyễn Thị Mai",
-        roles: ["Teacher"],
-        email: "mai.Teacher@gmail.com",
-        username: "nguyenthimai",
-        password: "123",
-        dateCreated: "04/10/2023",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "dark",
-      },
-      {
-        id: 2,
-        fullName: "Trần Văn An",
-        roles: ["Student"],
-        email: "an.student@gmail.com",
-        username: "tranvanan",
-        password: "456",
-        dateCreated: "06/03/2022",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "light",
-      },
-      {
-        id: 3,
-        fullName: "Lê Thị Hồng",
-        roles: ["Teacher"],
-        email: "hong.Teacher@gmail.com",
-        username: "lethihong",
-        password: "789",
-        dateCreated: "01/12/2021",
-        status: "Suspended",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "dark",
-      },
-      {
-        id: 4,
-        fullName: "Phạm Minh Tuấn",
-        roles: ["Student"],
-        email: "tuan.student@gmail.com",
-        username: "phamminhtuan",
-        password: "abc",
-        dateCreated: "08/09/2020",
-        status: "Inactive",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "light",
-      },
-      {
-        id: 5,
-        fullName: "Hoàng Lan",
-        roles: ["Teacher"],
-        email: "lan.multirole@gmail.com",
-        username: "hoanglan",
-        password: "def",
-        dateCreated: "12/08/2019",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "dark",
-      },
-      {
-        id: 6,
-        fullName: "Vũ Minh Châu",
-        roles: ["Student"],
-        email: "chau.student@gmail.com",
-        username: "vuminhchau",
-        password: "ghi",
-        dateCreated: "02/05/2021",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "light",
-      },
-      {
-        id: 7,
-        fullName: "Đặng Quốc Bảo",
-        roles: ["Teacher"],
-        email: "bao.Teacher@gmail.com",
-        username: "dangquocbao",
-        password: "jkl",
-        dateCreated: "11/11/2022",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "dark",
-      },
-      {
-        id: 8,
-        fullName: "Ngô Thị Thu",
-        roles: ["Student"],
-        email: "thu.student@gmail.com",
-        username: "ngothithu",
-        password: "mno",
-        dateCreated: "07/07/2020",
-        status: "Inactive",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "light",
-      },
-      {
-        id: 9,
-        fullName: "Phan Văn Hùng",
-        roles: ["Teacher"],
-        email: "hung.Teacher@gmail.com",
-        username: "phanvanhung",
-        password: "pqr",
-        dateCreated: "03/03/2023",
-        status: "Suspended",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "dark",
-      },
-      {
-        id: 10,
-        fullName: "Lý Thị Kim",
-        roles: ["Student"],
-        email: "kim.student@gmail.com",
-        username: "lythikim",
-        password: "stu",
-        dateCreated: "09/09/2021",
-        status: "Active",
-        avatar:
-          "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg",
-        theme: "light",
-      },
-    ];
-
-    setListUser(sampleUsers);
+  const handleOpenAdd = () => {
+    setFormData(emptyUser);
+    setModalMode("add");
+    setIsModalOpen(true);
   };
 
-  // Loại bỏ logic mở modal, chỉ giữ các hàm quản lý khác
-  const handleClickBtnView = () => {
-    // Vô hiệu hóa vì không có modal
-    console.log("View button clicked, but modal is disabled.");
+  const handleOpenEdit = (user) => {
+    setFormData(user);
+    setEditIndex(users.findIndex(u => u.email === user.email));
+    setModalMode("edit");
+    setIsModalOpen(true);
   };
 
-  const handleClickBtnUpdate = () => {
-    // Logic cập nhật (có thể mở rộng sau)
-    console.log("Update button clicked.");
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData(emptyUser);
+    setEditIndex(null);
   };
 
-  const handleClickBtnDelete = () => {
-    // Logic xóa (có thể mở rộng sau)
-    console.log("Delete button clicked.");
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (modalMode === "add") {
+      setUsers(prev => [
+        ...prev,
+        { ...formData, createAt: new Date().toISOString() }
+      ]);
+    } else if (modalMode === "edit" && editIndex !== null) {
+      setUsers(prev => prev.map((u, idx) => idx === editIndex ? { ...formData } : u));
+    }
+    handleCloseModal();
+  };
+
+  const handleDeleteUser = (user) => {
+    setUsers(prev => prev.filter(u => u.email !== user.email));
+  };
+
+  const handleViewUser = (user) => {
+    alert(`Thông tin người dùng:\nHọ tên: ${user.fullName}\nEmail: ${user.email}\nVai trò: ${user.role}\nSố điện thoại: ${user.phoneNumber}\nTrạng thái: ${user.isActive ? "Active" : "Inactive"}\nNgày tạo: ${user.createAt}`);
   };
 
   return (
-    <div className="manage-user-container">
-      <div className="table-user-container">
+    <Box sx={{ minHeight: "100vh", bgcolor: "#EAF1FF", py: 4 }}>
+      <Paper sx={{ borderRadius: 2, background: "#fff", border: "1px solid #E5E7EB", boxShadow: "none", p: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+          <Typography variant="h5" fontWeight={700} color="#222">
+            Quản lý người dùng
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAdd}
+            sx={{ bgcolor: "#6D28D9", color: "#fff", fontWeight: 600, borderRadius: 2, boxShadow: "none", "&:hover": { bgcolor: "#5126a7" } }}
+          >
+            Thêm người dùng
+          </Button>
+        </Box>
         <TableUser
-          listUsers={listUsers}
-          handleClickBtnView={handleClickBtnView}
-          handleClickBtnUpdate={handleClickBtnUpdate}
-          handleClickBtnDelete={handleClickBtnDelete}
-          handleManageStudent={() => {}}
-          handleManageTeacher={() => {}}
-          handleManageAccount={() => {}}
+          listUsers={users}
+          onView={handleViewUser}
+          onEdit={handleOpenEdit}
+          onDelete={handleDeleteUser}
         />
-      </div>
-    </div>
+        <Modal open={isModalOpen} onClose={handleCloseModal}>
+          <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 400, bgcolor: "#fff", borderRadius: 2, boxShadow: 24, p: 4 }}>
+            <Typography variant="h6" mb={2} fontWeight={700} color="#6D28D9">
+              {modalMode === "add" ? "Thêm người dùng mới" : "Chỉnh sửa người dùng"}
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <Stack spacing={2}>
+                <TextField name="fullName" label="Họ và tên" value={formData.fullName} onChange={handleInputChange} required fullWidth />
+                <TextField name="role" label="Vai trò" value={formData.role} onChange={handleInputChange} required fullWidth />
+                <TextField name="email" label="Email" value={formData.email} onChange={handleInputChange} required fullWidth />
+                <TextField name="phoneNumber" label="Số điện thoại" value={formData.phoneNumber} onChange={handleInputChange} required fullWidth />
+                <FormControlLabel
+                  control={<Switch checked={formData.isActive} onChange={handleInputChange} name="isActive" />}
+                  label="Active"
+                />
+                <Button type="submit" variant="contained" sx={{ bgcolor: "#6D28D9", color: "#fff" }}>
+                  {modalMode === "add" ? "Thêm" : "Lưu"}
+                </Button>
+              </Stack>
+            </form>
+          </Box>
+        </Modal>
+      </Paper>
+    </Box>
   );
-};
-
-export default ManageUser;
+}
