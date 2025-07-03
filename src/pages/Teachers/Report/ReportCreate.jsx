@@ -1,10 +1,27 @@
 import React, { useState } from "react";
-import { Box, Paper, Typography, TextField, Button, MenuItem, Select, InputLabel, FormControl, Stack, Alert, Fade, InputAdornment, Snackbar } from "@mui/material";
-import SchoolIcon from '@mui/icons-material/School';
-import EventIcon from '@mui/icons-material/Event';
-import CategoryIcon from '@mui/icons-material/Category';
-import TitleIcon from '@mui/icons-material/Title';
-import NotesIcon from '@mui/icons-material/Notes';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Stack,
+  Alert,
+  Fade,
+  InputAdornment,
+  Snackbar,
+} from "@mui/material";
+import SchoolIcon from "@mui/icons-material/School";
+import EventIcon from "@mui/icons-material/Event";
+import CategoryIcon from "@mui/icons-material/Category";
+import TitleIcon from "@mui/icons-material/Title";
+import NotesIcon from "@mui/icons-material/Notes";
+import { postReport } from "../../../services/apiServices";
+import { getUserInfo } from "../../../services/handleStorageApi";
 
 const classOptions = [
   { id: "12A1", name: "Lớp 12A1" },
@@ -29,7 +46,7 @@ const palette = {
   background: "#EBEBF5",
   active: "#2563eb",
   black: "#000000",
-  backgroundBrand: "#EAF1FF"
+  backgroundBrand: "#EAF1FF",
 };
 
 export default function ReportCreate() {
@@ -48,41 +65,82 @@ export default function ReportCreate() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    // Lấy thông tin giáo viên từ localStorage
+    const userInfo = getUserInfo();
+    const reportData = {
+      teacherId: userInfo?.userId || "",
+      teacherName: userInfo?.fullName || "",
+      classId: form.classId,
+      className:
+        classOptions.find((cls) => cls.id === form.classId)?.name || "",
+      title: form.title,
+      description: form.content,
+      termID: "SM001",
+    };
+
+    try {
+      await postReport(reportData, userInfo?.token);
       setSuccess(true);
-      setForm({ classId: "", date: "", type: "activity", title: "", content: "" });
-    }, 1200);
+      setForm({
+        classId: "",
+        date: "",
+        type: "activity",
+        title: "",
+        content: "",
+      });
+    } catch (error) {
+      // Xử lý lỗi nếu cần
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: palette.backgroundBrand, py: 6 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: palette.backgroundBrand, py: 6 }}>
       <Fade in timeout={700}>
-        <Paper sx={{
-          maxWidth: 480,
-          mx: 'auto',
-          p: { xs: 3, md: 5 },
-          borderRadius: 3,
-          background: palette.primary,
-          border: `1.5px solid ${palette.brand}`,
-          boxShadow: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+        <Paper
+          sx={{
+            maxWidth: 480,
+            mx: "auto",
+            p: { xs: 3, md: 5 },
+            borderRadius: 3,
+            background: palette.primary,
+            border: `1.5px solid ${palette.brand}`,
+            boxShadow: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
             <SchoolIcon sx={{ fontSize: 36, color: palette.brand }} />
-            <Typography variant="h4" fontWeight={900} color={palette.brand} letterSpacing={1}>
+            <Typography
+              variant="h4"
+              fontWeight={900}
+              color={palette.brand}
+              letterSpacing={1}
+            >
               Tạo báo cáo
             </Typography>
           </Box>
-          <Typography variant="subtitle1" color={palette.darkLight} fontWeight={500} mb={3} textAlign="center">
+          <Typography
+            variant="subtitle1"
+            color={palette.darkLight}
+            fontWeight={500}
+            mb={3}
+            textAlign="center"
+          >
             Gửi báo cáo hoạt động/thái độ học sinh cho lớp chủ nhiệm của bạn
           </Typography>
-          <form onSubmit={handleSubmit} autoComplete="off" style={{ width: '100%' }}>
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            style={{ width: "100%" }}
+          >
             <Stack spacing={2}>
               <FormControl fullWidth required variant="outlined">
                 <InputLabel id="class-label">Lớp</InputLabel>
@@ -92,11 +150,21 @@ export default function ReportCreate() {
                   value={form.classId}
                   label="Lớp"
                   onChange={handleChange}
-                  sx={{ background: palette.primary, borderRadius: 2, fontWeight: 600 }}
-                  startAdornment={<InputAdornment position="start"><SchoolIcon sx={{ color: palette.brand }}/></InputAdornment>}
+                  sx={{
+                    background: palette.primary,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                  }}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <SchoolIcon sx={{ color: palette.brand }} />
+                    </InputAdornment>
+                  }
                 >
                   {classOptions.map((cls) => (
-                    <MenuItem key={cls.id} value={cls.id}>{cls.name}</MenuItem>
+                    <MenuItem key={cls.id} value={cls.id}>
+                      {cls.name}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -125,11 +193,21 @@ export default function ReportCreate() {
                   value={form.type}
                   label="Loại"
                   onChange={handleChange}
-                  sx={{ background: palette.primary, borderRadius: 2, fontWeight: 600 }}
-                  startAdornment={<InputAdornment position="start"><CategoryIcon sx={{ color: palette.brand }}/></InputAdornment>}
+                  sx={{
+                    background: palette.primary,
+                    borderRadius: 2,
+                    fontWeight: 600,
+                  }}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <CategoryIcon sx={{ color: palette.brand }} />
+                    </InputAdornment>
+                  }
                 >
                   {typeOptions.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -176,15 +254,15 @@ export default function ReportCreate() {
                   borderRadius: 2,
                   fontSize: 18,
                   py: 1.2,
-                  boxShadow: 'none',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    bgcolor: '#5126a7',
+                  boxShadow: "none",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    bgcolor: "#5126a7",
                   },
                 }}
                 fullWidth
               >
-                {loading ? 'Đang gửi...' : 'GỬI BÁO CÁO'}
+                {loading ? "Đang gửi..." : "GỬI BÁO CÁO"}
               </Button>
             </Stack>
           </form>
@@ -194,13 +272,23 @@ export default function ReportCreate() {
         open={success}
         autoHideDuration={2200}
         onClose={() => setSuccess(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         TransitionComponent={Fade}
       >
-        <Alert icon={<SchoolIcon fontSize="inherit" />} severity="success" sx={{ bgcolor: palette.brand, color: palette.primary, fontWeight: 700, fontSize: 18, boxShadow: 'none' }}>
+        <Alert
+          icon={<SchoolIcon fontSize="inherit" />}
+          severity="success"
+          sx={{
+            bgcolor: palette.brand,
+            color: palette.primary,
+            fontWeight: 700,
+            fontSize: 18,
+            boxShadow: "none",
+          }}
+        >
           Báo cáo đã được gửi thành công!
         </Alert>
       </Snackbar>
     </Box>
   );
-} 
+}

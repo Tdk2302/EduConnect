@@ -9,10 +9,15 @@ export const getUserName = () => {
 export const logoutUser = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("userInfo");
+  localStorage.removeItem("teacherId");
+  localStorage.removeItem("teacherInfo");
 };
 
 export const setUserInfo = (userId, role, fullName, email, token) => {
-  localStorage.setItem("userInfo", JSON.stringify({ userId, role, fullName, email, token }));
+  localStorage.setItem(
+    "userInfo",
+    JSON.stringify({ userId, role, fullName, email, token })
+  );
 };
 
 export const getUserInfo = () => {

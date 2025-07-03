@@ -20,7 +20,6 @@ function ProtectedRoute({ allowedRoles, children }) {
   const user = getUserInfo();
   if (!user) return <Navigate to="/signin" replace />;
   if (!allowedRoles.includes(user.role)) {
-    // Nếu đã đăng nhập nhưng không đúng role, về đúng trang role của mình
     if (user.role === "Admin") return <Navigate to="/admin" replace />;
     if (user.role === "Teacher") return <Navigate to="/teacher" replace />;
     if (user.role === "Parent") return <Navigate to="/homepage" replace />;

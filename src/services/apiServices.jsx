@@ -129,6 +129,11 @@ const getParentProfile = async () => {
   return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
 };
 
+// ------------------ REPORT ------------------
+const postReport = async (formData) => {
+  return axios.post(`${BASE_URL}/Report`, formData, { withCredentials: true });
+};
+
 // ------------------ EXPORT ------------------
 export {
   postSignin,
@@ -140,4 +145,5 @@ export {
   updateParentProfile,
   getParentProfile,
   getToken,
+  postReport,
 };
