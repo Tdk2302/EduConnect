@@ -2,6 +2,7 @@ import axios from "axios";
 
 const BASE_URL = "https://localhost:7064/api";
 
+// ------------------ AUTH ------------------
 const postSignin = async (email, password) => {
   return axios.post(
     `${BASE_URL}/Auth/login`,
@@ -52,7 +53,7 @@ const resetPassword = async ({ email, token, newPassword }) => {
   );
 };
 
-// Helper lấy token từ localStorage
+// ------------------ TOKEN ------------------
 const getToken = () => {
   const info = localStorage.getItem("userInfo");
   if (!info) return null;
@@ -64,7 +65,7 @@ const getToken = () => {
   }
 };
 
-// Thêm hàm lấy danh sách user cho admin
+// ------------------ ADMIN ------------------
 const getAllAdminUsers = async (token) => {
   return axios.get(`${BASE_URL}/Admin/User`, {
     withCredentials: true,
@@ -72,7 +73,6 @@ const getAllAdminUsers = async (token) => {
   });
 };
 
-// Thêm hàm đổi role cho user (Admin)
 const putChangeUserRole = async (email, role, token) => {
   return axios.put(
     `${BASE_URL}/Admin/users/role`,
@@ -84,7 +84,7 @@ const putChangeUserRole = async (email, role, token) => {
   );
 };
 
-// Update Teacher
+// ------------------ TEACHER ------------------
 export const putUpdateTeacher = async (userId, subjectId, status, token) => {
   return axios.put(
     `${BASE_URL}/Teacher/${userId}`,
@@ -96,39 +96,40 @@ export const putUpdateTeacher = async (userId, subjectId, status, token) => {
   );
 };
 
-// Delete Teacher
 export const deleteTeacher = async (userId, token) => {
-  return axios.delete(
-    `${BASE_URL}/Teacher/${userId}`,
-    {
-      withCredentials: true,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    }
-  );
+  return axios.delete(`${BASE_URL}/Teacher/${userId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
-// Lấy chi tiết Teacher
 export const getTeacherDetail = async (userId, token) => {
-  return axios.get(
-    `${BASE_URL}/Teacher/${userId}`,
-    {
-      withCredentials: true,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    }
-  );
+  return axios.get(`${BASE_URL}/Teacher/${userId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
-// Lấy danh sách lịch dạy của giáo viên
 export const getTeacherCourses = async (teacherId, token) => {
-  return axios.get(
-    `${BASE_URL}/Course/teacher/${teacherId}`,
-    {
-      withCredentials: true,
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    }
-  );
+  return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
+// ------------------ PARENT ------------------
+const updateParentProfile = async (formData) => {
+  return axios.put(`${BASE_URL}/Parent/profile`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true,
+  });
+};
+
+const getParentProfile = async () => {
+  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
+};
+
+// ------------------ EXPORT ------------------
 export {
   postSignin,
   postRegister,
@@ -136,6 +137,7 @@ export {
   resetPassword,
   getAllAdminUsers,
   putChangeUserRole,
-  // getTeacherDetail,
-  // getTeacherCourses,
+  updateParentProfile,
+  getParentProfile,
+  getToken,
 };
