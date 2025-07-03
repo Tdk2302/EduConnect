@@ -51,7 +51,8 @@ const Header = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const isLoggedIn = !!getUserInfo();
+  const user = getUserInfo();
+  const isLoggedIn = !!user;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -119,6 +120,29 @@ const Header = () => {
                 )}
               </Box>
             ))}
+            {/* Teacher Only Section */}
+            {user?.role === "Teacher" && (
+              <Box
+                sx={{
+                  ml: 3,
+                  px: 2.5,
+                  py: 1.2,
+                  borderRadius: 2,
+                  background: "#6D28D9",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 17,
+                  letterSpacing: 0.5,
+                  boxShadow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer"
+                }}
+                onClick={() => navigate("/teacher")}
+              >
+                Teacher Hub
+              </Box>
+            )}
           </Box>
         </Box>
         <Box>

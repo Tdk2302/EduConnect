@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import TableUser from "./TableUser";
-import "./ManageUser.scss";
 
 const ManageUser = () => {
   const [listUsers, setListUser] = useState([]);
