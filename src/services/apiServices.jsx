@@ -118,6 +118,17 @@ export const getTeacherDetail = async (userId, token) => {
   );
 };
 
+const updateParentProfile = async (formData) => {
+  return axios.put(`${BASE_URL}/Parent/profile`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    withCredentials: true,
+  });
+};
+
+const getParentProfile = async () => {
+  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
+};
+
 export {
   postSignin,
   postRegister,
@@ -125,4 +136,6 @@ export {
   resetPassword,
   getAllAdminUsers,
   putChangeUserRole,
+  updateParentProfile,
+  getParentProfile,
 };
