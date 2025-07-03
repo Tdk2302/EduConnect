@@ -60,6 +60,7 @@ import { vi } from "date-fns/locale";
 import "./Notication.scss";
 import Header from "../../../component/Header";
 import axios from "axios";
+import { message } from "antd";
 
 const notificationTypes = {
   report: { label: "Báo cáo", icon: AssignmentIcon, color: "primary" },
@@ -260,15 +261,17 @@ export default function Notifications() {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
+    message.success("Đã đánh dấu là đã đọc!");
   };
 
   const handleDelete = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+    message.success("Đã xóa thông báo!");
   };
 
   const handleArchive = (id) => {
     // Implement archive functionality
-    console.log("Archive notification:", id);
+    message.success("Đã lưu trữ thông báo!");
   };
 
   const handleMarkAllRead = () => {

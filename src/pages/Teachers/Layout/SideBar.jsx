@@ -21,11 +21,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PersonIcon from "@mui/icons-material/Person";
 import { getUserInfo } from "../../../services/handleStorageApi";
-import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
@@ -45,25 +41,6 @@ const DARK_LIGHT = "#9CA3AF";
 export default function SideBar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
   const user = getUserInfo();
-  const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const openMenu = Boolean(anchorEl);
-
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const handleProfile = () => {
-    handleMenuClose();
-    navigate("/profile");
-  };
-  const handleLogout = () => {
-    handleMenuClose();
-    localStorage.clear();
-    navigate("/signin");
-  };
 
   return (
     <Drawer
@@ -184,7 +161,6 @@ export default function SideBar({ selected, onSelect }) {
             display: "flex",
             alignItems: "center",
             justifyContent: open ? "flex-start" : "center",
-            position: "relative",
           }}
         >
           <Avatar
@@ -249,6 +225,24 @@ export default function SideBar({ selected, onSelect }) {
             </>
           )}
         </Box>
+        {open && (
+          <Tooltip title="Đăng xuất">
+            <IconButton
+              onClick={() => {
+                logoutUser();
+                navigate("/signin");
+              }}
+              sx={{
+                color: "#e11d48",
+                ml: open ? 1 : 0,
+                transition: "background 0.2s",
+                "&:hover": { background: "#fee2e2" },
+              }}
+            >
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Drawer>
   );

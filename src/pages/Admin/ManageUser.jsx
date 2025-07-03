@@ -15,6 +15,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import "./ManageUser.scss";
+import { message } from "antd";
 
 const ROLE_CATEGORIES = [
   { label: "Quản trị viên", value: "Admin" },
@@ -154,7 +155,10 @@ const ManageUser = () => {
       await putUpdateTeacher(editTeacher.userId, editTeacher.subjectId, editTeacher.status, token);
       setOpenEditTeacher(false);
       fetchAllUsers();
-    } catch (e) {}
+      message.success("Cập nhật giáo viên thành công!");
+    } catch (e) {
+      message.error("Có lỗi xảy ra khi cập nhật giáo viên!");
+    }
     setLoadingEdit(false);
   };
   const handleDeleteTeacher = (user) => {
@@ -173,7 +177,10 @@ const ManageUser = () => {
       await deleteTeacher(deleteUserId, token);
       setOpenDelete(false);
       fetchAllUsers();
-    } catch (e) {}
+      message.success("Xóa giáo viên thành công!");
+    } catch (e) {
+      message.error("Có lỗi xảy ra khi xóa giáo viên!");
+    }
     setLoadingDelete(false);
   };
 

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Alert, Button, Select } from "antd";
+import { Spin, Alert, Button, Select, message } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { getUserInfo } from "../../../services/handleStorageApi";
 import { getTeacherDetail, getTeacherCourses } from "../../../services/apiServices";
 import "./TeacherSchedule.css";
+import AttendancePage from "./AttendancePage";
 
 const SLOTS = [
   "Slot 1",
@@ -56,6 +57,7 @@ const TeacherSchedule = () => {
   const [scheduleData, setScheduleData] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(getWeekDates(new Date()));
+  const [attendanceModal, setAttendanceModal] = useState({ open: false, courseId: null });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +67,7 @@ const TeacherSchedule = () => {
         const userInfo = getUserInfo();
         if (!userInfo || !userInfo.userId || !userInfo.token) {
           setError("Không tìm thấy thông tin đăng nhập.");
+          message.error("Không tìm thấy thông tin đăng nhập.");
           setLoading(false);
           return;
         }
@@ -74,6 +77,7 @@ const TeacherSchedule = () => {
         setTeacherInfo(teacher);
         if (!teacher.teacherId) {
           setError("Không tìm thấy mã giáo viên.");
+          message.error("Không tìm thấy mã giáo viên.");
           setLoading(false);
           return;
         }
@@ -103,12 +107,14 @@ const TeacherSchedule = () => {
               class: course.classId || "-",
               time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}`,
               status: course.status || "nostatus",
+              courseId: course.courseId,
             });
           }
         });
         setScheduleData(grid);
       } catch (err) {
         setError("Lỗi khi tải dữ liệu: " + (err?.response?.data?.message || err.message));
+        message.error("Lỗi khi tải dữ liệu: " + (err?.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
@@ -210,7 +216,13 @@ const TeacherSchedule = () => {
                             dataArr.map((data, idx) => {
                               const statusColor = STATUS_COLORS[data?.status] || STATUS_COLORS.nostatus;
                               return (
-                                <div key={idx} className="cell-office-main" style={{ marginBottom: 6 }}>
+                                <div
+                                  key={idx}
+                                  className="cell-office-main"
+                                  style={{ marginBottom: 6, cursor: 'pointer', borderRadius: 8, transition: 'background 0.2s' }}
+                                  onClick={() => data.courseId && setAttendanceModal({ open: true, courseId: data.courseId })}
+                                  title="Bấm để điểm danh"
+                                >
                                   <div className="cell-office-code"><b>Mã môn học:</b> {data.subjectCode}</div>
                                   <div className="cell-office-subject"><b>Tên môn:</b> {data.subject ?? 'Null'}</div>
                                   <div className="cell-office-class">Lớp: {data.class}</div>
@@ -237,6 +249,11 @@ const TeacherSchedule = () => {
           </div>
         </div>
       </Spin>
+      <AttendancePage
+        courseId={attendanceModal.courseId}
+        visible={attendanceModal.open}
+        onClose={() => setAttendanceModal({ open: false, courseId: null })}
+      />
       </div>
   );
 };

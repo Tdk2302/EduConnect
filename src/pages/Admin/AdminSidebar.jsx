@@ -4,7 +4,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { getUserInfo } from "../../services/handleStorageApi";
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../services/handleStorageApi';
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
@@ -23,6 +26,7 @@ const DARK_LIGHT = "#9CA3AF";
 export default function AdminSidebar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
   const user = getUserInfo();
+  const navigate = useNavigate();
 
   return (
     <Drawer
@@ -36,6 +40,10 @@ export default function AdminSidebar({ selected, onSelect }) {
         }),
         flexShrink: 0,
         height: '100vh',
+        border: 'none',
+        borderRadius: '18px 0 0 18px',
+        boxShadow: '0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)',
+        background: '#fff',
         '& .MuiDrawer-paper': {
           width: open ? drawerWidth : collapsedWidth,
           transition: theme.transitions.create('width', {
@@ -45,7 +53,9 @@ export default function AdminSidebar({ selected, onSelect }) {
           boxSizing: 'border-box',
           position: 'static',
           border: 'none',
-          backgroundColor: BACKGROUND_BRAND,
+          borderRadius: '18px 0 0 18px',
+          boxShadow: '0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)',
+          background: '#fff',
           overflow: 'hidden',
           height: '100vh',
           display: 'flex',
@@ -95,8 +105,8 @@ export default function AdminSidebar({ selected, onSelect }) {
           ))}
         </List>
       </Box>
-      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: SECONDARY }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "flex-start" : "center" }}>
+      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: open ? 'space-between' : 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: open ? 'flex-start' : 'center' }}>
           <Avatar src={user?.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} alt={user?.fullName || "User"} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BRAND}` }} />
           {open && (
             <Box>
@@ -105,6 +115,11 @@ export default function AdminSidebar({ selected, onSelect }) {
             </Box>
           )}
         </Box>
+        <Tooltip title="Đăng xuất">
+          <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: open ? 1 : 0 }}>
+            <LogoutOutlinedIcon fontSize="medium" />
+          </IconButton>
+        </Tooltip>
       </Box>
     </Drawer>
   );
