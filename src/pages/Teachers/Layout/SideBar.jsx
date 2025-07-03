@@ -6,7 +6,10 @@ import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { getUserInfo } from "../../../services/handleStorageApi";
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../../services/handleStorageApi';
 
 const drawerWidth = 240;
 const collapsedWidth = 80;
@@ -26,6 +29,7 @@ const DARK_LIGHT = "#9CA3AF";
 export default function SideBar({ selected, onSelect }) {
   const [open, setOpen] = useState(true);
   const user = getUserInfo();
+  const navigate = useNavigate();
 
   return (
     <Drawer
@@ -38,6 +42,10 @@ export default function SideBar({ selected, onSelect }) {
           duration: theme.transitions.duration.enteringScreen,
         }),
         flexShrink: 0,
+        border: 'none',
+        borderRadius: '18px 0 0 18px',
+        boxShadow: '0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)',
+        background: '#fff',
         '& .MuiDrawer-paper': {
           width: open ? drawerWidth : collapsedWidth,
           transition: theme.transitions.create('width', {
@@ -47,7 +55,9 @@ export default function SideBar({ selected, onSelect }) {
           boxSizing: 'border-box',
           position: 'static',
           border: 'none',
-          backgroundColor: BACKGROUND_BRAND,
+          borderRadius: '18px 0 0 18px',
+          boxShadow: '0 8px 32px 0 rgba(30,64,175,0.13), 0 2px 8px 0 rgba(30,64,175,0.10)',
+          background: '#fff',
           overflowX: 'hidden',
         },
       })}
@@ -93,9 +103,27 @@ export default function SideBar({ selected, onSelect }) {
         ))}
       </List>
       <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ p: 2, m: 1, borderRadius: 2, background: SECONDARY }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "flex-start" : "center" }}>
-          <Avatar src={user?.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} alt={user?.fullName || "User"} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BRAND}` }} />
+      <Box sx={{
+        p: 2,
+        m: 1,
+        mb: 2,
+        borderRadius: 3,
+        background: '#fff',
+        boxShadow: '0 4px 24px 0 rgba(30,64,175,0.10), 0 1.5px 6px 0 rgba(30,64,175,0.08)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: open ? 'space-between' : 'center',
+        minHeight: 70,
+        transition: 'box-shadow 0.2s, background 0.2s',
+        position: 'relative',
+        zIndex: 2,
+        ...(open ? {} : { alignItems: 'center', justifyContent: 'center' })
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Avatar src={user?.avatar || "https://randomuser.me/api/portraits/men/32.jpg"} alt={user?.fullName || "User"} sx={{ width: 40, height: 40, mr: open ? 1.5 : 0, border: `2px solid ${MAIN_BRAND}`,
+            transition: 'box-shadow 0.2s',
+            '&:hover': { boxShadow: '0 0 0 4px #e0e7ff' }
+          }} />
           {open && (
             <Box>
               <Typography sx={{ fontWeight: 600, fontSize: 15, color: TERTIARY }}>{user?.fullName || "User"}</Typography>
@@ -103,6 +131,16 @@ export default function SideBar({ selected, onSelect }) {
             </Box>
           )}
         </Box>
+        {open && (
+          <Tooltip title="Đăng xuất">
+            <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: open ? 1 : 0,
+              transition: 'background 0.2s',
+              '&:hover': { background: '#fee2e2' }
+            }}>
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Drawer>
   );
