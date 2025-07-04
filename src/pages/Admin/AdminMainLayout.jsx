@@ -12,18 +12,20 @@ export default function AdminMainLayout() {
   else content = <AdminSettings />;
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      <AdminSidebar selected={selected} onSelect={setSelected} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          height: "100vh",
-          overflowY: "auto",
-          p: 2,
-        }}
-      >
-        {content}
+    <Box sx={{ display: "flex", flexDirection: 'column', height: "100vh" }}>
+      <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
+        <AdminSidebar selected={selected} onSelect={setSelected} />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            height: "100%",
+            overflowY: "auto",
+            p: 2,
+          }}
+        >
+          {content}
+        </Box>
       </Box>
     </Box>
   );

@@ -115,11 +115,13 @@ export default function AdminSidebar({ selected, onSelect }) {
             </Box>
           )}
         </Box>
-        <Tooltip title="Đăng xuất">
-          <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: open ? 1 : 0 }}>
-            <LogoutOutlinedIcon fontSize="medium" />
-          </IconButton>
-        </Tooltip>
+        {open && (
+          <Tooltip title="Đăng xuất">
+            <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: 1 }}>
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Drawer>
   );

@@ -85,7 +85,7 @@ const putChangeUserRole = async (email, role, token) => {
 };
 
 // ------------------ TEACHER ------------------
-export const putUpdateTeacher = async (userId, subjectId, status, token) => {
+const putUpdateTeacher = async (userId, subjectId, status, token) => {
   return axios.put(
     `${BASE_URL}/Teacher/${userId}`,
     { subjectId, status },
@@ -96,22 +96,22 @@ export const putUpdateTeacher = async (userId, subjectId, status, token) => {
   );
 };
 
-export const deleteTeacher = async (userId, token) => {
+const deleteTeacher = async (userId, token) => {
   return axios.delete(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 };
 
-export const getTeacherDetail = async (userId, token) => {
+const getTeacherDetail = async (userId, token) => {
   return axios.get(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 };
 
-export const getTeacherCourses = async (teacherId, token) => {
-  return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
+const getTeacherCourses = async (teacherId, token) => {
+ return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -137,6 +137,10 @@ export {
   resetPassword,
   getAllAdminUsers,
   putChangeUserRole,
+  putUpdateTeacher,
+  deleteTeacher,
+  getTeacherDetail,
+  getTeacherCourses,
   updateParentProfile,
   getParentProfile,
   getToken,

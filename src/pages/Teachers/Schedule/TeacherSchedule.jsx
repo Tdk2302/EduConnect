@@ -50,6 +50,20 @@ const getStatusText = (status) => {
   }
 };
 
+// Thêm hàm xác định slot theo thời gian bắt đầu
+function getSlotNameByTime(startTime) {
+  if (!startTime) return "Slot 1";
+  const date = new Date(startTime);
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+  const total = hour * 60 + minute;
+  if (total >= 420 && total < 555) return "Slot 1";      // 07:00 - 09:15
+  if (total >= 570 && total < 705) return "Slot 2";      // 09:30 - 11:45
+  if (total >= 750 && total < 885) return "Slot 3";      // 12:30 - 14:45
+  if (total >= 900 && total < 1035) return "Slot 4";     // 15:00 - 17:15
+  return "Slot 1";
+}
+
 const TeacherSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -99,7 +113,7 @@ const TeacherSchedule = () => {
           const dateStr = courseDate.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" });
           // Nếu ngày nằm trong tuần đang xem
           if (weekDateMap[dateStr] !== undefined) {
-            const slotName = course.slot || "Slot 1";
+            const slotName = getSlotNameByTime(course.startTime);
             if (!grid[slotName][dateStr]) grid[slotName][dateStr] = [];
             grid[slotName][dateStr].push({
               subject: course.subjectName ?? null,
@@ -223,11 +237,10 @@ const TeacherSchedule = () => {
                                   onClick={() => data.courseId && setAttendanceModal({ open: true, courseId: data.courseId })}
                                   title="Bấm để điểm danh"
                                 >
-                                  <div className="cell-office-code"><b>Mã môn học:</b> {data.subjectCode}</div>
                                   <div className="cell-office-subject"><b>Tên môn:</b> {data.subject ?? 'Null'}</div>
                                   <div className="cell-office-class">Lớp: {data.class}</div>
                                   <div className="cell-office-time">{data.time}</div>
-                                  <div
+                              <div
                                     className={`office-status-badge ${data.status?.toLowerCase() || "nostatus"}`}
                                     style={{ color: statusColor.color, background: statusColor.bg }}
                               >
