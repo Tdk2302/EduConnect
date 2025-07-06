@@ -2,18 +2,33 @@ import React, { useState } from "react";
 import { Box } from "@mui/material";
 import SideBar from "./SideBar";
 
+import TeacherDashboard from "../Dashboard/TeacherDashboard";
 import NotificationDashboard from "../Notification/NotificationBox";
 import TeacherSchedulePage from "./TeacherSchedulePage";
 import ReportCreate from "../Report/ReportCreate";
 import "./TeacherMainLayout.css";
 
 export default function TeacherMainLayout() {
-  const [selected, setSelected] = useState("notify");
+  const [selected, setSelected] = useState("dashboard");
 
   let content;
-  if (selected === "notify") content = <NotificationDashboard />;
-  else if (selected === "schedule") content = <TeacherSchedulePage />;
-  else content = <ReportCreate />;
+  switch (selected) {
+    case "dashboard":
+      content = <TeacherDashboard />;
+      break;
+    case "notify":
+      content = <NotificationDashboard />;
+      break;
+    case "schedule":
+      content = <TeacherSchedulePage />;
+      break;
+    case "report":
+      content = <ReportCreate />;
+      break;
+    default:
+      content = <TeacherDashboard />;
+      break;
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: 'column', height: "100vh" }}>

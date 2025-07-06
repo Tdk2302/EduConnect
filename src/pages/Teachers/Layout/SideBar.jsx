@@ -6,6 +6,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import SchoolIcon from '@mui/icons-material/School';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { getUserInfo } from "../../../services/handleStorageApi";
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +16,7 @@ const drawerWidth = 240;
 const collapsedWidth = 80;
 
 const NAV_ITEMS = [
+  { key: "dashboard", label: "Dashboard", icon: <SchoolIcon /> },
   { key: "notify", label: "Thông Báo", icon: <NotificationsIcon /> },
   { key: "schedule", label: "Thời khóa biểu", icon: <CalendarMonthIcon /> },
   { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },

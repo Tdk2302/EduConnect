@@ -13,7 +13,12 @@ import TeacherNotifications from "./pages/Teachers/Notification/NotificationBox"
 import StudentSchedule from "./pages/Parents/Schedule/StudentSchedule";
 import TeacherSchedule from "./pages/Teachers/Schedule/TeacherSchedule";
 import AdminMainLayout from "./pages/Admin/AdminMainLayout";
+import TeacherScheduleCreate from "./pages/Admin/TeacherScheduleCreate";
+import TeacherCourseCreate from "./pages/Admin/TeacherCourseCreate";
+import TeacherAttendanceCreate from "./pages/Admin/TeacherAttendanceCreate";
 import { getUserInfo } from "./services/handleStorageApi";
+import ManageUser from "./pages/Admin/ManageUser";
+import AdminSettings from "./pages/Admin/AdminSettings";
 
 // ProtectedRoute component
 function ProtectedRoute({ allowedRoles, children }) {
@@ -62,13 +67,47 @@ const Router = () => {
               <AdminMainLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="manage-user" element={<ManageUser />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="create-course" element={<TeacherCourseCreate />} />
+          <Route path="create-attendance/:courseId" element={<TeacherAttendanceCreate />} />
+        </Route>
         <Route
           path="/teacher-notifications"
           element={<TeacherNotifications />}
         />
         <Route path="/student-schedule" element={<StudentSchedule />} />
         <Route path="/teacher-schedule" element={<TeacherSchedule />} />
+        <Route
+          path="/admin/create-schedule"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <TeacherScheduleCreate />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create-course"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminMainLayout>
+                <TeacherCourseCreate />
+              </AdminMainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/create-attendance/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminMainLayout>
+                <TeacherAttendanceCreate />
+              </AdminMainLayout>
+            </ProtectedRoute>
+          }
+        />
+    
 
         {/* <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />        */}

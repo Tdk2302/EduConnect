@@ -129,6 +129,31 @@ const getParentProfile = async () => {
   return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
 };
 
+// ------------------ COURSE & ATTENDANCE ------------------
+const postCourse = async (courseData, token) => {
+  return axios.post(
+    `${BASE_URL}/Course`,
+    courseData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+const postAttendance = async (attendanceData, token) => {
+  return axios.post(
+    `${BASE_URL}/Attendance`,
+    attendanceData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+// ------------------ ATTENDANCE STATISTICS ------------------
+
 // ------------------ EXPORT ------------------
 export {
   postSignin,
@@ -144,4 +169,6 @@ export {
   updateParentProfile,
   getParentProfile,
   getToken,
+  postCourse,
+  postAttendance,
 };

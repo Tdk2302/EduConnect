@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Table, Input, Select, Button, Spin, Alert, message } from "antd";
+import { Modal, Table, Input, Select, Button, Spin, Alert, message, Tabs } from "antd";
 import { UserOutlined, CheckCircleOutlined, EditOutlined, BookOutlined, StarFilled } from "@ant-design/icons";
 import { getToken } from "../../../services/apiServices";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const FOCUS_OPTIONS = ["Kém", "Trung bình", "Rất tốt"];
+const PARTICIPATION_OPTIONS = ["Có tham gia", "Không tham gia"];
+const STUDENT_IDS = [
+  "stu001", "stu002", "stu003", "stu004",
+  "stu005", "stu006", "stu007", "stu008"
+];
 
 const AttendancePage = ({ courseId, visible, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); // danh sách attendance đã có
   const [saving, setSaving] = useState(false);
+  const [tab, setTab] = useState("create");
+  const [createRows, setCreateRows] = useState([]); // học sinh chưa có attendance
+  const [editRows, setEditRows] = useState([]); // học sinh đã có attendance
 
   useEffect(() => {
     if (!visible) return;
@@ -28,7 +38,24 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
-        setData(res.data || []);
+        const attendances = res.data || [];
+        setData(attendances);
+        // Phân loại học sinh đã/ chưa có attendance
+        const attendedIds = attendances
+          .filter(a => a.participation || a.note || a.homework || a.focus)
+          .map(a => a.studentId);
+        setEditRows(
+          attendances.filter(a => attendedIds.includes(a.studentId))
+        );
+        setCreateRows(
+          STUDENT_IDS.filter(id => !attendedIds.includes(id)).map(id => ({
+            studentId: id,
+            participation: "",
+            note: "",
+            homework: "",
+            focus: ""
+          }))
+        );
       } catch (err) {
         setError("Lỗi khi tải dữ liệu điểm danh: " + (err?.response?.data?.message || err.message));
       } finally {
@@ -38,29 +65,61 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     fetchAttendance();
   }, [courseId, visible]);
 
-  const handleChange = (idx, field, value) => {
-    setData((prev) =>
-      prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row))
-    );
+  // Xử lý thay đổi cho từng dòng
+  const handleChange = (rows, setRows, idx, field, value) => {
+    setRows(prev => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
   };
 
+  // POST cho học sinh chưa có attendance
+  const handleCreate = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const token = getToken();
+      await axios.post(
+        `https://localhost:7064/api/Attendance`,
+        createRows.map(row => ({
+          atID: "",
+          studentId: row.studentId,
+          courseId: courseId,
+          participation: row.participation || "",
+          note: row.note || "",
+          homework: row.homework || "",
+          focus: row.focus || "",
+        })),
+        {
+          withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+      message.success("Tạo điểm danh thành công!");
+      onClose(true);
+    } catch (err) {
+      setError("Lỗi khi tạo điểm danh: " + (err?.response?.data?.message || err.message));
+      message.error("Lỗi khi tạo điểm danh: " + (err?.response?.data?.message || err.message));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // PUT cho học sinh đã có attendance
   const handleSave = async () => {
     setSaving(true);
     setError("");
     try {
       const token = getToken();
       await Promise.all(
-        data.map((row) =>
+        editRows.map(row =>
           axios.put(
             `https://localhost:7064/api/Attendance`,
             {
               atID: row.atID,
               studentId: row.studentId,
               courseId: courseId,
-              participation: row.participation,
-              note: row.note,
-              homework: row.homework,
-              focus: row.focus,
+              participation: row.participation || "",
+              note: row.note || "",
+              homework: row.homework || "",
+              focus: row.focus || "",
             },
             {
               withCredentials: true,
@@ -69,7 +128,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           )
         )
       );
-      message.success("Lưu điểm danh thành công!");
+      message.success("Cập nhật điểm danh thành công!");
       onClose(true);
     } catch (err) {
       setError("Lỗi khi lưu điểm danh: " + (err?.response?.data?.message || err.message));
@@ -79,7 +138,8 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     }
   };
 
-  const columns = [
+  // Cột chung cho cả 2 tab
+  const getColumns = (rows, setRows, isEdit) => [
     {
       title: <span><UserOutlined style={{ color: '#2563eb', marginRight: 6 }} />Mã học sinh</span>,
       dataIndex: "studentId",
@@ -93,11 +153,18 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       key: "participation",
       align: "center",
       render: (text, row, idx) => (
-        <Input
+        <Select
           value={text}
-          onChange={(e) => handleChange(idx, "participation", e.target.value)}
-          placeholder="Nhập tham gia"
-        />
+          onChange={(value) => handleChange(rows, setRows, idx, "participation", value)}
+          style={{ width: 180 }}
+          placeholder="Chọn trạng thái"
+        >
+          {PARTICIPATION_OPTIONS.map((opt) => (
+            <Option key={opt} value={opt}>
+              {opt}
+            </Option>
+          ))}
+        </Select>
       ),
     },
     {
@@ -108,7 +175,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       render: (text, row, idx) => (
         <Input
           value={text}
-          onChange={(e) => handleChange(idx, "note", e.target.value)}
+          onChange={(e) => handleChange(rows, setRows, idx, "note", e.target.value)}
           placeholder="Nhập ghi chú"
         />
       ),
@@ -121,7 +188,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       render: (text, row, idx) => (
         <Input
           value={text}
-          onChange={(e) => handleChange(idx, "homework", e.target.value)}
+          onChange={(e) => handleChange(rows, setRows, idx, "homework", e.target.value)}
           placeholder="Nhập bài tập"
         />
       ),
@@ -134,8 +201,8 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       render: (text, row, idx) => (
         <Select
           value={text}
-          onChange={(value) => handleChange(idx, "focus", value)}
-          style={{ width: 120 }}
+          onChange={(value) => handleChange(rows, setRows, idx, "focus", value)}
+          style={{ width: 180 }}
         >
           {FOCUS_OPTIONS.map((opt) => (
             <Option key={opt} value={opt}>
@@ -160,19 +227,38 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     >
       {error && <Alert type="error" message={error} style={{ marginBottom: 16 }} />}
       <Spin spinning={loading || saving} tip={saving ? "Đang lưu..." : "Đang tải..."}>
-        <Table
-          columns={columns}
-          dataSource={data}
-          rowKey="studentId"
-          pagination={false}
-          bordered
-          style={{ background: '#fff', borderRadius: 12 }}
-        />
-        <div style={{ textAlign: 'right', marginTop: 24 }}>
-          <Button type="primary" onClick={handleSave} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}>
-            Lưu điểm danh
-          </Button>
-        </div>
+        <Tabs activeKey={tab} onChange={setTab} style={{ marginBottom: 16 }}>
+          <TabPane tab="Tạo điểm danh" key="create">
+            <Table
+              columns={getColumns(createRows, setCreateRows, false)}
+              dataSource={createRows}
+              rowKey="studentId"
+              pagination={false}
+              bordered
+              style={{ background: '#fff', borderRadius: 12 }}
+            />
+            <div style={{ textAlign: 'right', marginTop: 24 }}>
+              <Button type="primary" onClick={handleCreate} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={createRows.length === 0}>
+                Tạo điểm danh
+              </Button>
+            </div>
+          </TabPane>
+          <TabPane tab="Sửa điểm danh" key="edit">
+            <Table
+              columns={getColumns(editRows, setEditRows, true)}
+              dataSource={editRows}
+              rowKey="studentId"
+              pagination={false}
+              bordered
+              style={{ background: '#fff', borderRadius: 12 }}
+            />
+            <div style={{ textAlign: 'right', marginTop: 24 }}>
+              <Button type="primary" onClick={handleSave} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={editRows.length === 0}>
+                Lưu điểm danh
+              </Button>
+            </div>
+          </TabPane>
+        </Tabs>
       </Spin>
     </Modal>
   );
