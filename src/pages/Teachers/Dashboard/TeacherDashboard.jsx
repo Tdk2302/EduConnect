@@ -17,6 +17,10 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import {
   School as SchoolIcon,
@@ -30,11 +34,107 @@ import {
   Visibility as ViewIcon,
   AccessTime as TimeIcon,
   CalendarToday as CalendarIcon,
+  BarChart as BarChartIcon,
+  PieChart as PieChartIcon,
 } from "@mui/icons-material";
-import { getTeacherDetail, getTeacherCourses, getToken } from "../../../services/apiServices";
+import { 
+  getTeacherDetail, 
+  getTeacherCourses, 
+  getAttendanceByCourse,
+  getToken 
+} from "../../../services/apiServices";
 import { getUserInfo } from "../../../services/handleStorageApi";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
+
+// Simple Chart Components
+function AttendanceBarChart({ data }) {
+  const participationCounts = data.reduce((acc, item) => {
+    acc[item.participation] = (acc[item.participation] || 0) + 1;
+    return acc;
+  }, {});
+
+  const maxCount = Math.max(...Object.values(participationCounts));
+  const total = data.length;
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      {Object.entries(participationCounts).map(([participation, count]) => {
+        const percentage = total > 0 ? (count / total) * 100 : 0;
+        const barWidth = maxCount > 0 ? (count / maxCount) * 100 : 0;
+        
+        return (
+          <Box key={participation} sx={{ mb: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="body2" fontWeight="500">
+                {participation}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {count} ({percentage.toFixed(1)}%)
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                width: "100%",
+                height: 20,
+                bgcolor: "grey.200",
+                borderRadius: 1,
+                overflow: "hidden",
+              }}
+            >
+              <Box
+                sx={{
+                  width: `${barWidth}%`,
+                  height: "100%",
+                  bgcolor: participation === "Có tham gia" ? "success.main" : "error.main",
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </Box>
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
+function FocusPieChart({ data }) {
+  const focusCounts = data.reduce((acc, item) => {
+    acc[item.focus] = (acc[item.focus] || 0) + 1;
+    return acc;
+  }, {});
+
+  const colors = {
+    "Rất tốt": "#4caf50",
+    "Tốt": "#8bc34a", 
+    "Trung bình": "#ff9800",
+    "Kém": "#f44336"
+  };
+
+  return (
+    <Box sx={{ mt: 2 }}>
+      {Object.entries(focusCounts).map(([focus, count]) => (
+        <Box key={focus} sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+          <Box
+            sx={{
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              bgcolor: colors[focus] || "#ccc",
+              mr: 1,
+            }}
+          />
+          <Typography variant="body2" sx={{ flexGrow: 1 }}>
+            {focus}
+          </Typography>
+          <Typography variant="body2" fontWeight="500">
+            {count}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  );
+}
 
 function StatCard({ icon, title, value, subtitle, color = "primary", onClick }) {
   return (
@@ -134,7 +234,10 @@ const formatTime = (timeString) => {
 export default function TeacherDashboard() {
   const [teacherInfo, setTeacherInfo] = useState(null);
   const [courses, setCourses] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [loading, setLoading] = useState(true);
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -165,7 +268,13 @@ export default function TeacherDashboard() {
 
       // Gọi API getTeacherCourses với teacherId
       const coursesRes = await getTeacherCourses(teacher.teacherId, token);
-      setCourses(coursesRes.data || []);
+      const coursesData = coursesRes.data || [];
+      setCourses(coursesData);
+
+      // Tự động chọn khóa học đầu tiên để hiển thị attendance
+      if (coursesData.length > 0) {
+        setSelectedCourse(coursesData[0].courseId);
+      }
 
       setHasLoaded(true);
     } catch (err) {
@@ -176,9 +285,31 @@ export default function TeacherDashboard() {
     }
   }, [user, hasLoaded]);
 
+  const fetchAttendanceData = useCallback(async (courseId) => {
+    if (!courseId) return;
+    
+    setAttendanceLoading(true);
+    try {
+      const token = getToken();
+      const attendanceRes = await getAttendanceByCourse(courseId, token);
+      setAttendanceData(attendanceRes.data || []);
+    } catch (err) {
+      console.error("Lỗi khi tải attendance:", err);
+      setAttendanceData([]);
+    } finally {
+      setAttendanceLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      fetchAttendanceData(selectedCourse);
+    }
+  }, [selectedCourse, fetchAttendanceData]);
 
   // Tính toán thống kê từ dữ liệu courses thực tế
   const stats = useMemo(() => {
@@ -195,6 +326,29 @@ export default function TeacherDashboard() {
       activeCoursesCount: activeCourses.length
     };
   }, [courses]);
+
+  // Tính toán thống kê attendance
+  const attendanceStats = useMemo(() => {
+    if (!attendanceData.length) return null;
+
+    const totalStudents = attendanceData.length;
+    const presentCount = attendanceData.filter(item => item.participation === "Có tham gia").length;
+    const absentCount = attendanceData.filter(item => item.participation === "Không tham gia").length;
+    const attendanceRate = totalStudents > 0 ? (presentCount / totalStudents) * 100 : 0;
+
+    const focusStats = attendanceData.reduce((acc, item) => {
+      acc[item.focus] = (acc[item.focus] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      totalStudents,
+      presentCount,
+      absentCount,
+      attendanceRate,
+      focusStats
+    };
+  }, [attendanceData]);
 
   // Lấy courses hôm nay
   const todayCourses = useMemo(() => {
@@ -378,69 +532,189 @@ export default function TeacherDashboard() {
           </Paper>
         </Grid>
 
-        {/* Today's Schedule */}
+        {/* Attendance Charts */}
         <Grid item xs={12} md={8}>
           <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
               <Typography variant="h6" fontWeight="600">
-                Lịch dạy hôm nay ({todayCourses.length})
+                Thống kê điểm danh
               </Typography>
-              <Tooltip title="Xem tất cả">
-                <IconButton size="small" sx={{ ml: "auto" }}>
-                  <ViewIcon />
-                </IconButton>
-              </Tooltip>
+              <FormControl size="small" sx={{ ml: "auto", minWidth: 200 }}>
+                <InputLabel>Chọn khóa học</InputLabel>
+                <Select
+                  value={selectedCourse}
+                  label="Chọn khóa học"
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                >
+                  {courses.map((course) => (
+                    <MenuItem key={course.courseId} value={course.courseId}>
+                      {course.subjectName} - {course.classId}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
-            {todayCourses.length > 0 ? (
-              <List>
-                {todayCourses.map((course, index) => (
-                  <ListItem 
-                    key={course.courseId} 
-                    divider 
-                    sx={{ 
-                      borderRadius: 2, 
-                      mb: 1,
-                      "&:hover": { bgcolor: "action.hover" }
-                    }}
-                  >
-                    <ListItemIcon>
-                      <TimeIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={`${course.subjectName} - ${course.classId}`}
-                      secondary={
-                        <Box>
-                          <Typography variant="body2">
-                            {formatTime(course.startTime)} - {formatTime(course.endTime)}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Khóa học ID: {course.courseId}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                    <Chip
-                      label={course.status}
-                      color={course.status === "Active" ? "success" : "default"}
-                      size="small"
-                    />
-                  </ListItem>
-                ))}
-              </List>
+
+            {attendanceLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : attendanceData.length > 0 ? (
+              <Grid container spacing={3}>
+                {/* Attendance Overview */}
+                <Grid item xs={12} md={6}>
+                  <Card sx={{ p: 2, borderRadius: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <BarChartIcon color="primary" sx={{ mr: 1 }} />
+                      <Typography variant="h6" fontWeight="600">
+                        Tỷ lệ tham gia
+                      </Typography>
+                    </Box>
+                    {attendanceStats && (
+                      <Box>
+                        <Typography variant="h4" fontWeight="700" color="primary" gutterBottom>
+                          {attendanceStats.attendanceRate.toFixed(1)}%
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {attendanceStats.presentCount}/{attendanceStats.totalStudents} học sinh có mặt
+                        </Typography>
+                        <AttendanceBarChart data={attendanceData} />
+                      </Box>
+                    )}
+                  </Card>
+                </Grid>
+
+                {/* Focus Distribution */}
+                <Grid item xs={12} md={6}>
+                  <Card sx={{ p: 2, borderRadius: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <PieChartIcon color="secondary" sx={{ mr: 1 }} />
+                      <Typography variant="h6" fontWeight="600">
+                        Mức độ tập trung
+                      </Typography>
+                    </Box>
+                    <FocusPieChart data={attendanceData} />
+                  </Card>
+                </Grid>
+
+                {/* Attendance Details */}
+                <Grid item xs={12}>
+                  <Card sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="h6" fontWeight="600" gutterBottom>
+                      Chi tiết điểm danh ({attendanceData.length} học sinh)
+                    </Typography>
+                    <Box sx={{ maxHeight: 300, overflow: "auto" }}>
+                      <List dense>
+                        {attendanceData.map((item, index) => (
+                          <ListItem key={item.atID || index} divider>
+                            <ListItemIcon>
+                              <PersonIcon color={item.participation === "Có tham gia" ? "success" : "error"} />
+                            </ListItemIcon>
+                            <ListItemText
+                              primary={`Học sinh ${item.studentId}`}
+                              secondary={
+                                <Box>
+                                  <Typography variant="body2">
+                                    Tham gia: {item.participation}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Tập trung: {item.focus} | Bài tập: {item.homework}
+                                  </Typography>
+                                  {item.note && (
+                                    <Typography variant="body2" color="text.secondary">
+                                      Ghi chú: {item.note}
+                                    </Typography>
+                                  )}
+                                </Box>
+                              }
+                            />
+                            <Chip
+                              label={item.participation}
+                              color={item.participation === "Có tham gia" ? "success" : "error"}
+                              size="small"
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Box>
+                  </Card>
+                </Grid>
+              </Grid>
             ) : (
               <Box textAlign="center" py={4}>
-                <CalendarIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+                <BarChartIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                  Không có lịch dạy hôm nay
+                  Không có dữ liệu điểm danh
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Hôm nay bạn không có khóa học nào được lên lịch.
+                  Chọn một khóa học để xem thống kê điểm danh.
                 </Typography>
               </Box>
             )}
           </Paper>
         </Grid>
       </Grid>
+
+      {/* Today's Schedule */}
+      <Paper sx={{ p: 3, mt: 3, borderRadius: 3 }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Typography variant="h6" fontWeight="600">
+            Lịch dạy hôm nay ({todayCourses.length})
+          </Typography>
+          <Tooltip title="Xem tất cả">
+            <IconButton size="small" sx={{ ml: "auto" }}>
+              <ViewIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {todayCourses.length > 0 ? (
+          <List>
+            {todayCourses.map((course, index) => (
+              <ListItem 
+                key={course.courseId} 
+                divider 
+                sx={{ 
+                  borderRadius: 2, 
+                  mb: 1,
+                  "&:hover": { bgcolor: "action.hover" }
+                }}
+              >
+                <ListItemIcon>
+                  <TimeIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={`${course.subjectName} - ${course.classId}`}
+                  secondary={
+                    <Box>
+                      <Typography variant="body2">
+                        {formatTime(course.startTime)} - {formatTime(course.endTime)}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Khóa học ID: {course.courseId}
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <Chip
+                  label={course.status}
+                  color={course.status === "Active" ? "success" : "default"}
+                  size="small"
+                />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Box textAlign="center" py={4}>
+            <CalendarIcon sx={{ fontSize: 64, color: "text.secondary", mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Không có lịch dạy hôm nay
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Hôm nay bạn không có khóa học nào được lên lịch.
+            </Typography>
+          </Box>
+        )}
+      </Paper>
 
       {/* Recent Courses */}
       <Paper sx={{ p: 3, mt: 3, borderRadius: 3 }}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Table, Input, Select, Button, Spin, Alert, message, Tabs } from "antd";
+import { Modal, Table, Input, Select, Button, Spin, Alert, message, Tabs, Row, Col } from "antd";
 import { UserOutlined, CheckCircleOutlined, EditOutlined, BookOutlined, StarFilled } from "@ant-design/icons";
 import { getToken } from "../../../services/apiServices";
 import axios from "axios";
@@ -8,8 +8,23 @@ import { v4 as uuidv4 } from "uuid";
 const { Option } = Select;
 const { TabPane } = Tabs;
 
-const FOCUS_OPTIONS = ["Kém", "Trung bình", "Rất tốt"];
-const PARTICIPATION_OPTIONS = ["Có tham gia", "Không tham gia"];
+const HOMEWORK_OPTIONS = [
+  "Hoàn thành bài tốt",
+  "Có chuẩn bị bài",
+  "Cần cải thiện điểm",
+  "Chưa chuẩn bị bài"
+];
+const FOCUS_OPTIONS = [
+  "Tốt",
+  "Rất tốt",
+  "Trung Bình",
+  "Kém"
+];
+const PARTICIPATION_OPTIONS = [
+  "Vắng mặt",
+  "Có mặt",
+  "Đi trễ"
+];
 const STUDENT_IDS = [
   "stu001", "stu002", "stu003", "stu004",
   "stu005", "stu006", "stu007", "stu008"
@@ -138,6 +153,15 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     }
   };
 
+  // Hàm áp dụng giá trị cho tất cả các dòng
+  const applyAll = (rows, setRows, values) => {
+    setRows(prev => prev.map(row => ({ ...row, ...values })));
+  };
+
+  // State cho control áp dụng tất cả
+  const [bulkCreate, setBulkCreate] = useState({ participation: '', homework: '', focus: '' });
+  const [bulkEdit, setBulkEdit] = useState({ participation: '', homework: '', focus: '' });
+
   // Cột chung cho cả 2 tab
   const getColumns = (rows, setRows, isEdit) => [
     {
@@ -173,10 +197,12 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       key: "note",
       align: "center",
       render: (text, row, idx) => (
-        <Input
+        <Input.TextArea
           value={text}
           onChange={(e) => handleChange(rows, setRows, idx, "note", e.target.value)}
           placeholder="Nhập ghi chú"
+          autoSize={false}
+          style={{ resize: 'none', minWidth: 180, maxWidth: 220, minHeight: 32, height: 32 }}
         />
       ),
     },
@@ -186,11 +212,18 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       key: "homework",
       align: "center",
       render: (text, row, idx) => (
-        <Input
+        <Select
           value={text}
-          onChange={(e) => handleChange(rows, setRows, idx, "homework", e.target.value)}
-          placeholder="Nhập bài tập"
-        />
+          onChange={(value) => handleChange(rows, setRows, idx, "homework", value)}
+          style={{ width: 180 }}
+          placeholder="Chọn trạng thái bài tập"
+        >
+          {HOMEWORK_OPTIONS.map((opt) => (
+            <Option key={opt} value={opt}>
+              {opt}
+            </Option>
+          ))}
+        </Select>
       ),
     },
     {
@@ -203,6 +236,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           value={text}
           onChange={(value) => handleChange(rows, setRows, idx, "focus", value)}
           style={{ width: 180 }}
+          placeholder="Chọn mức độ tập trung"
         >
           {FOCUS_OPTIONS.map((opt) => (
             <Option key={opt} value={opt}>
@@ -219,7 +253,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       open={visible}
       onCancel={() => onClose(false)}
       title={<span style={{ fontWeight: 700, color: '#2563eb', fontSize: 20 }}>Điểm danh lớp học</span>}
-      width={900}
+      width={1200}
       footer={null}
       bodyStyle={{ padding: 24, background: '#f8fafc', borderRadius: 12 }}
       style={{ top: 40 }}
@@ -229,6 +263,48 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       <Spin spinning={loading || saving} tip={saving ? "Đang lưu..." : "Đang tải..."}>
         <Tabs activeKey={tab} onChange={setTab} style={{ marginBottom: 16 }}>
           <TabPane tab="Tạo điểm danh" key="create">
+            {/* Control áp dụng tất cả */}
+            <Row gutter={12} style={{ marginBottom: 12 }}>
+              <Col>
+                <Select
+                  value={bulkCreate.participation}
+                  onChange={v => setBulkCreate(b => ({ ...b, participation: v }))}
+                  style={{ width: 150 }}
+                  placeholder="Tham gia (tất cả)"
+                >
+                  {PARTICIPATION_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  value={bulkCreate.homework}
+                  onChange={v => setBulkCreate(b => ({ ...b, homework: v }))}
+                  style={{ width: 170 }}
+                  placeholder="Bài tập (tất cả)"
+                >
+                  {HOMEWORK_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  value={bulkCreate.focus}
+                  onChange={v => setBulkCreate(b => ({ ...b, focus: v }))}
+                  style={{ width: 150 }}
+                  placeholder="Tập trung (tất cả)"
+                >
+                  {FOCUS_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Button
+                  onClick={() => applyAll(createRows, setCreateRows, bulkCreate)}
+                  type="primary"
+                  disabled={createRows.length === 0 || (!bulkCreate.participation && !bulkCreate.homework && !bulkCreate.focus)}
+                >
+                  Áp dụng cho tất cả
+                </Button>
+              </Col>
+            </Row>
             <Table
               columns={getColumns(createRows, setCreateRows, false)}
               dataSource={createRows}
@@ -236,6 +312,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
               pagination={false}
               bordered
               style={{ background: '#fff', borderRadius: 12 }}
+              scroll={{ y: 350 }}
             />
             <div style={{ textAlign: 'right', marginTop: 24 }}>
               <Button type="primary" onClick={handleCreate} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={createRows.length === 0}>
@@ -244,6 +321,48 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
             </div>
           </TabPane>
           <TabPane tab="Sửa điểm danh" key="edit">
+            {/* Control áp dụng tất cả */}
+            <Row gutter={12} style={{ marginBottom: 12 }}>
+              <Col>
+                <Select
+                  value={bulkEdit.participation}
+                  onChange={v => setBulkEdit(b => ({ ...b, participation: v }))}
+                  style={{ width: 150 }}
+                  placeholder="Tham gia (tất cả)"
+                >
+                  {PARTICIPATION_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  value={bulkEdit.homework}
+                  onChange={v => setBulkEdit(b => ({ ...b, homework: v }))}
+                  style={{ width: 170 }}
+                  placeholder="Bài tập (tất cả)"
+                >
+                  {HOMEWORK_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Select
+                  value={bulkEdit.focus}
+                  onChange={v => setBulkEdit(b => ({ ...b, focus: v }))}
+                  style={{ width: 150 }}
+                  placeholder="Tập trung (tất cả)"
+                >
+                  {FOCUS_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                </Select>
+              </Col>
+              <Col>
+                <Button
+                  onClick={() => applyAll(editRows, setEditRows, bulkEdit)}
+                  type="primary"
+                  disabled={editRows.length === 0 || (!bulkEdit.participation && !bulkEdit.homework && !bulkEdit.focus)}
+                >
+                  Áp dụng cho tất cả
+                </Button>
+              </Col>
+            </Row>
             <Table
               columns={getColumns(editRows, setEditRows, true)}
               dataSource={editRows}
@@ -251,6 +370,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
               pagination={false}
               bordered
               style={{ background: '#fff', borderRadius: 12 }}
+              scroll={{ y: 350 }}
             />
             <div style={{ textAlign: 'right', marginTop: 24 }}>
               <Button type="primary" onClick={handleSave} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={editRows.length === 0}>

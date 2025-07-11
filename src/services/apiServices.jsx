@@ -152,7 +152,21 @@ const postAttendance = async (attendanceData, token) => {
   );
 };
 
+// ------------------ SLOT ------------------
+const getSlots = async (token) => {
+  return axios.get(`${BASE_URL}/Slot/all`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
 // ------------------ ATTENDANCE STATISTICS ------------------
+const getAttendanceByCourse = async (courseId, token) => {
+  return axios.get(`${BASE_URL}/Attendance/course/${courseId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
 
 // ------------------ EXPORT ------------------
 export {
@@ -171,4 +185,6 @@ export {
   getToken,
   postCourse,
   postAttendance,
+  getSlots,
+  getAttendanceByCourse,
 };
