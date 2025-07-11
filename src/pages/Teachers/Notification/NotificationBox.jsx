@@ -18,6 +18,12 @@ import {
   Tabs,
   Tab,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {
   BarChart,
@@ -50,6 +56,7 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { Select, MenuItem } from "@mui/material";
 
 // Dynamically generate dates for mock data
 const today = new Date();
@@ -372,6 +379,13 @@ export default function NotificationDashboard() {
     selectedClasses: [],
   });
   const [sending, setSending] = useState(false);
+  
+  // Thêm state cho thống kê điểm danh
+  const [selectedClass, setSelectedClass] = useState("class01");
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [attendanceStats, setAttendanceStats] = useState(null);
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
 
   // Always ensure demo data for selected date
   ensureDemoEventForDate(format(selectedDate, "yyyy-MM-dd"));
@@ -455,6 +469,48 @@ export default function NotificationDashboard() {
     }
   };
 
+  // Hàm lấy dữ liệu attendance
+  const fetchAttendanceData = async () => {
+    setLoadingAttendance(true);
+    try {
+      const token = getToken();
+      const dateStr = format(selectedDate, "yyyy-MM-dd");
+      
+      // Lấy attendance theo class và ngày
+      const attendanceRes = await getAttendanceByClassAndDate(selectedClass, dateStr, token);
+      setAttendanceData(attendanceRes.data || []);
+      
+      // Lấy thống kê attendance
+      const statsRes = await getAttendanceStats(selectedClass, dateStr, token);
+      setAttendanceStats(statsRes.data || null);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu attendance:", error);
+      setAttendanceData([]);
+      setAttendanceStats(null);
+    } finally {
+      setLoadingAttendance(false);
+    }
+  };
+
+  // Tính toán thống kê từ dữ liệu attendance
+  const calculateStats = () => {
+    if (!attendanceData.length) return null;
+    
+    const total = attendanceData.length;
+    const present = attendanceData.filter(a => a.participation === "Có tham gia").length;
+    const absent = attendanceData.filter(a => a.participation === "Không tham gia").length;
+    
+    return {
+      total,
+      present,
+      absent,
+      presentRate: total > 0 ? Math.round((present / total) * 100) : 0,
+      absentRate: total > 0 ? Math.round((absent / total) * 100) : 0
+    };
+  };
+
+  const stats = calculateStats();
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -466,6 +522,13 @@ export default function NotificationDashboard() {
     };
     fetchNotifications();
   }, []);
+
+  // Gọi API attendance khi thay đổi class hoặc ngày
+  useEffect(() => {
+    if (activeTab === 1) { // Chỉ gọi khi ở tab thống kê
+      fetchAttendanceData();
+    }
+  }, [selectedClass, selectedDate, activeTab]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={vi}>
@@ -626,78 +689,245 @@ export default function NotificationDashboard() {
           </Grid>
         </Grid>
 
-        {/* Overview Chart */}
-        {dailyData.classes.length > 0 && (
-          <Paper
-            variant="outlined"
-            sx={{ p: { xs: 2, md: 3 }, borderRadius: 4 }}
-          >
-            <Typography variant="h6" fontWeight="600" mb={2}>
-              Tổng quan hoạt động trong ngày
-            </Typography>
-            <Box sx={{ height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={overviewChartData}
-                  margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+        {/* Tabs */}
+        <Paper variant="outlined" sx={{ borderRadius: 3 }}>
+          <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+            <Tab label="Thông báo" />
+            <Tab label="Thống kê điểm danh" />
+          </Tabs>
+          
+          {/* Tab 1: Thông báo */}
+          {activeTab === 0 && (
+            <Box sx={{ p: 3 }}>
+              {/* Overview Chart */}
+              {dailyData.classes.length > 0 && (
+                <Paper
+                  variant="outlined"
+                  sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, mb: 3 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip wrapperStyle={{ zIndex: 1100 }} />
-                  <Legend />
-                  <Bar
-                    dataKey="Báo cáo"
-                    fill="#FF8042"
-                    name="Báo cáo"
-                    radius={[5, 5, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="Thông báo"
-                    fill="#00C49F"
-                    name="Thông báo"
-                    radius={[5, 5, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        )}
+                  <Typography variant="h6" fontWeight="600" mb={2}>
+                    Tổng quan hoạt động trong ngày
+                  </Typography>
+                  <Box sx={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={overviewChartData}
+                        margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip wrapperStyle={{ zIndex: 1100 }} />
+                        <Legend />
+                        <Bar
+                          dataKey="Báo cáo"
+                          fill="#FF8042"
+                          name="Báo cáo"
+                          radius={[5, 5, 0, 0]}
+                        />
+                        <Bar
+                          dataKey="Thông báo"
+                          fill="#00C49F"
+                          name="Thông báo"
+                          radius={[5, 5, 0, 0]}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Box>
+                </Paper>
+              )}
 
-        {/* Main content area with Accordion restored */}
-        <Typography variant="h5" fontWeight={700}>
-          Hoạt động & Thái độ học sinh trong ngày
-        </Typography>
-        {homeroomClass ? (
-          <Paper
-            key={homeroomClass.id}
-            variant="outlined"
-            sx={{ borderRadius: 3, background: "#EAF1FF", p: { xs: 2, md: 3 } }}
-          >
-            <Typography variant="h6" fontWeight="600" sx={{ color: "#1F2937" }}>
-              {homeroomClass.name}
-              <Typography
-                component="span"
-                sx={{ color: "#9CA3AF", ml: 2, fontWeight: "normal" }}
-              >
-                - GVCN: {homeroomClass.teacher}
+              {/* Main content area with Accordion restored */}
+              <Typography variant="h5" fontWeight={700}>
+                Hoạt động & Thái độ học sinh trong ngày
               </Typography>
-            </Typography>
-            <ClassDetailView classInfo={homeroomClass} />
-          </Paper>
-        ) : (
-          <Paper
-            variant="outlined"
-            sx={{ borderRadius: 3, background: "#EAF1FF" }}
-          >
-            <Box textAlign="center" p={5}>
-              <InfoIcon sx={{ fontSize: 48, color: "#9CA3AF" }} />
-              <Typography variant="h6" color="#9CA3AF">
-                Không có hoạt động nào trong ngày này.
-              </Typography>
+              {homeroomClass ? (
+                <Paper
+                  key={homeroomClass.id}
+                  variant="outlined"
+                  sx={{ borderRadius: 3, background: "#EAF1FF", p: { xs: 2, md: 3 } }}
+                >
+                  <Typography variant="h6" fontWeight="600" sx={{ color: "#1F2937" }}>
+                    {homeroomClass.name}
+                    <Typography
+                      component="span"
+                      sx={{ color: "#9CA3AF", ml: 2, fontWeight: "normal" }}
+                    >
+                      - GVCN: {homeroomClass.teacher}
+                    </Typography>
+                  </Typography>
+                  <ClassDetailView classInfo={homeroomClass} />
+                </Paper>
+              ) : (
+                <Paper
+                  variant="outlined"
+                  sx={{ borderRadius: 3, background: "#EAF1FF" }}
+                >
+                  <Box textAlign="center" p={5}>
+                    <InfoIcon sx={{ fontSize: 48, color: "#9CA3AF" }} />
+                    <Typography variant="h6" color="#9CA3AF">
+                      Không có hoạt động nào trong ngày này.
+                    </Typography>
+                  </Box>
+                </Paper>
+              )}
             </Box>
-          </Paper>
-        )}
+          )}
+
+          {/* Tab 2: Thống kê điểm danh */}
+          {activeTab === 1 && (
+            <Box sx={{ p: 3 }}>
+              {/* Class Selector */}
+              <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="h6" fontWeight="600">
+                  Chọn lớp:
+                </Typography>
+                <Select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  sx={{ minWidth: 200 }}
+                >
+                  {classesData.map((cls) => (
+                    <MenuItem key={cls.id} value={cls.id}>
+                      {cls.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
+
+              {/* Attendance Stats */}
+              {loadingAttendance ? (
+                <Box textAlign="center" p={5}>
+                  <Typography>Đang tải dữ liệu...</Typography>
+                </Box>
+              ) : stats ? (
+                <>
+                  {/* Stats Cards */}
+                  <Grid container spacing={3} sx={{ mb: 3 }}>
+                    <Grid item xs={12} sm={3}>
+                      <StatCard
+                        icon={<ClassIcon />}
+                        title="Tổng học sinh"
+                        value={stats.total}
+                        color="primary"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <StatCard
+                        icon={<AssessmentIcon />}
+                        title="Đi học"
+                        value={`${stats.present} (${stats.presentRate}%)`}
+                        color="success"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <StatCard
+                        icon={<InfoIcon />}
+                        title="Vắng"
+                        value={`${stats.absent} (${stats.absentRate}%)`}
+                        color="error"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
+                      <StatCard
+                        icon={<ArticleIcon />}
+                        title="Tỷ lệ đi học"
+                        value={`${stats.presentRate}%`}
+                        color="info"
+                      />
+                    </Grid>
+                  </Grid>
+
+                  {/* Attendance Chart */}
+                  <Paper variant="outlined" sx={{ p: 3, borderRadius: 4, mb: 3 }}>
+                    <Typography variant="h6" fontWeight="600" mb={2}>
+                      Biểu đồ điểm danh
+                    </Typography>
+                    <Box sx={{ height: 300 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: 'Đi học', value: stats.present, color: '#4CAF50' },
+                              { name: 'Vắng', value: stats.absent, color: '#F44336' }
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="value"
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          >
+                            {[
+                              { name: 'Đi học', value: stats.present, color: '#4CAF50' },
+                              { name: 'Vắng', value: stats.absent, color: '#F44336' }
+                            ].map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Box>
+                  </Paper>
+
+                  {/* Attendance Table */}
+                  <Paper variant="outlined" sx={{ borderRadius: 4 }}>
+                    <Typography variant="h6" fontWeight="600" sx={{ p: 3, pb: 1 }}>
+                      Chi tiết điểm danh
+                    </Typography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Học sinh</TableCell>
+                            <TableCell>Trạng thái</TableCell>
+                            <TableCell>Tham gia</TableCell>
+                            <TableCell>Ghi chú</TableCell>
+                            <TableCell>Bài tập</TableCell>
+                            <TableCell>Tập trung</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {attendanceData.map((row) => (
+                            <TableRow key={row.studentId}>
+                              <TableCell>{row.studentId}</TableCell>
+                              <TableCell>
+                                <Box
+                                  sx={{
+                                    px: 2,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    bgcolor: row.participation === "Có tham gia" ? "#E8F5E8" : "#FFEBEE",
+                                    color: row.participation === "Có tham gia" ? "#2E7D32" : "#C62828",
+                                    fontWeight: 600,
+                                    fontSize: "0.875rem"
+                                  }}
+                                >
+                                  {row.participation === "Có tham gia" ? "Đi học" : "Vắng"}
+                                </Box>
+                              </TableCell>
+                              <TableCell>{row.participation || "-"}</TableCell>
+                              <TableCell>{row.note || "-"}</TableCell>
+                              <TableCell>{row.homework || "-"}</TableCell>
+                              <TableCell>{row.focus || "-"}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Paper>
+                </>
+              ) : (
+                <Box textAlign="center" p={5}>
+                  <InfoIcon sx={{ fontSize: 48, color: "#9CA3AF" }} />
+                  <Typography variant="h6" color="#9CA3AF">
+                    Không có dữ liệu điểm danh cho ngày này.
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+        </Paper>
       </Stack>
     </LocalizationProvider>
   );

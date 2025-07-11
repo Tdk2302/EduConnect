@@ -27,6 +27,8 @@ const SUBJECT_OPTIONS = [
   { value: "SUB001", label: "Toán" },
   { value: "SUB002", label: "Tiếng Việt" },
   { value: "SUB003", label: "Ngoại Ngữ" },
+  { value: "SUB004", label: "Khoa học" },
+  { value: "SUB005", label: "Địa lý" },
 ];
 
 const ManageUser = () => {
@@ -36,7 +38,7 @@ const ManageUser = () => {
   const [openRoleModal, setOpenRoleModal] = useState(false);
   const [newRole, setNewRole] = useState("");
   const [loadingRole, setLoadingRole] = useState(false);
-  const [roleFilter, setRoleFilter] = useState("All");
+  const [roleFilter, setRoleFilter] = useState("Admin");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [openEditTeacher, setOpenEditTeacher] = useState(false);
@@ -58,7 +60,31 @@ const ManageUser = () => {
       const userInfo = getUserInfo();
       const token = userInfo?.token;
       const res = await getAllAdminUsers(token);
-      setListUser(res.data);
+      let users = res.data;
+
+      // Lấy danh sách userId của giáo viên
+      const teacherUsers = users.filter(u => u.role === "Teacher");
+
+      // Gọi getTeacherDetail cho từng giáo viên (song song)
+      const teacherDetails = await Promise.all(
+        teacherUsers.map(u =>
+          getTeacherDetail(u.userId, token)
+            .then(res => ({ ...u, ...res.data }))
+            .catch(() => u) // Nếu lỗi thì giữ nguyên user gốc
+        )
+      );
+
+      // Gộp lại vào list user
+      const mergedUsers = users.map(u => {
+        if (u.role === "Teacher") {
+          // Tìm detail đã merge
+          const detail = teacherDetails.find(t => t.userId === u.userId);
+          return detail || u;
+        }
+        return u;
+      });
+
+      setListUser(mergedUsers);
     } catch (error) {
       setListUser([]);
     } finally {
@@ -106,6 +132,11 @@ const ManageUser = () => {
     setTeacherDetail(null);
   };
   const handleOpenRoleModal = (user) => {
+    // Prevent role changes for Parent users
+    if (user.role === 'Parent') {
+      message.warning("Không thể thay đổi quyền của tài khoản Phụ huynh!");
+      return;
+    }
     setSelectedUser(user);
     setNewRole(user.role);
     setOpenRoleModal(true);
@@ -139,9 +170,32 @@ const ManageUser = () => {
   // Filter tab change
   const handleChangeTab = (e, value) => setRoleFilter(value);
 
-  const handleEditTeacher = (user) => {
-    setEditTeacher({ userId: user.userId, subjectId: user.subjectId || '', status: user.status || 'Active' });
-    setOpenEditTeacher(true);
+  const handleEditTeacher = async (user) => {
+    setLoadingEdit(true);
+    try {
+      const userInfo = getUserInfo();
+      const token = userInfo?.token;
+      // Fetch fresh teacher details to get the latest status
+      const res = await getTeacherDetail(user.userId, token);
+      const teacherData = res.data;
+      
+      // Map the status from API response to form values
+      const statusValue = teacherData.status === '1' || teacherData.status === 1 ? 'Active' : 
+                         (teacherData.status === '0' || teacherData.status === 0 || teacherData.status === '2' || teacherData.status === 2) ? 'Inactive' : 
+                         'Active';
+      
+      setEditTeacher({ 
+        userId: user.userId, 
+        subjectId: teacherData.subjectId || '', 
+        status: statusValue 
+      });
+      setOpenEditTeacher(true);
+    } catch (error) {
+      message.error("Không thể tải thông tin giáo viên!");
+      console.error("Error fetching teacher details:", error);
+    } finally {
+      setLoadingEdit(false);
+    }
   };
   const handleCloseEditTeacher = () => {
     setOpenEditTeacher(false);
@@ -152,9 +206,26 @@ const ManageUser = () => {
     try {
       const userInfo = getUserInfo();
       const token = userInfo?.token;
-      await putUpdateTeacher(editTeacher.userId, editTeacher.subjectId, editTeacher.status, token);
+      
+      // Map the status from form values to API format
+      const apiStatus = editTeacher.status === 'Active' ? '1' : '0';
+      
+      await putUpdateTeacher(editTeacher.userId, editTeacher.subjectId, apiStatus, token);
       setOpenEditTeacher(false);
-      fetchAllUsers();
+      
+      // Refresh the user list
+      await fetchAllUsers();
+      
+      // If teacher detail modal is open, refresh the teacher details
+      if (teacherDetail && teacherDetail.userId === editTeacher.userId) {
+        try {
+          const res = await getTeacherDetail(editTeacher.userId, token);
+          setTeacherDetail(res.data);
+        } catch (error) {
+          console.error("Error refreshing teacher details:", error);
+        }
+      }
+      
       message.success("Cập nhật giáo viên thành công!");
     } catch (e) {
       message.error("Có lỗi xảy ra khi cập nhật giáo viên!");
@@ -219,6 +290,7 @@ const ManageUser = () => {
           onEdit={handleEditTeacher}
           onDelete={handleDeleteTeacher}
           onChangeRole={handleOpenRoleModal}
+          loadingEdit={loadingEdit}
         />
       </Box>
       {/* Modal xem thông tin user/teacher */}

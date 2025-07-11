@@ -5,6 +5,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import { getUserInfo } from "../../services/handleStorageApi";
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../services/handleStorageApi';
@@ -13,8 +14,9 @@ const drawerWidth = 240;
 const collapsedWidth = 80;
 
 const NAV_ITEMS = [
-  { key: "users", label: "Quản lý người dùng", icon: <PeopleIcon /> },
-  { key: "settings", label: "Cài đặt", icon: <SettingsIcon /> },
+  { key: "users", label: "Quản lý người dùng", icon: <PeopleIcon />, path: "/admin/manage-user" },
+  { key: "create-schedule", label: "Tạo TKB GV", icon: <EventNoteIcon />, path: "/admin/create-course" },
+  { key: "settings", label: "Cài đặt", icon: <SettingsIcon />, path: "/admin/settings" },
 ];
 
 const MAIN_BRAND = "#6D28D9";
@@ -84,7 +86,7 @@ export default function AdminSidebar({ selected, onSelect }) {
               <ListItem
                 button
                 selected={selected === item.key}
-                onClick={() => onSelect(item.key)}
+                onClick={() => navigate(item.path)}
                 sx={{
                   borderRadius: 2,
                   mb: 0.5,
@@ -115,11 +117,13 @@ export default function AdminSidebar({ selected, onSelect }) {
             </Box>
           )}
         </Box>
-        <Tooltip title="Đăng xuất">
-          <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: open ? 1 : 0 }}>
-            <LogoutOutlinedIcon fontSize="medium" />
-          </IconButton>
-        </Tooltip>
+        {open && (
+          <Tooltip title="Đăng xuất">
+            <IconButton onClick={() => { logoutUser(); navigate('/signin'); }} sx={{ color: '#e11d48', ml: 1 }}>
+              <LogoutOutlinedIcon fontSize="medium" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     </Drawer>
   );

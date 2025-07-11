@@ -9,12 +9,25 @@ import {
 import "./TeacherSchedule.css";
 import AttendancePage from "./AttendancePage";
 
-const SLOTS = ["Slot 1", "Slot 2", "Slot 3", "Slot 4"];
+
+const SLOTS = [
+  "Slot 1",
+  "Slot 2",
+  "Slot 3",
+  "Slot 4",
+  "Slot 5",
+  "Slot 6",
+  "Slot 7",
+];
+
 const SLOT_TIMES = {
-  "Slot 1": "07:00 - 09:15",
-  "Slot 2": "09:30 - 11:45",
-  "Slot 3": "12:30 - 14:45",
-  "Slot 4": "15:00 - 17:15",
+  "Slot 1": "7h - 7h45",
+  "Slot 2": "7h50 - 8h35",
+  "Slot 3": "8h50 - 9h35",
+  "Slot 4": "9h40 - 10h25",
+  "Slot 5": "10h30 - 11h15",
+  "Slot 6": "13h30 - 14h15",
+  "Slot 7": "14h30 - 15h15",
 };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -56,6 +69,23 @@ const getStatusText = (status) => {
       return "Chưa diễn ra";
   }
 };
+
+// Thêm hàm xác định slot theo thời gian bắt đầu (theo slot mới)
+function getSlotNameByTime(startTime) {
+  if (!startTime) return "Slot 1";
+  const date = new Date(startTime);
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+  const total = hour * 60 + minute;
+  if (total >= 420 && total < 465) return "Slot 1";      // 7:00 - 7:45
+  if (total >= 470 && total < 515) return "Slot 2";      // 7:50 - 8:35
+  if (total >= 530 && total < 575) return "Slot 3";      // 8:50 - 9:35
+  if (total >= 580 && total < 625) return "Slot 4";      // 9:40 - 10:25
+  if (total >= 630 && total < 675) return "Slot 5";      // 10:30 - 11:15
+  if (total >= 810 && total < 855) return "Slot 6";      // 13:30 - 14:15
+  if (total >= 870 && total < 915) return "Slot 7";      // 14:30 - 15:15
+  return "Slot 1";
+}
 
 const TeacherSchedule = () => {
   const [loading, setLoading] = useState(true);
@@ -122,7 +152,7 @@ const TeacherSchedule = () => {
           });
           // Nếu ngày nằm trong tuần đang xem
           if (weekDateMap[dateStr] !== undefined) {
-            const slotName = course.slot || "Slot 1";
+            const slotName = getSlotNameByTime(course.startTime);
             if (!grid[slotName][dateStr]) grid[slotName][dateStr] = [];
             grid[slotName][dateStr].push({
               subject: course.subjectName ?? null,
@@ -284,19 +314,12 @@ const TeacherSchedule = () => {
                                   }
                                   title="Bấm để điểm danh"
                                 >
-                                  <div className="cell-office-code">
-                                    <b>Mã môn học:</b> {data.subjectCode}
-                                  </div>
-                                  <div className="cell-office-subject">
-                                    <b>Tên môn:</b> {data.subject ?? "Null"}
-                                  </div>
-                                  <div className="cell-office-class">
-                                    Lớp: {data.class}
-                                  </div>
-                                  <div className="cell-office-time">
-                                    {data.time}
-                                  </div>
-                                  <div
+
+                                  <div className="cell-office-subject"><b>Tên môn:</b> {data.subject ?? 'Null'}</div>
+                                  <div className="cell-office-class">Lớp: {data.class}</div>
+                                  <div className="cell-office-time">{data.time}</div>
+                              <div
+
                                     className={`office-status-badge ${data.status?.toLowerCase() || "nostatus"}`}
                                     style={{
                                       color: statusColor.color,

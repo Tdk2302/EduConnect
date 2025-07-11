@@ -178,3 +178,7 @@ video {
     background-color: black;
   }
 }
+
+body, html {
+  font-family: 'Roboto', 'Arial', 'Tahoma', 'Segoe UI', 'Noto Sans', 'Open Sans', sans-serif;
+}
