@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Spin, Alert, Button, Select, message } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { getUserInfo } from "../../../services/handleStorageApi";
-import { getTeacherDetail, getTeacherCourses } from "../../../services/apiServices";
+import {
+  getTeacherDetail,
+  getTeacherCourses,
+} from "../../../services/apiServices";
 import "./TeacherSchedule.css";
 import AttendancePage from "./AttendancePage";
+
 
 const SLOTS = [
   "Slot 1",
@@ -15,6 +19,7 @@ const SLOTS = [
   "Slot 6",
   "Slot 7",
 ];
+
 const SLOT_TIMES = {
   "Slot 1": "7h - 7h45",
   "Slot 2": "7h50 - 8h35",
@@ -29,11 +34,15 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 function getWeekDates(date) {
   const week = [];
   const startOfWeek = new Date(date);
-  startOfWeek.setDate(date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1));
+  startOfWeek.setDate(
+    date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1)
+  );
   for (let i = 0; i < 7; i++) {
     const day = new Date(startOfWeek);
     day.setDate(startOfWeek.getDate() + i);
-    week.push(day.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" }));
+    week.push(
+      day.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" })
+    );
   }
   return week;
 }
@@ -48,11 +57,16 @@ const STATUS_COLORS = {
 
 const getStatusText = (status) => {
   switch (status) {
-    case "On-going": return "Đang diễn ra";
-    case "Finished": return "Đã kết thúc";
-    case "Canceled": return "Đã hủy";
-    case "Completed": return "Hoàn thành";
-    default: return "Chưa có";
+    case "On-going":
+      return "Đang diễn ra";
+    case "Finished":
+      return "Đã kết thúc";
+    case "Canceled":
+      return "Đã hủy";
+    case "Completed":
+      return "Hoàn thành";
+    default:
+      return "Chưa diễn ra";
   }
 };
 
@@ -80,7 +94,10 @@ const TeacherSchedule = () => {
   const [scheduleData, setScheduleData] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(getWeekDates(new Date()));
-  const [attendanceModal, setAttendanceModal] = useState({ open: false, courseId: null });
+  const [attendanceModal, setAttendanceModal] = useState({
+    open: false,
+    courseId: null,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +112,10 @@ const TeacherSchedule = () => {
           return;
         }
         // Lấy thông tin giáo viên
-        const teacherRes = await getTeacherDetail(userInfo.userId, userInfo.token);
+        const teacherRes = await getTeacherDetail(
+          userInfo.userId,
+          userInfo.token
+        );
         const teacher = teacherRes.data;
         setTeacherInfo(teacher);
         if (!teacher.teacherId) {
@@ -105,21 +125,31 @@ const TeacherSchedule = () => {
           return;
         }
         // Lấy lịch dạy
-        const scheduleRes = await getTeacherCourses(teacher.teacherId, userInfo.token);
+        const scheduleRes = await getTeacherCourses(
+          teacher.teacherId,
+          userInfo.token
+        );
         let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
         // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
         const grid = {};
-        SLOTS.forEach((slot) => { grid[slot] = {}; });
+        SLOTS.forEach((slot) => {
+          grid[slot] = {};
+        });
         // Tạo map ngày (dd/MM) -> index trong tuần
         const weekDateMap = {};
-        selectedWeek.forEach((date, idx) => { weekDateMap[date] = idx; });
+        selectedWeek.forEach((date, idx) => {
+          weekDateMap[date] = idx;
+        });
         courses.forEach((course) => {
           // Lấy ngày của course (dd/MM)
           const courseDate = course.startTime
             ? new Date(course.startTime)
             : null;
           if (!courseDate) return;
-          const dateStr = courseDate.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" });
+          const dateStr = courseDate.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+          });
           // Nếu ngày nằm trong tuần đang xem
           if (weekDateMap[dateStr] !== undefined) {
             const slotName = getSlotNameByTime(course.startTime);
@@ -128,7 +158,7 @@ const TeacherSchedule = () => {
               subject: course.subjectName ?? null,
               subjectCode: course.subjectId || "-",
               class: course.classId || "-",
-              time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}`,
+              time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
               status: course.status || "nostatus",
               courseId: course.courseId,
             });
@@ -136,8 +166,14 @@ const TeacherSchedule = () => {
         });
         setScheduleData(grid);
       } catch (err) {
-        setError("Lỗi khi tải dữ liệu: " + (err?.response?.data?.message || err.message));
-        message.error("Lỗi khi tải dữ liệu: " + (err?.response?.data?.message || err.message));
+        setError(
+          "Lỗi khi tải dữ liệu: " +
+            (err?.response?.data?.message || err.message)
+        );
+        message.error(
+          "Lỗi khi tải dữ liệu: " +
+            (err?.response?.data?.message || err.message)
+        );
       } finally {
         setLoading(false);
       }
@@ -176,29 +212,39 @@ const TeacherSchedule = () => {
   const isToday = (dateStr) => {
     const today = new Date();
     const [day, month] = dateStr.split("/");
-    return today.getDate() === Number(day) && today.getMonth() + 1 === Number(month);
+    return (
+      today.getDate() === Number(day) && today.getMonth() + 1 === Number(month)
+    );
   };
 
   return (
-      <div className="schedule-container office-style">
-        <div className="schedule-header office-header">
-          <div className="left">
-            <Select
-              defaultValue={String(currentDate.getFullYear())}
-              onChange={handleYearChange}
-              className="schedule-select"
-            >
-              {generateYearOptions()}
-            </Select>
-            <span className="week-text">
+    <div className="schedule-container office-style">
+      <div className="schedule-header office-header">
+        <div className="left">
+          <Select
+            defaultValue={String(currentDate.getFullYear())}
+            onChange={handleYearChange}
+            className="schedule-select"
+          >
+            {generateYearOptions()}
+          </Select>
+          <span className="week-text">
             Tuần: {selectedWeek[0]} - {selectedWeek[6]}
-            </span>
-          </div>
-          <div className="right">
-          <Button icon={<LeftOutlined />} onClick={() => handleWeekChange("prev")} className="nav-btn"/>
-          <Button icon={<RightOutlined />} onClick={() => handleWeekChange("next")} className="nav-btn"/>
+          </span>
         </div>
-          </div>
+        <div className="right">
+          <Button
+            icon={<LeftOutlined />}
+            onClick={() => handleWeekChange("prev")}
+            className="nav-btn"
+          />
+          <Button
+            icon={<RightOutlined />}
+            onClick={() => handleWeekChange("next")}
+            className="nav-btn"
+          />
+        </div>
+      </div>
       {teacherInfo && (
         <div style={{ marginBottom: 16, textAlign: "center" }}>
           <b>Họ tên:</b> {teacherInfo.fullName} &nbsp;|&nbsp;
@@ -206,7 +252,9 @@ const TeacherSchedule = () => {
           <b>Trạng thái:</b> {teacherInfo.status}
         </div>
       )}
-      {error && <Alert type="error" message={error} style={{ marginBottom: 16 }} />}
+      {error && (
+        <Alert type="error" message={error} style={{ marginBottom: 16 }} />
+      )}
       <Spin spinning={loading} tip="Đang tải dữ liệu...">
         <div className="schedule-content office-content">
           <div className="table-scroll">
@@ -215,8 +263,13 @@ const TeacherSchedule = () => {
                 <tr>
                   <th className="th-slot office-slot">Slot</th>
                   {selectedWeek.map((date, idx) => (
-                    <th key={date} className={`th-date office-date ${isToday(date) ? "today-header" : ""}`}>
-                      {DAYS[idx]}<br />{date}
+                    <th
+                      key={date}
+                      className={`th-date office-date ${isToday(date) ? "today-header" : ""}`}
+                    >
+                      {DAYS[idx]}
+                      <br />
+                      {date}
                     </th>
                   ))}
                 </tr>
@@ -226,7 +279,9 @@ const TeacherSchedule = () => {
                   <tr key={slot}>
                     <td className="td-slot office-slot">
                       <span className="slot-icon">{slot}</span>
-                      <div style={{ fontSize: 12, color: '#64748b' }}>{SLOT_TIMES[slot]}</div>
+                      <div style={{ fontSize: 12, color: "#64748b" }}>
+                        {SLOT_TIMES[slot]}
+                      </div>
                     </td>
                     {selectedWeek.map((date) => {
                       const dataArr = scheduleData[slot]?.[date];
@@ -237,25 +292,43 @@ const TeacherSchedule = () => {
                         >
                           {Array.isArray(dataArr) && dataArr.length > 0 ? (
                             dataArr.map((data, idx) => {
-                              const statusColor = STATUS_COLORS[data?.status] || STATUS_COLORS.nostatus;
+                              const statusColor =
+                                STATUS_COLORS[data?.status] ||
+                                STATUS_COLORS.nostatus;
                               return (
                                 <div
                                   key={idx}
                                   className="cell-office-main"
-                                  style={{ marginBottom: 6, cursor: 'pointer', borderRadius: 8, transition: 'background 0.2s' }}
-                                  onClick={() => data.courseId && setAttendanceModal({ open: true, courseId: data.courseId })}
+                                  style={{
+                                    marginBottom: 6,
+                                    cursor: "pointer",
+                                    borderRadius: 8,
+                                    transition: "background 0.2s",
+                                  }}
+                                  onClick={() =>
+                                    data.courseId &&
+                                    setAttendanceModal({
+                                      open: true,
+                                      courseId: data.courseId,
+                                    })
+                                  }
                                   title="Bấm để điểm danh"
                                 >
+
                                   <div className="cell-office-subject"><b>Tên môn:</b> {data.subject ?? 'Null'}</div>
                                   <div className="cell-office-class">Lớp: {data.class}</div>
                                   <div className="cell-office-time">{data.time}</div>
                               <div
+
                                     className={`office-status-badge ${data.status?.toLowerCase() || "nostatus"}`}
-                                    style={{ color: statusColor.color, background: statusColor.bg }}
-                              >
-                                {getStatusText(data.status)}
-                              </div>
-                            </div>
+                                    style={{
+                                      color: statusColor.color,
+                                      background: statusColor.bg,
+                                    }}
+                                  >
+                                    {getStatusText(data.status)}
+                                  </div>
+                                </div>
                               );
                             })
                           ) : (
@@ -276,7 +349,7 @@ const TeacherSchedule = () => {
         visible={attendanceModal.open}
         onClose={() => setAttendanceModal({ open: false, courseId: null })}
       />
-      </div>
+    </div>
   );
 };
 

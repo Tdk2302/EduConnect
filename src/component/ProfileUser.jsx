@@ -2,7 +2,11 @@
 import React, { useState, useEffect } from "react";
 import "./ProfileUser.scss";
 import Header from "./Header";
-import { updateParentProfile, getParentProfile } from "../services/apiServices";
+import {
+  updateParentProfile,
+  getParentProfile,
+  getTeacherDetail,
+} from "../services/apiServices";
 import { toast } from "react-toastify";
 
 const getUserFromStorage = () => {
@@ -17,19 +21,15 @@ const getUserFromStorage = () => {
 export default function ProfileUser() {
   const user = getUserFromStorage();
   const [profile, setProfile] = useState({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    fullName: `${user.firstName} ${user.lastName}`,
+    fullName: user.fullName,
     email: user.email,
     role: user.role,
-    phone: "+84909090909",
-    gender: "Male",
-    dateOfBirth: "23/02/2000",
-    nationalId: "1234567890",
-    country: "Vietnam",
-    city: "Hanoi",
-    postalCode: "10000",
-    taxId: "",
+    phone: user.phoneNumber,
+    gender: user.gender,
+    dateOfBirth: user.dateOfBirth,
+    nationalId: user.nationalId,
+    country: user.country,
+    city: user.city,
     avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -37,9 +37,15 @@ export default function ProfileUser() {
 
   useEffect(() => {
     async function fetchProfile() {
-      const data = await getParentProfile();
-      setProfile(data.data);
-      console.log(data.data);
+      if (user.role === "Teacher") {
+        const data = await getTeacherDetail(user.userId, user.token);
+        console.log(data.data);
+        setProfile(data.data);
+      } else {
+        const data = await getParentProfile();
+        setProfile(data.data);
+        console.log(data.data);
+      }
     }
     fetchProfile();
   }, []);
@@ -186,7 +192,7 @@ export default function ProfileUser() {
               <label>Số điện thoại</label>
               <input
                 name="phone"
-                value={profile.phone}
+                value={profile.phoneNumber}
                 readOnly={!isEditing}
                 onChange={handleChange}
               />

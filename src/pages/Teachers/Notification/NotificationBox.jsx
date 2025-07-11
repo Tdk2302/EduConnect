@@ -352,18 +352,18 @@ function ClassDetailView({ classInfo }) {
 }
 
 export function ensureDemoEventForDate(dateStr) {
-  const hasEvent = allEvents.some(ev => ev.date === dateStr);
+  const hasEvent = allEvents.some((ev) => ev.date === dateStr);
   if (!hasEvent) {
     // Tạo event demo cho tất cả classId trong classesData
     allEvents = [
       ...allEvents,
-      ...classesData.map(cls => ({
+      ...classesData.map((cls) => ({
         date: dateStr,
         classId: cls.id,
         type: "Report",
         title: "Demo báo cáo cho ngày " + dateStr,
         content: "Đây là dữ liệu demo tự động tạo cho ngày bạn chọn.",
-      }))
+      })),
     ];
   }
 }
