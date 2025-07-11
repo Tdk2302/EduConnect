@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -20,15 +20,12 @@ import EventIcon from "@mui/icons-material/Event";
 import CategoryIcon from "@mui/icons-material/Category";
 import TitleIcon from "@mui/icons-material/Title";
 import NotesIcon from "@mui/icons-material/Notes";
-import { postReport } from "../../../services/apiServices";
+import {
+  postReport,
+  getClassesByTeacherId,
+  getToken,
+} from "../../../services/apiServices";
 import { getUserInfo } from "../../../services/handleStorageApi";
-
-const classOptions = [
-  { id: "12A1", name: "Lớp 12A1" },
-  { id: "11B3", name: "Lớp 11B3" },
-  { id: "10C5", name: "Lớp 10C5" },
-  { id: "12A2", name: "Lớp 12A2" },
-];
 
 const typeOptions = [
   { value: "activity", label: "Hoạt động" },
@@ -71,12 +68,23 @@ export default function ReportCreate() {
 
     // Lấy thông tin giáo viên từ localStorage
     const userInfo = getUserInfo();
+    // Lấy danh sách lớp từ localStorage
+    const teacherClasses = JSON.parse(
+      localStorage.getItem("teacherClasses") || "[]"
+    );
+    // Tìm className theo classId đã chọn
+    const selectedClass = teacherClasses.find(
+      (cls) => cls.classID === form.classId
+    );
+
+    const classId = selectedClass?.classID || "";
+    const className = selectedClass?.className || "";
+
     const reportData = {
-      teacherId: userInfo?.userId || "",
+      teacherId: userInfo?.id || "",
       teacherName: userInfo?.fullName || "",
-      classId: form.classId,
-      className:
-        classOptions.find((cls) => cls.id === form.classId)?.name || "",
+      classId: classId,
+      className: className,
       title: form.title,
       description: form.content,
       termID: "SM001",
@@ -98,6 +106,23 @@ export default function ReportCreate() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const teacherID = localStorage.getItem("teacherId");
+    const token = getToken();
+    console.log(teacherID, token);
+    if (teacherID) {
+      getClassesByTeacherId(teacherID, token)
+        .then((data) => {
+          // Lưu vào localStorage
+          localStorage.setItem("teacherClasses", JSON.stringify(data.data));
+        })
+        .catch((err) => {
+          // Xử lý lỗi nếu cần
+          console.error("Lỗi lấy danh sách lớp:", err);
+        });
+    }
+  }, []);
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: palette.backgroundBrand, py: 6 }}>
@@ -161,9 +186,11 @@ export default function ReportCreate() {
                     </InputAdornment>
                   }
                 >
-                  {classOptions.map((cls) => (
-                    <MenuItem key={cls.id} value={cls.id}>
-                      {cls.name}
+                  {JSON.parse(
+                    localStorage.getItem("teacherClasses") || "[]"
+                  ).map((cls) => (
+                    <MenuItem key={cls.classID} value={cls.classID}>
+                      {cls.className}
                     </MenuItem>
                   ))}
                 </Select>

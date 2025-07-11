@@ -117,16 +117,31 @@ export const getTeacherCourses = async (teacherId, token) => {
   });
 };
 
+const getClassesByTeacherId = async (teacherId, token) => {
+  return axios.get(`${BASE_URL}/Classroom/teacher/${teacherId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
 // ------------------ PARENT ------------------
-const updateParentProfile = async (formData) => {
+const updateParentProfile = async (formData, token) => {
+  console.log(formData);
+
   return axios.put(`${BASE_URL}/Parent/profile`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    },
     withCredentials: true,
   });
 };
 
-const getParentProfile = async () => {
-  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
+const getParentProfile = async (token) => {
+  return axios.get(`${BASE_URL}/Parent/profile`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
 // ------------------ REPORT ------------------
@@ -146,4 +161,5 @@ export {
   getParentProfile,
   getToken,
   postReport,
+  getClassesByTeacherId,
 };

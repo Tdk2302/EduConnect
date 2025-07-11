@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   { key: "report", label: "Tạo báo cáo", icon: <AssignmentIcon /> },
 ];
 
-const MAIN_BRAND = "#6D28D9"; // brand
+const MAIN_BRAND = "#6D28D9";
 const BACKGROUND_BRAND = "#EAF1FF";
 const SECONDARY = "#E5E7EB";
 const TERTIARY = "#1F2937";
