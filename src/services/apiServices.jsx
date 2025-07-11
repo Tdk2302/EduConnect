@@ -85,7 +85,7 @@ const putChangeUserRole = async (email, role, token) => {
 };
 
 // ------------------ TEACHER ------------------
-export const putUpdateTeacher = async (userId, subjectId, status, token) => {
+const putUpdateTeacher = async (userId, subjectId, status, token) => {
   return axios.put(
     `${BASE_URL}/Teacher/${userId}`,
     { subjectId, status },
@@ -96,22 +96,22 @@ export const putUpdateTeacher = async (userId, subjectId, status, token) => {
   );
 };
 
-export const deleteTeacher = async (userId, token) => {
+const deleteTeacher = async (userId, token) => {
   return axios.delete(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 };
 
-export const getTeacherDetail = async (userId, token) => {
+const getTeacherDetail = async (userId, token) => {
   return axios.get(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 };
 
-export const getTeacherCourses = async (teacherId, token) => {
-  return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
+const getTeacherCourses = async (teacherId, token) => {
+ return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -144,9 +144,43 @@ const getParentProfile = async (token) => {
   });
 };
 
-// ------------------ REPORT ------------------
-const postReport = async (formData) => {
-  return axios.post(`${BASE_URL}/Report`, formData, { withCredentials: true });
+// ------------------ COURSE & ATTENDANCE ------------------
+const postCourse = async (courseData, token) => {
+  return axios.post(
+    `${BASE_URL}/Course`,
+    courseData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+const postAttendance = async (attendanceData, token) => {
+  return axios.post(
+    `${BASE_URL}/Attendance`,
+    attendanceData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+// ------------------ SLOT ------------------
+const getSlots = async (token) => {
+  return axios.get(`${BASE_URL}/Slot/all`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
+// ------------------ ATTENDANCE STATISTICS ------------------
+const getAttendanceByCourse = async (courseId, token) => {
+  return axios.get(`${BASE_URL}/Attendance/course/${courseId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
 // ------------------ EXPORT ------------------
@@ -157,9 +191,17 @@ export {
   resetPassword,
   getAllAdminUsers,
   putChangeUserRole,
+  putUpdateTeacher,
+  deleteTeacher,
+  getTeacherDetail,
+  getTeacherCourses,
   updateParentProfile,
   getParentProfile,
   getToken,
   postReport,
   getClassesByTeacherId,
+  postCourse,
+  postAttendance,
+  getSlots,
+  getAttendanceByCourse,
 };

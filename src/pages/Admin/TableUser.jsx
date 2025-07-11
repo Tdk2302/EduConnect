@@ -1,12 +1,12 @@
 import React from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Typography, Chip, Avatar, Box } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Typography, Chip, Avatar, Box, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const AVATAR_URL = "https://randomuser.me/api/portraits/men/32.jpg"; // Ảnh avatar mặc định
 
-function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole }) {
+function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingEdit }) {
   return (
     <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 4px 24px 0 rgba(80,80,80,0.08)', background: '#fff', mt: 3, p: 2 }}>
       <Table>
@@ -42,8 +42,8 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole }) {
                     <Avatar src={user.avatar || AVATAR_URL} alt={user.fullName} sx={{ width: 44, height: 44, boxShadow: 2 }} />
                     <Box>
                       <Typography variant="body1" fontWeight={700} color="#222">
-                        {user.fullName}
-                      </Typography>
+                      {user.fullName}
+                    </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {user.email}
                       </Typography>
@@ -57,8 +57,20 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole }) {
                 <TableCell>{user.phoneNumber}</TableCell>
                 <TableCell>
                   <Chip
-                    label={user.isActive ? "Active" : "Inactive"}
-                    color={user.isActive ? "success" : "default"}
+                    label={
+                      user.status === "Active" || user.status === 1 || user.status === "1"
+                        ? "Active"
+                        : user.status === "Inactive" || user.status === 0 || user.status === "0"
+                        ? "Inactive"
+                        : user.isActive
+                        ? "Active"
+                        : "Inactive"
+                    }
+                    color={
+                      user.status === "Active" || user.status === 1 || user.status === "1" || user.isActive
+                        ? "success"
+                        : "default"
+                    }
                     size="small"
                     sx={{ fontWeight: 600, fontSize: 13, px: 1.5 }}
                   />
@@ -70,17 +82,26 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole }) {
                   </IconButton>
                   {user.role === 'Teacher' && (
                     <>
-                      <IconButton color="info" onClick={() => onEdit && onEdit(user)} sx={{ mx: 0.5, bgcolor: '#e0f7fa', '&:hover': { bgcolor: '#b2ebf2' }, borderRadius: 2 }}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton color="error" onClick={() => onDelete && onDelete(user)} sx={{ mx: 0.5, bgcolor: '#ffeaea', '&:hover': { bgcolor: '#ffd6d6' }, borderRadius: 2 }}>
-                        <DeleteIcon />
+                      <IconButton 
+                        color="info" 
+                        onClick={() => onEdit && onEdit(user)} 
+                        disabled={loadingEdit}
+                        sx={{ mx: 0.5, bgcolor: '#e0f7fa', '&:hover': { bgcolor: '#b2ebf2' }, borderRadius: 2 }}
+                      >
+                        {loadingEdit ? <CircularProgress size={20} /> : <EditIcon />}
                       </IconButton>
                     </>
                   )}
-                  <IconButton color="secondary" onClick={() => onChangeRole && onChangeRole(user)} sx={{ mx: 0.5, bgcolor: '#f3e8ff', '&:hover': { bgcolor: '#e1d0ff' }, borderRadius: 2 }}>
-                    <span role="img" aria-label="change-role" style={{ fontSize: 20 }}>🔄</span>
-                  </IconButton>
+                  {user.role !== 'Teacher' && user.role !== 'Parent' && (
+                    <IconButton color="error" onClick={() => onDelete && onDelete(user)} sx={{ mx: 0.5, bgcolor: '#ffeaea', '&:hover': { bgcolor: '#ffd6d6' }, borderRadius: 2 }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                  {user.role !== 'Parent' && (
+                    <IconButton color="secondary" onClick={() => onChangeRole && onChangeRole(user)} sx={{ mx: 0.5, bgcolor: '#f3e8ff', '&:hover': { bgcolor: '#e1d0ff' }, borderRadius: 2 }}>
+                      <span role="img" aria-label="change-role" style={{ fontSize: 20 }}>🔄</span>
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))
