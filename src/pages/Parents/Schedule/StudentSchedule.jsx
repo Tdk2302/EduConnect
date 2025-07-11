@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { Button, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Select, message, Spin, Alert } from "antd";
 
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Header from "../../../component/Header";
 import "./StudentSchedule.css";
 import Footer from "../../../component/Footer";
+import { getUserInfo } from "../../../services/handleStorageApi";
+import { getTeacherCourses } from "../../../services/apiServices";
 
 const { Option } = Select;
 
@@ -68,231 +70,67 @@ const STATUS_COLORS = {
   nostatus: { bg: "#f3f4f6", color: "#7a869a" },
 };
 
-const Schedule = () => {
+const StudentSchedule = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(getWeekDates(new Date()));
+  const [scheduleData, setScheduleData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [scheduleData, setScheduleData] = useState({
-    "Slot 1": {
-      "16/06": {
-        subject: "Giải tích 1",
-        subjectCode: "MATH101",
-        class: "A1",
-        time: "7:00-9:15",
-        status: "On-going",
-        link: "meetURL1",
-      },
-      "17/06": {
-        subject: "Lập trình C",
-        subjectCode: "CSD201",
-        class: "B2",
-        time: "7:00-9:15",
-        status: "Finished",
-        link: "meetURL2",
-      },
-      "18/06": {
-        subject: "Lập trình C",
-        subjectCode: "CSD201",
-        class: "B2",
-        time: "7:00-9:15",
-        status: "Canceled",
-        link: "meetURL3",
-      },
-      "19/06": {
-        subject: "Lập trình C",
-        subjectCode: "CSD201",
-        class: "B2",
-        time: "7:00-9:15",
-        status: "Completed",
-        link: "meetURL4",
-      },
-      "20/06": {
-        subject: "Lập trình C",
-        subjectCode: "CSD201",
-        class: "B2",
-        time: "7:00-9:15",
-        status: "On-going",
-        link: "meetURL5",
-      },
-      "21/06": {
-        subject: "Cơ sở dữ liệu",
-        subjectCode: "DBI202",
-        class: "C3",
-        time: "7:00-9:15",
-        status: "On-going",
-        link: "meetURL6",
-      },
-      "22/06": {
-        subject: "Cơ sở dữ liệu",
-        subjectCode: "DBI202",
-        class: "C3",
-        time: "7:00-9:15",
-        status: "On-going",
-        link: "meetURL7",
-      },
-    },
-    "Slot 2": {
-      "16/06": {
-        subject: "Cơ sở dữ liệu",
-        subjectCode: "DBI202",
-        class: "C3",
-        time: "9:30-11:45",
-        status: "Finished",
-        link: "meetURL8",
-      },
-      "17/06": {
-        subject: "Xác suất TK",
-        subjectCode: "STA201",
-        class: "D4",
-        time: "9:30-11:45",
-        status: "Completed",
-        link: "meetURL9",
-      },
-      "18/06": {
-        subject: "Xác suất TK",
-        subjectCode: "STA201",
-        class: "D4",
-        time: "9:30-11:45",
-        status: "On-going",
-        link: "meetURL10",
-      },
-      "19/06": {
-        subject: "Xác suất TK",
-        subjectCode: "STA201",
-        class: "D4",
-        time: "9:30-11:45",
-        status: "Canceled",
-        link: "meetURL11",
-      },
-      "20/06": {
-        subject: "Xác suất TK",
-        subjectCode: "STA201",
-        class: "D4",
-        time: "9:30-11:45",
-        status: "On-going",
-        link: "meetURL12",
-      },
-      "21/06": {
-        subject: "Cơ sở dữ liệu",
-        subjectCode: "DBI202",
-        class: "C3",
-        time: "9:30-11:45",
-        status: "On-going",
-        link: "meetURL13",
-      },
-      "22/06": {
-        subject: "Cơ sở dữ liệu",
-        subjectCode: "DBI202",
-        class: "C3",
-        time: "9:30-11:45",
-        status: "On-going",
-        link: "meetURL14",
-      },
-    },
-    "Slot 3": {
-      "16/06": {
-        subject: "Cấu trúc DL",
-        subjectCode: "DSA201",
-        class: "E5",
-        time: "12:30-14:45",
-        status: "Canceled",
-        link: "meetURL15",
-      },
-      "17/06": {
-        subject: "Hệ điều hành",
-        subjectCode: "OSG202",
-        class: "F6",
-        time: "12:30-14:45",
-        status: "Finished",
-        link: "meetURL16",
-      },
-      "18/06": {
-        subject: "Hệ điều hành",
-        subjectCode: "OSG202",
-        class: "F6",
-        time: "12:30-14:45",
-        status: "On-going",
-        link: "meetURL17",
-      },
-      "19/06": {
-        subject: "Hệ điều hành",
-        subjectCode: "OSG202",
-        class: "F6",
-        time: "12:30-14:45",
-        status: "Completed",
-        link: "meetURL18",
-      },
-      "20/06": {
-        subject: "Hệ điều hành",
-        subjectCode: "OSG202",
-        class: "F6",
-        time: "12:30-14:45",
-        status: "On-going",
-        link: "meetURL19",
-      },
-      "21/06": {
-        subject: "Cấu trúc DL",
-        subjectCode: "DSA201",
-        class: "E5",
-        time: "12:30-14:45",
-        status: "On-going",
-        link: "meetURL20",
-      },
-      "22/06": {
-        subject: "Cấu trúc DL",
-        subjectCode: "DSA201",
-        class: "E5",
-        time: "12:30-14:45",
-        status: "On-going",
-        link: "meetURL21",
-      },
-    },
-    "Slot 4": {
-      "16/06": { status: "On-going", time: "15:00-16:30" },
-      "17/06": { status: "On-going", time: "15:00-16:30" },
-      "18/06": { status: "On-going", time: "15:00-16:30" },
-      "19/06": { status: "On-going", time: "15:00-16:30" },
-      "20/06": { status: "On-going", time: "15:00-16:30" },
-      "21/06": { status: "On-going", time: "15:00-16:30" },
-      "22/06": { status: "On-going", time: "15:00-16:30" },
-    },
-    "Slot 5": {
-      "16/06": { status: "Finished", time: "16:45-18:00" },
-      "17/06": { status: "Finished", time: "16:45-18:00" },
-      "18/06": { status: "Finished", time: "16:45-18:00" },
-      "19/06": { status: "Finished", time: "16:45-18:00" },
-      "20/06": { status: "Finished", time: "16:45-18:00" },
-      "21/06": { status: "Finished", time: "16:45-18:00" },
-      "22/06": { status: "Finished", time: "16:45-18:00" },
-    },
-    "Slot 6": {
-      "16/06": { status: "Canceled", time: "18:15-19:30" },
-      "17/06": { status: "Canceled", time: "18:15-19:30" },
-      "18/06": { status: "Canceled", time: "18:15-19:30" },
-      "19/06": { status: "Canceled", time: "18:15-19:30" },
-      "20/06": { status: "Canceled", time: "18:15-19:30" },
-      "21/06": { status: "Canceled", time: "18:15-19:30" },
-      "22/06": { status: "Canceled", time: "18:15-19:30" },
-    },
-    "Slot 7": {
-      "16/06": { status: "Completed", time: "19:45-21:00" },
-      "17/06": { status: "Completed", time: "19:45-21:00" },
-      "18/06": { status: "Completed", time: "19:45-21:00" },
-      "19/06": { status: "Completed", time: "19:45-21:00" },
-      "20/06": { status: "Completed", time: "19:45-21:00" },
-      "21/06": { status: "Completed", time: "19:45-21:00" },
-      "22/06": { status: "Completed", time: "19:45-21:00" },
-    },
-    "Slot 8": {
-      "16/06": { status: "On-going", time: "21:15-22:30" },
-      "17/06": { status: "Finished", time: "21:15-22:30" },
-      "18/06": { status: "Canceled", time: "21:15-22:30" },
-      "19/06": { status: "Completed", time: "21:15-22:30" },
-      "20/06": { status: "On-going", time: "21:15-22:30" },
-      "21/06": { status: "On-going", time: "21:15-22:30" },
-      "22/06": { status: "On-going", time: "21:15-22:30" },
-    },
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const userInfo = getUserInfo();
+        if (!userInfo || !userInfo.userId || !userInfo.token) {
+          setError("Không tìm thấy thông tin đăng nhập.");
+          setLoading(false);
+          return;
+        }
+        const res = await getTeacherCourses(userInfo.userId, userInfo.token);
+        const courses = Array.isArray(res.data) ? res.data : [];
+        const grid = {};
+        SLOTS.forEach((slot) => {
+          grid[slot] = {};
+        });
+        const weekDateMap = {};
+        selectedWeek.forEach((date) => {
+          weekDateMap[date] = true;
+        });
+        courses.forEach((course) => {
+          const courseDate = course.startTime
+            ? new Date(course.startTime)
+            : null;
+          if (!courseDate) return;
+          const dateStr = courseDate.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+          if (weekDateMap[dateStr]) {
+            const slotName = course.slot || "Slot 1";
+            grid[slotName][dateStr] = {
+              subject: course.subjectName ?? null,
+              subjectCode: course.subjectId || "-",
+              class: course.classId || "-",
+              time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
+              status: course.status || "nostatus",
+              link: course.link || "",
+            };
+          }
+        });
+        setScheduleData(grid);
+      } catch (err) {
+        setError(
+          "Lỗi khi tải dữ liệu: " +
+            (err?.response?.data?.message || err.message)
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [selectedWeek]);
 
   const handleWeekChange = (direction) => {
     const newDate = new Date(currentDate);
@@ -352,94 +190,101 @@ const Schedule = () => {
           </div>
         </div>
         <div className="schedule-content office-content">
-          <div className="table-scroll">
-            <table className="schedule-table office-table">
-              <thead>
-                <tr>
-                  <th className="th-slot fixed-col office-slot">Slot</th>
-                  {selectedWeek.map((date, idx) => (
-                    <th
-                      key={date}
-                      className={`th-date office-date ${isToday(date) ? "today-header" : ""}`}
-                    >
-                      {DAYS[idx]}
-                      <br />
-                      {date}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SLOTS.map((slot, slotIdx) => (
-                  <tr key={slot}>
-                    <td className="td-slot fixed-col office-slot">
-                      <span className="slot-icon">
-                        {String.fromCodePoint(0x2460 + slotIdx)}
-                      </span>{" "}
-                      {slot}
-                    </td>
-                    {selectedWeek.map((date) => {
-                      const data = scheduleData[slot][date];
-                      const statusColor =
-                        STATUS_COLORS[data?.status] || STATUS_COLORS.nostatus;
-                      return (
-                        <td
-                          key={`${slot}-${date}`}
-                          className={`td-cell office-cell ${isToday(date) ? "today-cell" : ""}`}
-                          style={{
-                            background: statusColor.bg,
-                            cursor: data && data.class ? "pointer" : "default",
-                          }}
-                          title={data && data.link ? data.link : ""}
-                          onClick={() => handleCellClick(slot, date, data)}
-                        >
-                          {data ? (
-                            <div className="cell-office-main">
-                              {data.subject && (
-                                <div className="cell-office-subject">
-                                  {data.subject}
-                                </div>
-                              )}
-                              {data.subjectCode && (
-                                <div className="cell-office-code">
-                                  {data.subjectCode}
-                                </div>
-                              )}
-                              {data.class && (
-                                <div className="cell-office-class">
-                                  Lớp: {data.class}
-                                </div>
-                              )}
-                              {data.time && (
-                                <div className="cell-office-time">
-                                  {data.time}
-                                </div>
-                              )}
-                              <div
-                                className="office-status-badge"
-                                style={{
-                                  background: statusColor.bg,
-                                  color: statusColor.color,
-                                  border: "none",
-                                  fontWeight: 600,
-                                  fontSize: 13,
-                                  marginTop: 2,
-                                }}
-                              >
-                                {getStatusText(data.status)}
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="nodata">-</span>
-                          )}
-                        </td>
-                      );
-                    })}
+          {error && (
+            <Alert type="error" message={error} style={{ marginBottom: 16 }} />
+          )}
+          <Spin spinning={loading} tip="Đang tải dữ liệu...">
+            <div className="table-scroll">
+              <table className="schedule-table office-table">
+                <thead>
+                  <tr>
+                    <th className="th-slot fixed-col office-slot">Slot</th>
+                    {selectedWeek.map((date, idx) => (
+                      <th
+                        key={date}
+                        className={`th-date office-date ${isToday(date) ? "today-header" : ""}`}
+                      >
+                        {DAYS[idx]}
+                        <br />
+                        {date}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {SLOTS.map((slot, slotIdx) => (
+                    <tr key={slot}>
+                      <td className="td-slot fixed-col office-slot">
+                        <span className="slot-icon">
+                          {String.fromCodePoint(0x2460 + slotIdx)}
+                        </span>{" "}
+                        {slot}
+                      </td>
+                      {selectedWeek.map((date) => {
+                        const slotData = scheduleData[slot] || {};
+                        const data = slotData[date];
+                        const statusColor =
+                          STATUS_COLORS[data?.status] || STATUS_COLORS.nostatus;
+                        return (
+                          <td
+                            key={`${slot}-${date}`}
+                            className={`td-cell office-cell ${isToday(date) ? "today-cell" : ""}`}
+                            style={{
+                              background: statusColor.bg,
+                              cursor:
+                                data && data.class ? "pointer" : "default",
+                            }}
+                            title={data && data.link ? data.link : ""}
+                            onClick={() => handleCellClick(slot, date, data)}
+                          >
+                            {data ? (
+                              <div className="cell-office-main">
+                                {data.subject && (
+                                  <div className="cell-office-subject">
+                                    {data.subject}
+                                  </div>
+                                )}
+                                {data.subjectCode && (
+                                  <div className="cell-office-code">
+                                    {data.subjectCode}
+                                  </div>
+                                )}
+                                {data.class && (
+                                  <div className="cell-office-class">
+                                    Lớp: {data.class}
+                                  </div>
+                                )}
+                                {data.time && (
+                                  <div className="cell-office-time">
+                                    {data.time}
+                                  </div>
+                                )}
+                                <div
+                                  className="office-status-badge"
+                                  style={{
+                                    background: statusColor.bg,
+                                    color: statusColor.color,
+                                    border: "none",
+                                    fontWeight: 600,
+                                    fontSize: 13,
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {getStatusText(data.status)}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="nodata">-</span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Spin>
         </div>
       </div>
 
@@ -448,4 +293,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default StudentSchedule;

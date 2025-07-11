@@ -10,6 +10,7 @@ import "./TeacherSchedule.css";
 import AttendancePage from "./AttendancePage";
 
 
+
 const SLOTS = [
   "Slot 1",
   "Slot 2",
@@ -20,6 +21,7 @@ const SLOTS = [
   "Slot 7",
 ];
 
+
 const SLOT_TIMES = {
   "Slot 1": "7h - 7h45",
   "Slot 2": "7h50 - 8h35",
@@ -29,6 +31,50 @@ const SLOT_TIMES = {
   "Slot 6": "13h30 - 14h15",
   "Slot 7": "14h30 - 15h15",
 };
+
+// Hàm để xác định slot dựa trên thời gian
+const getSlotByTime = (startTime) => {
+  if (!startTime) return "Slot 1";
+
+  const startHour = new Date(startTime).getHours();
+  const startMinute = new Date(startTime).getMinutes();
+  const timeInMinutes = startHour * 60 + startMinute;
+
+  // Định nghĩa thời gian bắt đầu của từng slot (tính bằng phút từ 00:00)
+  const slotStartTimes = {
+    "Slot 1": 7 * 60 + 0, // 07:00
+    "Slot 2": 7 * 60 + 50, // 07:50
+    "Slot 3": 8 * 60 + 50, // 08:50
+    "Slot 4": 9 * 60 + 40, // 09:40
+    "Slot 5": 10 * 60 + 30, // 10:30
+    "Slot 6": 13 * 60 + 30, // 13:30
+    "Slot 7": 14 * 60 + 30, // 14:30
+  };
+
+  // Tìm slot phù hợp
+  for (const [slot, startTimeInMinutes] of Object.entries(slotStartTimes)) {
+    if (timeInMinutes >= startTimeInMinutes) {
+      // Kiểm tra xem có phải slot cuối cùng không
+      const slotKeys = Object.keys(slotStartTimes);
+      const currentIndex = slotKeys.indexOf(slot);
+
+      if (currentIndex === slotKeys.length - 1) {
+        return slot; // Slot cuối cùng
+      }
+
+      // Kiểm tra xem có vượt quá slot tiếp theo không
+      const nextSlot = slotKeys[currentIndex + 1];
+      const nextStartTime = slotStartTimes[nextSlot];
+
+      if (timeInMinutes < nextStartTime) {
+        return slot;
+      }
+    }
+  }
+
+  return "Slot 1"; // Mặc định
+};
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function getWeekDates(date) {
@@ -124,11 +170,11 @@ const TeacherSchedule = () => {
           setLoading(false);
           return;
         }
+        const teacherID = localStorage.getItem("teacherId");
+        console.log(teacherID);
         // Lấy lịch dạy
-        const scheduleRes = await getTeacherCourses(
-          teacher.teacherId,
-          userInfo.token
-        );
+        const scheduleRes = await getTeacherCourses(teacherID, userInfo.token);
+        console.log(scheduleRes);
         let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
         // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
         const grid = {};
@@ -152,6 +198,7 @@ const TeacherSchedule = () => {
           });
           // Nếu ngày nằm trong tuần đang xem
           if (weekDateMap[dateStr] !== undefined) {
+
             const slotName = getSlotNameByTime(course.startTime);
             if (!grid[slotName][dateStr]) grid[slotName][dateStr] = [];
             grid[slotName][dateStr].push({
