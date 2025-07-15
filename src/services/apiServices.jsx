@@ -117,31 +117,16 @@ const getTeacherCourses = async (teacherId, token) => {
   });
 };
 
-const getClassesByTeacherId = async (teacherId, token) => {
-  return axios.get(`${BASE_URL}/Classroom/teacher/${teacherId}`, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-};
-
 // ------------------ PARENT ------------------
-const updateParentProfile = async (formData, token) => {
-  console.log(formData);
-
+const updateParentProfile = async (formData) => {
   return axios.put(`${BASE_URL}/Parent/profile`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });
 };
 
-const getParentProfile = async (token) => {
-  return axios.get(`${BASE_URL}/Parent/profile`, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+const getParentProfile = async () => {
+  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
 };
 
 // ------------------ COURSE & ATTENDANCE ------------------
@@ -183,6 +168,90 @@ const getAttendanceByCourse = async (courseId, token) => {
   });
 };
 
+const updateAttendance = async (attendanceData, token) => {
+  return axios.put(
+    `${BASE_URL}/Attendance`,
+    attendanceData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+const postScore = async (scoreData, token) => {
+  return axios.post(
+    `${BASE_URL}/Score`,
+    scoreData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+const getScoresByCourse = async (courseId, token) => {
+  return axios.get(`${BASE_URL}/Score/course/${courseId}`, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
+const updateScore = async (scoreData, token) => {
+  return axios.put(
+    `${BASE_URL}/Score`,
+    scoreData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+// ------------------ REPORT ------------------
+const postReport = async (reportData, token) => {
+  return axios.post(
+    `${BASE_URL}/Report`,
+    reportData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+// ------------------ TERM ------------------
+const postTerm = async (termData, token) => {
+  return axios.post(
+    `${BASE_URL}/Term`,
+    termData,
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
+// ------------------ TEACHER SUBJECT MAPPING ------------------
+const getTeacherSubject = (teacherId) => {
+  const subjectMap = {
+    'T001': { name: 'Toán', code: 'SUB001' },
+    'T002': { name: 'Văn', code: 'SUB002' },
+    'T003': { name: 'Tiếng Anh', code: 'SUB003' },
+    'T004': { name: 'Lý', code: 'SUB004' },
+    'T005': { name: 'Hóa', code: 'SUB005' },
+  };
+  return subjectMap[teacherId] || { name: 'Toán', code: 'SUB001' };
+};
+
+// ------------------ CHATBOT ------------------
+const postChatBotAsk = async (parentId, messageText) => {
+  return axios.post(
+    `${BASE_URL}/ChatBotLog/ask`,
+    { parentId, messageText }
+  );
+};
+
 // ------------------ EXPORT ------------------
 export {
   postSignin,
@@ -198,10 +267,16 @@ export {
   updateParentProfile,
   getParentProfile,
   getToken,
-  postReport,
-  getClassesByTeacherId,
   postCourse,
   postAttendance,
   getSlots,
   getAttendanceByCourse,
+  updateAttendance,
+  postScore,
+  getScoresByCourse,
+  updateScore,
+  postReport,
+  postTerm,
+  getTeacherSubject,
+  postChatBotAsk,
 };
