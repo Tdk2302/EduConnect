@@ -7,9 +7,9 @@ import Signin from "./component/Signin/Singin";
 import TeacherMainLayout from "./pages/Teachers/Layout/TeacherMainLayout";
 import Homepage from "./pages/Parents/HomePage/Homepage";
 import ProfileUser from "./component/ProfileUser";
-import ChatBotPage from "./pages/Parents/ChatBot/ChatBotPage";
+import ChatBotPage from "./pages/Parents/ChatBot/ChatBox";
 import ParentNotifications from "./pages/Parents/Notification/Notification";
-import TeacherNotifications from "./pages/Teachers/Notification/NotificationBox";
+
 import StudentSchedule from "./pages/Parents/Schedule/StudentSchedule";
 import TeacherSchedule from "./pages/Teachers/Schedule/TeacherSchedule";
 import AdminMainLayout from "./pages/Admin/AdminMainLayout";
@@ -58,7 +58,7 @@ const Router = () => {
         />
         <Route path="/profile" element={<ProfileUser />} />
         <Route path="/chatbot" element={<ChatBotPage />} />
-        <Route path="/notifications" element={<ParentNotifications />} />
+
         <Route
           path="/admin"
           element={
@@ -72,10 +72,6 @@ const Router = () => {
           <Route path="create-course" element={<TeacherCourseCreate />} />
           <Route path="create-attendance/:courseId" element={<TeacherAttendanceCreate />} />
         </Route>
-        <Route
-          path="/teacher-notifications"
-          element={<TeacherNotifications />}
-        />
         <Route path="/student-schedule" element={<StudentSchedule />} />
         <Route path="/teacher-schedule" element={<TeacherSchedule />} />
         <Route
