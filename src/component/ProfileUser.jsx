@@ -28,12 +28,12 @@ export default function ProfileUser() {
     fullName: user.fullName,
     email: user.email,
     role: user.role,
-    phone: user.phoneNumber || "0903053808",
-    gender: user.gender || "Male",
-    dateOfBirth: user.dateOfBirth || "1990-01-01",
-    nationalId: user.nationalId || "1234567890",
-    country: user.country || "Vietnam",
-    city: user.city || "Hà Nội",
+    phone: user.phoneNumber,
+    gender: user.gender,
+    dateOfBirth: user.dateOfBirth,
+    nationalId: user.nationalId,
+    country: user.country,
+    city: user.city,
     avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -47,7 +47,6 @@ export default function ProfileUser() {
       } else {
         const data = await getParentProfile(user.token);
         setProfile(data.data);
-        console.log(data.data);
       }
     }
     fetchProfile();
@@ -111,11 +110,11 @@ export default function ProfileUser() {
           ...prev,
           userImage: imageUrl || prev.userImage,
           phone: profile.phone,
-          role: profile.role,
           fullName: profile.fullName,
           ...updateResponse.data,
         }));
         toast.success("Cập nhật thành công!");
+
         const currentUser = JSON.parse(
           localStorage.getItem("userInfo") || "{}"
         );
@@ -143,17 +142,17 @@ export default function ProfileUser() {
       reader.readAsDataURL(file);
     }
   };
-  const backendUrl = "https://localhost:7064";
+
+  const backendUrl = "http://localhost:7064";
 
   return (
     <>
-      {user.role !== "Teacher" && <Header />}
-
       <div style={{ display: "flex", minHeight: "100vh" }}>
         {user.role === "Teacher" && (
           <SideBar selected="profile" onSelect={() => {}} />
         )}
         <div style={{ flex: 1, display: "flex" }}>
+          {user.role !== "Teacher" && <Header />}
           <div className="profile-container" style={{ flex: 1 }}>
             {user.role !== "Teacher" && (
               <div className="profile-sidebar">
@@ -170,7 +169,9 @@ export default function ProfileUser() {
                   src={
                     profile.avatar ||
                     (profile.userImage
-                      ? `${backendUrl}${profile.userImage}`
+                      ? profile.userImage.startsWith("http")
+                        ? profile.userImage
+                        : `${backendUrl}${profile.userImage}`
                       : "https://randomuser.me/api/portraits/men/1.jpg")
                   }
                   alt="avatar"
