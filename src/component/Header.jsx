@@ -36,7 +36,7 @@ const Logo = ({ navigate }) => (
 const menuItems = [
   { label: "Schedule", path: "/student-schedule" },
   { label: "Chat Bot", path: "/chatbot" },
-  { label: "Notifications", path: "/notifications" },
+  { label: "Notifications", path: "/parent-notifications" },
 ];
 
 const StyledButton = styled(Button)(({ theme }) => ({

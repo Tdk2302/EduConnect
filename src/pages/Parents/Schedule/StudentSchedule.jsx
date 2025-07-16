@@ -1,12 +1,15 @@
-import React, { useState } from "react";
-import { Button, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Select, message, Spin, Alert } from "antd";
 
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Header from "../../../component/Header";
 import "./StudentSchedule.css";
 import Footer from "../../../component/Footer";
 import { getUserInfo } from "../../../services/handleStorageApi";
-import { getTeacherCourses } from "../../../services/apiServices";
+import {
+  getStudentByParentEmail,
+  getStudentSchedule,
+} from "../../../services/apiServices";
 
 const { Option } = Select;
 
@@ -81,35 +84,71 @@ function getSlotNameByTime(startTime) {
   return "Slot 1";
 }
 
-const Schedule = () => {
+const StudentSchedule = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(getWeekDates(new Date()));
   const [scheduleData, setScheduleData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedClassId, setSelectedClassId] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      try {
+        const userInfo = getUserInfo();
+        if (!userInfo || !userInfo.email || !userInfo.token) {
+          setLoading(false);
+          return;
+        }
+        const res = await getStudentByParentEmail(
+          userInfo.token,
+          userInfo.email
+        );
+        const data = await res.data;
+        setStudents(data);
+        if (data.length > 0) {
+          setSelectedStudent(data[0].studentId); // Hoặc ID của học sinh đã chọn
+          setSelectedClassId(data[0].classId); // Lưu classId
+        }
+      } catch (err) {
+        setStudents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    const fetchClassSchedule = async () => {
       setLoading(true);
       setError("");
       try {
         const userInfo = getUserInfo();
-        if (!userInfo || !userInfo.userId || !userInfo.token) {
+        if (!userInfo || !userInfo.token) {
           setError("Không tìm thấy thông tin đăng nhập.");
-          setLoading(false);
           return;
         }
-        const res = await getTeacherCourses(userInfo.userId, userInfo.token);
-        const courses = Array.isArray(res.data) ? res.data : [];
+        const scheduleRes = await getStudentSchedule(
+          selectedClassId,
+          userInfo.token
+        );
+        let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
+        // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
         const grid = {};
         SLOTS.forEach((slot) => {
           grid[slot] = {};
         });
+        // Tạo map ngày (dd/MM) -> index trong tuần
         const weekDateMap = {};
-        selectedWeek.forEach((date) => {
-          weekDateMap[date] = true;
+        selectedWeek.forEach((date, idx) => {
+          weekDateMap[date] = idx;
         });
         courses.forEach((course) => {
+          // Lấy ngày của course (dd/MM)
           const courseDate = course.startTime
             ? new Date(course.startTime)
             : null;
@@ -118,16 +157,18 @@ const Schedule = () => {
             day: "2-digit",
             month: "2-digit",
           });
-          if (weekDateMap[dateStr]) {
-            const slotName = course.slot || "Slot 1";
-            grid[slotName][dateStr] = {
+          // Nếu ngày nằm trong tuần đang xem
+          if (weekDateMap[dateStr] !== undefined) {
+            const slotName = getSlotNameByTime(course.startTime);
+            if (!grid[slotName][dateStr]) grid[slotName][dateStr] = [];
+            grid[slotName][dateStr].push({
               subject: course.subjectName ?? null,
               subjectCode: course.subjectId || "-",
               class: course.classId || "-",
               time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
-              status: course.status || "nostatus",
-              link: course.link || "",
-            };
+              status: course.status,
+              courseId: course.courseId,
+            });
           }
         });
         setScheduleData(grid);
@@ -140,8 +181,8 @@ const Schedule = () => {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [selectedWeek]);
+    fetchClassSchedule();
+  }, [selectedStudent]);
 
   const handleWeekChange = (direction) => {
     const newDate = new Date(currentDate);
@@ -246,67 +287,49 @@ const Schedule = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {SLOTS.map((slot, slotIdx) => (
+                  {SLOTS.map((slot) => (
                     <tr key={slot}>
-                      <td className="td-slot fixed-col office-slot">
-                        <span className="slot-icon">
-                          {String.fromCodePoint(0x2460 + slotIdx)}
-                        </span>{" "}
-                        {slot}
+                      <td className="td-slot office-slot">
+                        <span className="slot-icon">{slot}</span>
+                        <div style={{ fontSize: 12, color: "#64748b" }}>
+                          {SLOT_TIMES[slot]}
+                        </div>
                       </td>
                       {selectedWeek.map((date) => {
-                        const slotData = scheduleData[slot] || {};
-                        const data = slotData[date];
-                        const statusColor =
-                          STATUS_COLORS[data?.status] || STATUS_COLORS.nostatus;
+                        const dataArr = scheduleData[slot]?.[date];
                         return (
                           <td
                             key={`${slot}-${date}`}
                             className={`td-cell office-cell ${isToday(date) ? "today-cell" : ""}`}
-                            style={{
-                              background: statusColor.bg,
-                              cursor:
-                                data && data.class ? "pointer" : "default",
-                            }}
-                            title={data && data.link ? data.link : ""}
-                            onClick={() => handleCellClick(slot, date, data)}
                           >
-                            {data ? (
-                              <div className="cell-office-main">
-                                {data.subject && (
-                                  <div className="cell-office-subject">
-                                    {data.subject}
+                            {Array.isArray(dataArr) && dataArr.length > 0 ? (
+                              dataArr.map((data, idx) => {
+                                const statusColor =
+                                  STATUS_COLORS[data?.status] ||
+                                  STATUS_COLORS.nostatus;
+                                return (
+                                  <div>
+                                    <div className="cell-office-subject">
+                                      <b>Tên môn:</b> {data.subject ?? "Null"}
+                                    </div>
+                                    <div className="cell-office-class">
+                                      Lớp: {data.class}
+                                    </div>
+                                    <div className="cell-office-time">
+                                      {data.time}
+                                    </div>
+                                    <div
+                                      className={`office-status-badge ${data.status?.toLowerCase() || "nostatus"}`}
+                                      style={{
+                                        color: statusColor.color,
+                                        background: statusColor.bg,
+                                      }}
+                                    >
+                                      {data.status}
+                                    </div>
                                   </div>
-                                )}
-                                {data.subjectCode && (
-                                  <div className="cell-office-code">
-                                    {data.subjectCode}
-                                  </div>
-                                )}
-                                {data.class && (
-                                  <div className="cell-office-class">
-                                    Lớp: {data.class}
-                                  </div>
-                                )}
-                                {data.time && (
-                                  <div className="cell-office-time">
-                                    {data.time}
-                                  </div>
-                                )}
-                                <div
-                                  className="office-status-badge"
-                                  style={{
-                                    background: statusColor.bg,
-                                    color: statusColor.color,
-                                    border: "none",
-                                    fontWeight: 600,
-                                    fontSize: 13,
-                                    marginTop: 2,
-                                  }}
-                                >
-                                  {getStatusText(data.status)}
-                                </div>
-                              </div>
+                                );
+                              })
                             ) : (
                               <span className="nodata">-</span>
                             )}
@@ -327,4 +350,4 @@ const Schedule = () => {
   );
 };
 
-export default Schedule;
+export default StudentSchedule;
