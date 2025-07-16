@@ -216,6 +216,14 @@ const postReport = async (reportData, token) => {
   });
 };
 
+const getReport = async (classId, token) => {
+  return axios.get(`${BASE_URL}/Report`, {
+    params: { classId },
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
 // ------------------ TERM ------------------
 const postTerm = async (termData, token) => {
   return axios.post(`${BASE_URL}/Term`, termData, {
@@ -253,6 +261,7 @@ export {
   deleteTeacher,
   getTeacherDetail,
   getTeacherCourses,
+  getReport,
   updateParentProfile,
   getParentProfile,
   getStudentSchedule,
@@ -268,5 +277,6 @@ export {
   postReport,
   postTerm,
   getTeacherSubject,
+  getStudentByParentEmail,
   postChatBotAsk,
 };

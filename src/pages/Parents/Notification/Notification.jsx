@@ -55,12 +55,14 @@ import {
   Delete as DeleteIcon,
   Archive as ArchiveIcon,
 } from "@mui/icons-material";
-import { format, parseISO, isToday, isYesterday, isThisWeek } from "date-fns";
+import { format, isToday, isYesterday, isThisWeek } from "date-fns";
 import { vi } from "date-fns/locale";
 import "./Notication.scss";
 import Header from "../../../component/Header";
 import axios from "axios";
 import { message } from "antd";
+import { getReport } from "../../../services/apiServices";
+import { getUserInfo } from "../../../services/handleStorageApi";
 
 const notificationTypes = {
   report: { label: "Báo cáo", icon: AssignmentIcon, color: "primary" },
@@ -286,16 +288,16 @@ export default function Notifications() {
     }, 1000);
   };
 
-  const fetchNotiDetail = (notiId) => {
-    console.log("notiId fetch:", notiId);
-    setDetailLoading(true);
-    const BASE_URL = "https://localhost:7064/api";
-    axios
-      .get(`${BASE_URL}/Report/${notiId}`)
-      .then((res) => setNotiDetail(res.data))
-      .catch(() => setNotiDetail(null))
-      .finally(() => setDetailLoading(false));
-  };
+  // const fetchNotiDetail = (notiId) => {
+  //   console.log("notiId fetch:", notiId);
+  //   setDetailLoading(true);
+  //   const BASE_URL = "https://localhost:7064/api";
+  //   axios
+  //     .get(`${BASE_URL}/Report/${notiId}`)
+  //     .then((res) => setNotiDetail(res.data))
+  //     .catch(() => setNotiDetail(null))
+  //     .finally(() => setDetailLoading(false));
+  // };
 
   // Filter notifications based on search, tab, type, and priority
   useEffect(() => {
@@ -332,29 +334,31 @@ export default function Notifications() {
   }, [notifications, selectedTab, selectedType, selectedPriority, searchTerm]);
 
   useEffect(() => {
-    const BASE_URL = "https://localhost:7064/api";
-    const classId = "class01";
-    setLoading(true);
-    axios
-      .get(`${BASE_URL}/Report`, { params: { classId } })
-      .then((res) => {
-        const mapped = res.data.map((item) => ({
-          id: item.reportId || item.id,
-          title: item.title || "",
-          content: item.description || "",
-          type: "report",
-          priority: "medium",
-          isRead: false,
-          timestamp: new Date(),
-          teacher: item.teacherName || item.teacher || "",
-          class: item.className || item.class || item.classId || "",
-        }));
-        setNotifications(mapped);
-      })
-      .catch((err) => {
-        setNotifications([]);
-      })
-      .finally(() => setLoading(false));
+    const fetchReport = async () => {
+      const classId = "class01";
+      const userInfo = getUserInfo();
+      setLoading(true);
+      const res = await getReport(classId, userInfo.token)
+        .then((res) => {
+          const mapped = res.data.map((item) => ({
+            id: item.reportId || item.id,
+            title: item.title || "",
+            content: item.description || "",
+            type: "report",
+            priority: "medium",
+            isRead: false,
+            timestamp: new Date(),
+            teacher: item.teacherName || item.teacher || "",
+            class: item.className || item.class || item.classId || "",
+          }));
+          setNotifications(mapped);
+        })
+        .catch((err) => {
+          setNotifications([]);
+        })
+        .finally(() => setLoading(false));
+    };
+    fetchReport();
   }, []);
 
   return (

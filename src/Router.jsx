@@ -35,12 +35,20 @@ function ProtectedRoute({ allowedRoles, children }) {
 const Router = () => {
   return (
     <>
-      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+      <GoogleOAuthProvider clientId="846378431742-59jfr2idp9l6tfmt6kf1j2kumpka4vut.apps.googleusercontent.com">
         {" "}
         <Routes>
           <Route path="/" element={<Navigate to="/homepage" replace />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/register" element={<Register />} />
+          <Route
+            path="/parent-notifications"
+            element={
+              <ProtectedRoute allowedRoles={["Parent"]}>
+                <ParentNotifications />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/teacher"
             element={
@@ -107,8 +115,8 @@ const Router = () => {
             }
           />
 
-          {/* <Route path="/forget-password" element={<ForgetPassword/>} />
-        <Route path="/reset-password" element={<ResetPassword/>} />        */}
+          {/* <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} /> */}
         </Routes>
       </GoogleOAuthProvider>
 
