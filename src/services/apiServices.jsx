@@ -117,20 +117,12 @@ const getTeacherCourses = async (teacherId, token) => {
   });
 };
 
-const getClassesByTeacherId = async (teacherId, token) => {
-  return axios.get(`${BASE_URL}/Classroom/teacher/${teacherId}`, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-};
-
 // ------------------ PARENT ------------------
 const updateParentProfile = async (formData, token) => {
+  console.log(formData);
+
   return axios.put(`${BASE_URL}/Parent/profile`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });
 };
@@ -142,11 +134,8 @@ const getStudentByParentEmail = async (token, email) => {
   });
 };
 
-const getParentProfile = async (token) => {
-  return axios.get(`${BASE_URL}/Parent/profile`, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+const getParentProfile = async () => {
+  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
 };
 
 // ------------------ COURSE & ATTENDANCE ------------------
@@ -189,14 +178,6 @@ const getAttendanceByCourse = async (courseId, token) => {
   });
 };
 
-// ------------------ REPORT ------------------
-const postReport = async (reportData, token) => {
-  return axios.post(`${BASE_URL}/Report`, reportData, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-};
-
 // ------------------ EXPORT ------------------
 export {
   postSignin,
@@ -213,11 +194,10 @@ export {
   updateParentProfile,
   getParentProfile,
   getToken,
+  postReport,
   getClassesByTeacherId,
   postCourse,
   postAttendance,
   getSlots,
   getAttendanceByCourse,
-  getStudentByParentEmail,
-  getStudentSchedule,
 };
