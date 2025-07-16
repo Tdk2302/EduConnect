@@ -9,7 +9,7 @@ import Homepage from "./pages/Parents/HomePage/Homepage";
 import ProfileUser from "./component/ProfileUser";
 import ChatBotPage from "./pages/Parents/ChatBot/ChatBox";
 import ParentNotifications from "./pages/Parents/Notification/Notification";
-
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import StudentSchedule from "./pages/Parents/Schedule/StudentSchedule";
 import TeacherSchedule from "./pages/Teachers/Schedule/TeacherSchedule";
 import AdminMainLayout from "./pages/Admin/AdminMainLayout";
@@ -20,7 +20,6 @@ import { getUserInfo } from "./services/handleStorageApi";
 import ManageUser from "./pages/Admin/ManageUser";
 import AdminSettings from "./pages/Admin/AdminSettings";
 
-// ProtectedRoute component
 function ProtectedRoute({ allowedRoles, children }) {
   const user = getUserInfo();
   if (!user) return <Navigate to="/signin" replace />;
@@ -36,77 +35,83 @@ function ProtectedRoute({ allowedRoles, children }) {
 const Router = () => {
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Navigate to="/homepage" replace />} />
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/teacher"
-          element={
-            <ProtectedRoute allowedRoles={["Teacher"]}>
-              <TeacherMainLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/homepage"
-          element={
-            <ProtectedRoute allowedRoles={["Parent"]}>
-              <Homepage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/profile" element={<ProfileUser />} />
-        <Route path="/chatbot" element={<ChatBotPage />} />
+      <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+        {" "}
+        <Routes>
+          <Route path="/" element={<Navigate to="/homepage" replace />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/teacher"
+            element={
+              <ProtectedRoute allowedRoles={["Teacher"]}>
+                <TeacherMainLayout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/homepage"
+            element={
+              <ProtectedRoute allowedRoles={["Parent"]}>
+                <Homepage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/profile" element={<ProfileUser />} />
+          <Route path="/chatbot" element={<ChatBotPage />} />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminMainLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="manage-user" element={<ManageUser />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="create-course" element={<TeacherCourseCreate />} />
-          <Route path="create-attendance/:courseId" element={<TeacherAttendanceCreate />} />
-        </Route>
-        <Route path="/student-schedule" element={<StudentSchedule />} />
-        <Route path="/teacher-schedule" element={<TeacherSchedule />} />
-        <Route
-          path="/admin/create-schedule"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <TeacherScheduleCreate />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/create-course"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminMainLayout>
-                <TeacherCourseCreate />
-              </AdminMainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/create-attendance/:courseId"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminMainLayout>
-                <TeacherAttendanceCreate />
-              </AdminMainLayout>
-            </ProtectedRoute>
-          }
-        />
-    
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminMainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="manage-user" element={<ManageUser />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="create-course" element={<TeacherCourseCreate />} />
+            <Route
+              path="create-attendance/:courseId"
+              element={<TeacherAttendanceCreate />}
+            />
+          </Route>
+          <Route path="/student-schedule" element={<StudentSchedule />} />
+          <Route path="/teacher-schedule" element={<TeacherSchedule />} />
+          <Route
+            path="/admin/create-schedule"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <TeacherScheduleCreate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/create-course"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminMainLayout>
+                  <TeacherCourseCreate />
+                </AdminMainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/create-attendance/:courseId"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminMainLayout>
+                  <TeacherAttendanceCreate />
+                </AdminMainLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* <Route path="/forget-password" element={<ForgetPassword/>} />
+          {/* <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />        */}
-      </Routes>
+        </Routes>
+      </GoogleOAuthProvider>
+
       <ToastContainer
         position="top-center"
         autoClose={5000}

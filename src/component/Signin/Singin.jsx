@@ -7,6 +7,7 @@ import { postSignin } from "../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css";
 import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
 
 const { Title, Text, Link } = Typography;
 
@@ -139,6 +140,26 @@ const Signin = () => {
               Đăng nhập
             </Button>
           </Form.Item>
+
+          <div style={{ textAlign: "center", marginBottom: 16 }}>
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                // Xử lý đăng nhập thành công ở đây
+                // credentialResponse.credential là JWT trả về từ Google
+                // Gửi lên backend để xác thực hoặc decode lấy thông tin user
+                console.log(credentialResponse);
+                // Ví dụ: gọi API backend để xác thực và đăng nhập
+              }}
+              onError={() => {
+                toast.error("Đăng nhập Google thất bại!");
+              }}
+              width="100%"
+              text="signin_with"
+              shape="rectangular"
+              theme="outline"
+              size="large"
+            />
+          </div>
         </Form>
 
         <div className="signin-header">
