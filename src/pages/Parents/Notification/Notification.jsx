@@ -299,28 +299,23 @@ export default function Notifications() {
   //     .finally(() => setDetailLoading(false));
   // };
 
-  // Filter notifications based on search, tab, type, and priority
   useEffect(() => {
     let filtered = notifications;
 
-    // Filter by tab (all, unread, read)
     if (selectedTab === 1) {
       filtered = filtered.filter((n) => !n.isRead);
     } else if (selectedTab === 2) {
       filtered = filtered.filter((n) => n.isRead);
     }
 
-    // Filter by type
     if (selectedType !== "all") {
       filtered = filtered.filter((n) => n.type === selectedType);
     }
 
-    // Filter by priority
     if (selectedPriority !== "all") {
       filtered = filtered.filter((n) => n.priority === selectedPriority);
     }
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (n) =>

@@ -1,3 +1,5 @@
+import { Cookie } from "@mui/icons-material";
+
 export const setUserName = (name) => {
   localStorage.setItem("username", name);
 };
@@ -11,6 +13,7 @@ export const logoutUser = () => {
   localStorage.removeItem("userInfo");
   localStorage.removeItem("teacherId");
   localStorage.removeItem("teacherInfo");
+  localStorage.removeItem("teacherClasses");
 };
 
 export const setUserInfo = (userId, role, fullName, email, token) => {

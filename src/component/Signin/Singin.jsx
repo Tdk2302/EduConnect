@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { setUserInfo } from "../../services/handleStorageApi";
-import { postSignin } from "../../services/apiServices";
+import { postSignin, postGoogleLogin } from "../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css";
 import axios from "axios";
@@ -143,17 +143,61 @@ const Signin = () => {
 
           <div style={{ textAlign: "center", marginBottom: 16 }}>
             <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                // Xử lý đăng nhập thành công ở đây
-                // credentialResponse.credential là JWT trả về từ Google
-                // Gửi lên backend để xác thực hoặc decode lấy thông tin user
-                console.log(credentialResponse);
-                // Ví dụ: gọi API backend để xác thực và đăng nhập
+              onSuccess={async (credentialResponse) => {
+                console.log(credentialResponse.credential);
+                try {
+                  const response = await postGoogleLogin(
+                    credentialResponse.credential
+                  );
+                  console.log(response);
+                  if (response.status === 200) {
+                    toast.success("Đăng nhập Google thành công!");
+                    setUserInfo(
+                      response.data.userId,
+                      response.data.role,
+                      response.data.fullName,
+                      response.data.email,
+                      response.data.token
+                    );
+                    let role = response.data.role;
+                    if (role === "Admin") {
+                      navigate("/admin");
+                    } else if (role === "Parent") {
+                      navigate("/homepage");
+                    } else if (role === "Teacher") {
+                      axios
+                        .get(
+                          `https://localhost:7064/api/Teacher/${response.data.userId}`
+                        )
+                        .then((res) => {
+                          const teacherId = res.data.teacherId || res.data.id;
+                          if (teacherId) {
+                            localStorage.setItem("teacherId", teacherId);
+                          }
+                        })
+                        .catch((err) => {
+                          console.error("Lỗi lấy teacherId:", err);
+                        });
+                      navigate("/teacher");
+                    } else {
+                      navigate("/homepage");
+                    }
+                  } else {
+                    toast.error(
+                      response?.message || "Đăng nhập Google thất bại!"
+                    );
+                  }
+                } catch (error) {
+                  toast.error(
+                    error?.response?.data?.message ||
+                      "Đăng nhập Google thất bại!"
+                  );
+                }
               }}
               onError={() => {
                 toast.error("Đăng nhập Google thất bại!");
               }}
-              width="100%"
+              // width="100%"
               text="signin_with"
               shape="rectangular"
               theme="outline"
