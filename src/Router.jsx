@@ -35,8 +35,7 @@ function ProtectedRoute({ allowedRoles, children }) {
 const Router = () => {
   return (
     <>
-      <GoogleOAuthProvider clientId="846378431742-59jfr2idp9l6tfmt6kf1j2kumpka4vut.apps.googleusercontent.com">
-        {" "}
+      <GoogleOAuthProvider clientId="846378431742-kak8gvoft2navloh61h6ckkfs8mfm20o.apps.googleusercontent.com">
         <Routes>
           <Route path="/" element={<Navigate to="/homepage" replace />} />
           <Route path="/signin" element={<Signin />} />
@@ -114,7 +113,6 @@ const Router = () => {
               </ProtectedRoute>
             }
           />
-
           {/* <Route path="/forget-password" element={<ForgetPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} /> */}
         </Routes>

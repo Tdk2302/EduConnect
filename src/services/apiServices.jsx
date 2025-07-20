@@ -11,23 +11,26 @@ const postSignin = async (email, password) => {
   );
 };
 
+const postGoogleLogin = async (credential) => {
+  console.log(credential);
+  return axios.post(`${BASE_URL}/Auth/login-google`, { IdToken: credential });
+};
+
 const postRegister = async (
   firstName,
   lastName,
   email,
   password,
-  passwordConfirm,
-  gender
+  studentId
 ) => {
   return axios.post(
-    `https://localhost:7096/parent/registerUser`,
+    `${BASE_URL}/Auth/Register`,
     {
       firstName,
       lastName,
       email,
       password,
-      passwordConfirm,
-      gender,
+      studentId,
     },
     { withCredentials: true }
   );
@@ -120,10 +123,11 @@ const getTeacherCourses = async (teacherId, token) => {
 // ------------------ PARENT ------------------
 
 const updateParentProfile = async (formData, token) => {
-  console.log(formData);
-
   return axios.put(`${BASE_URL}/Parent/profile`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    },
     withCredentials: true,
   });
 };
@@ -135,8 +139,11 @@ const getStudentByParentEmail = async (token, email) => {
   });
 };
 
-const getParentProfile = async () => {
-  return axios.get(`${BASE_URL}/Parent/profile`, { withCredentials: true });
+const getParentProfile = async (token) => {
+  return axios.get(`${BASE_URL}/Parent/profile`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    withCredentials: true,
+  });
 };
 
 // ------------------ COURSE & ATTENDANCE ------------------
@@ -224,6 +231,14 @@ const getReport = async (classId, token) => {
   });
 };
 
+const getReportDetail = async (classId, token) => {
+  return axios.get(`${BASE_URL}/Report`, {
+    params: { classId },
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
 // ------------------ TERM ------------------
 const postTerm = async (termData, token) => {
   return axios.post(`${BASE_URL}/Term`, termData, {
@@ -252,6 +267,7 @@ const postChatBotAsk = async (parentId, messageText) => {
 // ------------------ EXPORT ------------------
 export {
   postSignin,
+  postGoogleLogin,
   postRegister,
   forgetPassword,
   resetPassword,

@@ -66,6 +66,18 @@
   font-size: 16px;
 }
 
+.google-login {
+  width: 100%;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+.google-login> div {
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+}
+
 .signin-btn:hover,
 .signin-btn:focus {
   background: linear-gradient(90deg, #355db4, #6495ed);
