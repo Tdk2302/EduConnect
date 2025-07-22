@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { postTerm, postReport, getToken } from '../../../services/apiServices';
+import React, { useState } from "react";
+import { postTerm, postReport, getToken } from "../../../services/apiServices";
 import {
   Paper,
   Box,
@@ -14,50 +14,49 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Divider
-} from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import EventIcon from '@mui/icons-material/Event';
-import SchoolIcon from '@mui/icons-material/School';
+  Divider,
+} from "@mui/material";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import EventIcon from "@mui/icons-material/Event";
+import SchoolIcon from "@mui/icons-material/School";
 
 const MODES = [
-  { value: 'tháng', label: 'Tháng' },
-  { value: 'năm', label: 'Năm' },
+  { value: "tháng", label: "Tháng" },
+  { value: "năm", label: "Năm" },
 ];
 
-const steps = ['Tạo kỳ báo cáo', 'Tạo báo cáo'];
+const steps = ["Tạo kỳ báo cáo", "Tạo báo cáo"];
 
 const ReportCreate = () => {
   // Stepper state
   const [activeStep, setActiveStep] = useState(0);
 
   // Step 1: Create Term
-  const [mode, setMode] = useState('tháng');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [mode, setMode] = useState("tháng");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [creatingTerm, setCreatingTerm] = useState(false);
-  const [termID, setTermID] = useState('');
-  const [termError, setTermError] = useState('');
-  const [termSuccess, setTermSuccess] = useState('');
+  const [termID, setTermID] = useState("");
+  const [termError, setTermError] = useState("");
+  const [termSuccess, setTermSuccess] = useState("");
 
   // Step 2: Create Report
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [classId, setClassId] = useState('');
-  const [teacherId, setTeacherId] = useState('');
-  const [teacherName, setTeacherName] = useState('');
-  const [className, setClassName] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [classId, setClassId] = useState("");
+  const [teacherId, setTeacherId] = useState("");
+  const [teacherName, setTeacherName] = useState("");
+  const [className, setClassName] = useState("");
   const [creatingReport, setCreatingReport] = useState(false);
-  const [reportError, setReportError] = useState('');
-  const [reportSuccess, setReportSuccess] = useState('');
+  const [reportError, setReportError] = useState("");
+  const [reportSuccess, setReportSuccess] = useState("");
 
-  // Step 1: Handle create term
   const handleCreateTerm = async (e) => {
     e.preventDefault();
-    setTermError('');
-    setTermSuccess('');
+    setTermError("");
+    setTermSuccess("");
     if (!mode || !startTime || !endTime) {
-      setTermError('Vui lòng nhập đầy đủ thông tin kỳ báo cáo.');
+      setTermError("Vui lòng nhập đầy đủ thông tin kỳ báo cáo.");
       return;
     }
     setCreatingTerm(true);
@@ -70,27 +69,34 @@ const ReportCreate = () => {
       };
       const token = getToken && getToken();
       const res = await postTerm(payload, token);
-      const newTermID = res?.data?.termID || res?.data?.termId || res?.data?.id || res?.data;
+      const newTermID =
+        res?.data?.termID || res?.data?.termId || res?.data?.id || res?.data;
       setTermID(newTermID);
-      setTermSuccess('Tạo kỳ báo cáo thành công!');
+      setTermSuccess("Tạo kỳ báo cáo thành công!");
       setTimeout(() => {
         setActiveStep(1);
-        setTermSuccess('');
+        setTermSuccess("");
       }, 800);
     } catch (err) {
-      setTermError('Tạo kỳ báo cáo thất bại!');
+      setTermError("Tạo kỳ báo cáo thất bại!");
     } finally {
       setCreatingTerm(false);
     }
   };
 
-  // Step 2: Handle create report
   const handleCreateReport = async (e) => {
     e.preventDefault();
-    setReportError('');
-    setReportSuccess('');
-    if (!title || !description || !classId || !teacherId || !teacherName || !className) {
-      setReportError('Vui lòng nhập đầy đủ thông tin báo cáo.');
+    setReportError("");
+    setReportSuccess("");
+    if (
+      !title ||
+      !description ||
+      !classId ||
+      !teacherId ||
+      !teacherName ||
+      !className
+    ) {
+      setReportError("Vui lòng nhập đầy đủ thông tin báo cáo.");
       return;
     }
     setCreatingReport(true);
@@ -106,26 +112,31 @@ const ReportCreate = () => {
       };
       const token = getToken && getToken();
       await postReport(payload, token);
-      setReportSuccess('Tạo báo cáo thành công!');
+      setReportSuccess("Tạo báo cáo thành công!");
       setTimeout(() => {
         setActiveStep(0);
-        setTitle(''); setDescription(''); setClassId(''); setTeacherId(''); setTeacherName(''); setClassName(''); setTermID('');
-        setReportSuccess('');
+        setTitle("");
+        setDescription("");
+        setClassId("");
+        setTeacherId("");
+        setTeacherName("");
+        setClassName("");
+        setTermID("");
+        setReportSuccess("");
       }, 1200);
     } catch (err) {
-      setReportError('Tạo báo cáo thất bại!');
+      setReportError("Tạo báo cáo thất bại!");
     } finally {
       setCreatingReport(false);
     }
   };
 
-  // Stepper navigation
   const handleBack = () => {
     setActiveStep((prev) => prev - 1);
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, mb: 4 }}>
+    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4, mb: 4 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 4 }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
           {steps.map((label, idx) => (
@@ -148,13 +159,17 @@ const ReportCreate = () => {
                   <Select
                     fullWidth
                     value={mode}
-                    onChange={e => setMode(e.target.value)}
+                    onChange={(e) => setMode(e.target.value)}
                     label="Chế độ báo cáo"
                     variant="outlined"
                     size="small"
                     sx={{ mb: 1 }}
                   >
-                    {MODES.map(m => <MenuItem key={m.value} value={m.value}>{m.label}</MenuItem>)}
+                    {MODES.map((m) => (
+                      <MenuItem key={m.value} value={m.value}>
+                        {m.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -164,7 +179,7 @@ const ReportCreate = () => {
                     label="Thời gian bắt đầu"
                     InputLabelProps={{ shrink: true }}
                     value={startTime}
-                    onChange={e => setStartTime(e.target.value)}
+                    onChange={(e) => setStartTime(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -175,7 +190,7 @@ const ReportCreate = () => {
                     label="Thời gian kết thúc"
                     InputLabelProps={{ shrink: true }}
                     value={endTime}
-                    onChange={e => setEndTime(e.target.value)}
+                    onChange={(e) => setEndTime(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -186,16 +201,30 @@ const ReportCreate = () => {
                     color="primary"
                     fullWidth
                     size="large"
-                    startIcon={creatingTerm ? <CircularProgress size={20} color="inherit" /> : <EventIcon />}
+                    startIcon={
+                      creatingTerm ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <EventIcon />
+                      )
+                    }
                     disabled={creatingTerm}
                     sx={{ mt: { xs: 1, sm: 0 } }}
                   >
-                    {creatingTerm ? 'Đang tạo...' : 'Tiếp tục'}
+                    {creatingTerm ? "Đang tạo..." : "Tiếp tục"}
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  {termError && <Alert severity="error" sx={{ mt: 1 }}>{termError}</Alert>}
-                  {termSuccess && <Alert severity="success" sx={{ mt: 1 }}>{termSuccess}</Alert>}
+                  {termError && (
+                    <Alert severity="error" sx={{ mt: 1 }}>
+                      {termError}
+                    </Alert>
+                  )}
+                  {termSuccess && (
+                    <Alert severity="success" sx={{ mt: 1 }}>
+                      {termSuccess}
+                    </Alert>
+                  )}
                 </Grid>
               </Grid>
             </form>
@@ -216,7 +245,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Tiêu đề báo cáo"
                     value={title}
-                    onChange={e => setTitle(e.target.value)}
+                    onChange={(e) => setTitle(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -225,7 +254,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Mô tả báo cáo"
                     value={description}
-                    onChange={e => setDescription(e.target.value)}
+                    onChange={(e) => setDescription(e.target.value)}
                     multiline
                     minRows={3}
                     size="small"
@@ -236,7 +265,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Mã lớp"
                     value={classId}
-                    onChange={e => setClassId(e.target.value)}
+                    onChange={(e) => setClassId(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -245,7 +274,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Tên lớp"
                     value={className}
-                    onChange={e => setClassName(e.target.value)}
+                    onChange={(e) => setClassName(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -254,7 +283,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Mã giáo viên"
                     value={teacherId}
-                    onChange={e => setTeacherId(e.target.value)}
+                    onChange={(e) => setTeacherId(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -263,7 +292,7 @@ const ReportCreate = () => {
                     fullWidth
                     label="Tên giáo viên"
                     value={teacherName}
-                    onChange={e => setTeacherName(e.target.value)}
+                    onChange={(e) => setTeacherName(e.target.value)}
                     size="small"
                   />
                 </Grid>
@@ -290,15 +319,29 @@ const ReportCreate = () => {
                     variant="contained"
                     color="secondary"
                     size="large"
-                    startIcon={creatingReport ? <CircularProgress size={20} color="inherit" /> : <AssignmentIcon />}
+                    startIcon={
+                      creatingReport ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <AssignmentIcon />
+                      )
+                    }
                     disabled={creatingReport}
                   >
-                    {creatingReport ? 'Đang tạo...' : 'Hoàn thành'}
+                    {creatingReport ? "Đang tạo..." : "Hoàn thành"}
                   </Button>
                 </Grid>
                 <Grid item xs={12}>
-                  {reportError && <Alert severity="error" sx={{ mt: 1 }}>{reportError}</Alert>}
-                  {reportSuccess && <Alert severity="success" sx={{ mt: 1 }}>{reportSuccess}</Alert>}
+                  {reportError && (
+                    <Alert severity="error" sx={{ mt: 1 }}>
+                      {reportError}
+                    </Alert>
+                  )}
+                  {reportSuccess && (
+                    <Alert severity="success" sx={{ mt: 1 }}>
+                      {reportSuccess}
+                    </Alert>
+                  )}
                 </Grid>
               </Grid>
             </form>
@@ -309,4 +352,4 @@ const ReportCreate = () => {
   );
 };
 
-export default ReportCreate; 
+export default ReportCreate;

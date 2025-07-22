@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// const BASE_URL = "https://swd-backend-web.onrender.com/api";
 const BASE_URL = "https://localhost:7064/api";
 
 // ------------------ AUTH ------------------
@@ -12,7 +13,6 @@ const postSignin = async (email, password) => {
 };
 
 const postGoogleLogin = async (credential) => {
-  console.log(credential);
   return axios.post(`${BASE_URL}/Auth/login-google`, { IdToken: credential });
 };
 
@@ -247,6 +247,17 @@ const postTerm = async (termData, token) => {
   });
 };
 
+const getTermByTermID = async (termID, token) => {
+  return (
+    axios.get(`${BASE_URL}/Term/${termID}`),
+    {
+      method: "GET",
+
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
 // ------------------ TEACHER SUBJECT MAPPING ------------------
 const getTeacherSubject = (teacherId) => {
   const subjectMap = {
@@ -292,6 +303,7 @@ export {
   updateScore,
   postReport,
   postTerm,
+  getTermByTermID,
   getTeacherSubject,
   getStudentByParentEmail,
   postChatBotAsk,

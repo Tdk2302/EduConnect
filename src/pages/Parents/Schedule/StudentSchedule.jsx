@@ -58,6 +58,21 @@ const STATUS_COLORS = {
   nostatus: { bg: "#f3f4f6", color: "#7a869a" },
 };
 
+const getStatusText = (status) => {
+  switch (status) {
+    case "On-going":
+      return "Đang diễn ra";
+    case "Finished":
+      return "Đã kết thúc";
+    case "Canceled":
+      return "Đã hủy";
+    case "Completed":
+      return "Hoàn thành";
+    default:
+      return "Chưa diễn ra";
+  }
+};
+
 const SLOT_TIMES = {
   "Slot 1": "7h - 7h45",
   "Slot 2": "7h50 - 8h35",
@@ -110,8 +125,8 @@ const StudentSchedule = () => {
         const data = await res.data;
         setStudents(data);
         if (data.length > 0) {
-          setSelectedStudent(data[0].studentId); // Hoặc ID của học sinh đã chọn
-          setSelectedClassId(data[0].classId); // Lưu classId
+          setSelectedStudent(data[0].studentId);
+          setSelectedClassId(data[0].classId);
         }
       } catch (err) {
         setStudents([]);
@@ -136,19 +151,17 @@ const StudentSchedule = () => {
           selectedClassId,
           userInfo.token
         );
+        console.log(scheduleRes);
         let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
-        // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
         const grid = {};
         SLOTS.forEach((slot) => {
           grid[slot] = {};
         });
-        // Tạo map ngày (dd/MM) -> index trong tuần
         const weekDateMap = {};
         selectedWeek.forEach((date, idx) => {
           weekDateMap[date] = idx;
         });
         courses.forEach((course) => {
-          // Lấy ngày của course (dd/MM)
           const courseDate = course.startTime
             ? new Date(course.startTime)
             : null;
@@ -221,7 +234,7 @@ const StudentSchedule = () => {
               value={selectedStudent}
               onChange={setSelectedStudent}
               className="schedule-select"
-              style={{ marginRight: 8 }}
+              style={{ marginRight: 8, minWidth: 120, maxWidth: 140 }}
             >
               {students.length > 0 ? (
                 students
@@ -229,9 +242,9 @@ const StudentSchedule = () => {
                   .map((student, idx) => (
                     <Option
                       key={student.studentId ?? `student-${idx}`}
-                      value={student.fullname}
+                      value={student.fullName}
                     >
-                      {student.fullname}
+                      {student.fullName}
                     </Option>
                   ))
               ) : (
@@ -325,7 +338,7 @@ const StudentSchedule = () => {
                                         background: statusColor.bg,
                                       }}
                                     >
-                                      {data.status}
+                                      {getStatusText(data.status)}
                                     </div>
                                   </div>
                                 );

@@ -3,7 +3,11 @@ import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { setUserInfo } from "../../services/handleStorageApi";
-import { postSignin, postGoogleLogin } from "../../services/apiServices";
+import {
+  postSignin,
+  postGoogleLogin,
+  getParentProfile,
+} from "../../services/apiServices";
 import "./Signin.css";
 import "antd/dist/reset.css";
 import axios from "axios";
@@ -52,9 +56,19 @@ const Signin = () => {
         if (role === "Admin") {
           navigate("/admin");
         } else if (role === "Parent") {
+          axios
+            .get(`https://localhost:7064/api/Parent`)
+            .then((res) => {
+              const parentId = res.data.parentId;
+              if (parentId) {
+                localStorage.setItem("parentId", parentId);
+              }
+            })
+            .catch((err) => {
+              console.error("Lỗi lấy parentId:", err);
+            });
           navigate("/homepage");
         } else if (role === "Teacher") {
-          navigate("/teacher");
           axios
             .get(`https://localhost:7064/api/Teacher/${response.data.userId}`)
             .then((res) => {
@@ -149,7 +163,6 @@ const Signin = () => {
                   const response = await postGoogleLogin(
                     credentialResponse.credential
                   );
-                  console.log(response);
                   if (response.status === 200) {
                     toast.success("Đăng nhập Google thành công!");
                     setUserInfo(
@@ -163,6 +176,11 @@ const Signin = () => {
                     if (role === "Admin") {
                       navigate("/admin");
                     } else if (role === "Parent") {
+                      const res = await getParentProfile(response.data.token);
+                      const parentId = res.data.parentId;
+                      if (parentId) {
+                        localStorage.setItem("parentId", parentId);
+                      }
                       navigate("/homepage");
                     } else if (role === "Teacher") {
                       axios

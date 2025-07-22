@@ -15,8 +15,8 @@ export default function AdminMainLayout() {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: 'column', height: "100vh" }}>
-      <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <Box sx={{ display: "flex", flex: 1, minHeight: 0 }}>
         <AdminSidebar selected={selected} onSelect={handleSelect} />
         <Box
           component="main"
@@ -32,4 +32,4 @@ export default function AdminMainLayout() {
       </Box>
     </Box>
   );
-} 
+}
