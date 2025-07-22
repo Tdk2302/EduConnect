@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import {
   Box,
   Typography,
@@ -6,10 +8,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  ListItemAvatar,
-  Avatar,
-  Chip,
   IconButton,
   Button,
   TextField,
@@ -59,10 +57,17 @@ import { format, isToday, isYesterday, isThisWeek } from "date-fns";
 import { vi } from "date-fns/locale";
 import "./Notication.scss";
 import Header from "../../../component/Header";
-import axios from "axios";
 import { message } from "antd";
 import { getReport } from "../../../services/apiServices";
 import { getUserInfo } from "../../../services/handleStorageApi";
+import { getStudentByParentEmail } from "../../../services/apiServices";
+import { getTermByTermID } from "../../../services/apiServices";
+
+const priorityColors = {
+  high: "error",
+  medium: "warning",
+  low: "info",
+};
 
 const notificationTypes = {
   report: { label: "Báo cáo", icon: AssignmentIcon, color: "primary" },
@@ -72,22 +77,19 @@ const notificationTypes = {
   payment: { label: "Học phí", icon: WarningIcon, color: "error" },
 };
 
-const priorityColors = {
-  high: "error",
-  medium: "warning",
-  low: "info",
-};
-
 function NotificationItem({
   notification,
   onMarkRead,
   onDelete,
   onArchive,
+  onShowDetail, // Thêm vào đây
   menuOpen,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
+
+  // Khởi tạo typeInfo
   const typeInfo = notificationTypes[notification.type];
-  const TypeIcon = typeInfo.icon;
+  const typeColor = notificationTypes[notification.color];
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -112,6 +114,10 @@ function NotificationItem({
   return (
     <>
       <ListItem
+        onClick={() => {
+          onMarkRead(notification.id); // Đánh dấu là đã đọc
+          onShowDetail(notification); // Gọi hàm hiển thị chi tiết
+        }}
         sx={{
           mb: 1,
           borderRadius: 2,
@@ -128,12 +134,6 @@ function NotificationItem({
           },
         }}
       >
-        <ListItemAvatar>
-          <Avatar sx={{ bgcolor: `${typeInfo.color}.main` }}>
-            <TypeIcon />
-          </Avatar>
-        </ListItemAvatar>
-
         <ListItemText
           primary={
             <Box
@@ -173,9 +173,9 @@ function NotificationItem({
                     {notification.class}
                   </Typography>
                 </Box>
-                <Typography variant="caption" color="text.secondary">
-                  {getTimeAgo(notification.timestamp)}
-                </Typography>
+                {/* <Typography variant="caption" color="text.secondary">
+                  {getTimeAgo(notification)}
+                </Typography> */}
               </Box>
             </Box>
           }
@@ -240,7 +240,7 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] =
     useState(notifications);
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedType, setSelectedType] = useState("all");
   const [selectedPriority, setSelectedPriority] = useState("all");
@@ -248,7 +248,20 @@ export default function Notifications() {
   const [selectedNotiId, setSelectedNotiId] = useState(null);
   const [notiDetail, setNotiDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
-
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState("");
+  const [selectedReport, setSelectedReport] = useState(null); // State để lưu thông tin báo cáo
+  const getTimeAgo = (timestamp) => {
+    if (isToday(timestamp)) {
+      return format(timestamp, "HH:mm");
+    } else if (isYesterday(timestamp)) {
+      return "Hôm qua";
+    } else if (isThisWeek(timestamp)) {
+      return format(timestamp, "EEEE", { locale: vi });
+    } else {
+      return format(timestamp, "dd/MM/yyyy");
+    }
+  };
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleSearch = (event) => {
@@ -272,7 +285,6 @@ export default function Notifications() {
   };
 
   const handleArchive = (id) => {
-    // Implement archive functionality
     message.success("Đã lưu trữ thông báo!");
   };
 
@@ -282,78 +294,110 @@ export default function Notifications() {
 
   const handleRefresh = () => {
     setLoading(true);
-    // Simulate API call
+
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   };
 
-  // const fetchNotiDetail = (notiId) => {
-  //   console.log("notiId fetch:", notiId);
-  //   setDetailLoading(true);
-  //   const BASE_URL = "https://localhost:7064/api";
-  //   axios
-  //     .get(`${BASE_URL}/Report/${notiId}`)
-  //     .then((res) => setNotiDetail(res.data))
-  //     .catch(() => setNotiDetail(null))
-  //     .finally(() => setDetailLoading(false));
-  // };
+  const handleShowDetail = (notification) => {
+    setSelectedReport(notification); // Lưu thông tin báo cáo vào state
+  };
 
   useEffect(() => {
     let filtered = notifications;
-
+    console.log(notifications);
     if (selectedTab === 1) {
       filtered = filtered.filter((n) => !n.isRead);
     } else if (selectedTab === 2) {
       filtered = filtered.filter((n) => n.isRead);
     }
 
-    if (selectedType !== "all") {
-      filtered = filtered.filter((n) => n.type === selectedType);
-    }
-
-    if (selectedPriority !== "all") {
-      filtered = filtered.filter((n) => n.priority === selectedPriority);
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (n) =>
-          n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          n.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          n.teacher.toLowerCase().includes(searchTerm.toLowerCase())
+    // Lọc theo học sinh đã chọn
+    if (selectedStudent) {
+      const selectedStudentObj = students.find(
+        (student) =>
+          student.fullName === selectedStudent ||
+          student.studentId === selectedStudent
       );
+      const classId = selectedStudentObj?.classId; // Lấy classId của học sinh đã chọn
+      // Lọc thông báo theo classId
+      if (classId) {
+        filtered = filtered.filter((n) => n.classId === classId);
+      }
     }
-
+    console.log(filtered);
     setFilteredNotifications(filtered);
-  }, [notifications, selectedTab, selectedType, selectedPriority, searchTerm]);
+  }, [notifications, selectedTab, selectedStudent]);
 
   useEffect(() => {
+    if (!selectedStudent) return;
+    const selectedStudentObj = students.find(
+      (student) =>
+        student.fullName === selectedStudent ||
+        student.studentId === selectedStudent
+    );
+    const classId = selectedStudentObj?.classId || "";
     const fetchReport = async () => {
-      const classId = "class01";
       const userInfo = getUserInfo();
       setLoading(true);
-      const res = await getReport(classId, userInfo.token)
-        .then((res) => {
-          const mapped = res.data.map((item) => ({
-            id: item.reportId || item.id,
-            title: item.title || "",
-            content: item.description || "",
-            type: "report",
-            priority: "medium",
-            isRead: false,
-            timestamp: new Date(),
-            teacher: item.teacherName || item.teacher || "",
-            class: item.className || item.class || item.classId || "",
-          }));
-          setNotifications(mapped);
-        })
-        .catch((err) => {
-          setNotifications([]);
-        })
-        .finally(() => setLoading(false));
+      try {
+        const res = await getReport(classId, userInfo.token);
+        const mapped = await Promise.all(
+          res.data.map(async (item) => {
+            const termInfo = await axios.get(
+              `https://localhost:7064/api/Term/${item.termId}`,
+              {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+              }
+            );
+            return {
+              id: item.reportId,
+              title: item.title,
+              content: item.description,
+              isRead: false,
+              timestamp: new Date(),
+              teacher: item.teacherName,
+              class: item.className,
+              classId: item.classId,
+              startTime: format(new Date(termInfo.data.startTime), "HH:mm", {
+                locale: vi,
+              }),
+              endTime: format(new Date(termInfo.data.endTime), "HH:mm", {
+                locale: vi,
+              }),
+              createdAt: termInfo.data.createdAt,
+            };
+          })
+        );
+        console.log("map", mapped);
+        setNotifications(mapped);
+      } catch (err) {
+        setNotifications([]);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchReport();
+  }, [selectedStudent]);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const userInfo = getUserInfo();
+        const res = await getStudentByParentEmail(
+          userInfo.token,
+          userInfo.email
+        );
+        setStudents(res.data || []);
+        if (res.data && res.data.length > 0) {
+          setSelectedStudent(res.data[0].studentId || res.data[0].id);
+        }
+      } catch (err) {
+        setStudents([]);
+      }
+    };
+    fetchStudents();
   }, []);
 
   return (
@@ -408,20 +452,33 @@ export default function Notifications() {
 
           {/* Search and Filters */}
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                placeholder="Tìm kiếm thông báo..."
-                value={searchTerm}
-                onChange={handleSearch}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+            <Grid item xs={12} md={3}>
+              <FormControl fullWidth>
+                <InputLabel id="student-select-label">Chọn học sinh</InputLabel>
+                <Select
+                  labelId="student-select-label"
+                  value={selectedStudent}
+                  label="Chọn học sinh"
+                  onChange={(e) => setSelectedStudent(e.target.value)}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        minWidth: 250,
+                        maxWidth: 400,
+                      },
+                    },
+                  }}
+                >
+                  {students.map((student) => (
+                    <MenuItem
+                      key={student.studentId || student.id}
+                      value={student.fullName || student.id}
+                    >
+                      {student.fullName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
         </Paper>
@@ -453,7 +510,6 @@ export default function Notifications() {
                   onClick={() => {
                     if (!notification.menuOpen) {
                       setSelectedNotiId(notification.id);
-                      fetchNotiDetail(notification.id);
                       setNotifications((prev) =>
                         prev.map((n) =>
                           n.id === notification.id ? { ...n, isRead: true } : n
@@ -467,7 +523,8 @@ export default function Notifications() {
                     onMarkRead={handleMarkRead}
                     onDelete={handleDelete}
                     onArchive={handleArchive}
-                    menuOpen={selectedNotiId === notification.id}
+                    onShowDetail={handleShowDetail}
+                    // menuOpen={selectedNotiId === notification.id}
                   />
                 </div>
               ))}
@@ -479,13 +536,6 @@ export default function Notifications() {
               />
               <Typography variant="h6" color="text.secondary" gutterBottom>
                 Không có thông báo nào
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchTerm ||
-                selectedType !== "all" ||
-                selectedPriority !== "all"
-                  ? "Thử thay đổi bộ lọc để xem thêm thông báo"
-                  : "Bạn sẽ nhận được thông báo từ giáo viên tại đây"}
               </Typography>
             </Box>
           )}
@@ -504,7 +554,7 @@ export default function Notifications() {
           </Fab>
         </Tooltip>
 
-        {selectedNotiId && (
+        {/* {selectedNotiId && (
           <Dialog
             open={!!selectedNotiId}
             onClose={() => {
@@ -545,7 +595,38 @@ export default function Notifications() {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setSelectedNotiId(null)}>Đóng</Button>
+              <Buttson onClick={() => setSelectedNotiId(null)}>Đóng</Buttson>
+            </DialogActions>
+          </Dialog>
+        )} */}
+        {selectedReport && (
+          <Dialog
+            open={!!selectedReport}
+            onClose={() => setSelectedReport(null)}
+            maxWidth="sm"
+            fullWidth
+          >
+            <DialogTitle>{selectedReport.title}</DialogTitle>
+            <DialogContent>
+              <Typography variant="body2">
+                Giáo viên: {selectedReport.teacher}
+              </Typography>
+              <Typography variant="body2">
+                Lớp: {selectedReport.class}
+              </Typography>
+              <Typography variant="body2">
+                Term: {selectedReport.termDetails?.name || "Không có thông tin"}
+              </Typography>
+              <Typography variant="body2">
+                Bắt đầu: {selectedReport.startTime || "Không có thông tin"}
+              </Typography>
+              <Typography variant="body2">
+                Kết thúc: {selectedReport.endTime || "Không có thông tin"}
+              </Typography>
+              <Typography variant="body1">{selectedReport.content}</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setSelectedReport(null)}>Đóng</Button>
             </DialogActions>
           </Dialog>
         )}

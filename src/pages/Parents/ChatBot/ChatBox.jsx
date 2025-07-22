@@ -267,8 +267,9 @@ export default function ChatBox() {
       return updated;
     });
     try {
-      const parentId = getParentIdFromUser();
+      const parentId = localStorage.getItem("parentId");
       const res = await postChatBotAsk(parentId, input);
+      console.log(parentId, input);
       const reply = res?.data?.reply || "Xin lỗi, tôi chưa hiểu ý bạn.";
       const botMsg = { from: "bot", text: reply };
       setMessages((msgs) => [...msgs, botMsg]);
