@@ -56,17 +56,11 @@ const Signin = () => {
         if (role === "Admin") {
           navigate("/admin");
         } else if (role === "Parent") {
-          axios
-            .get(`https://localhost:7064/api/Parent`)
-            .then((res) => {
-              const parentId = res.data.parentId;
-              if (parentId) {
-                localStorage.setItem("parentId", parentId);
-              }
-            })
-            .catch((err) => {
-              console.error("Lỗi lấy parentId:", err);
-            });
+          const res = await getParentProfile(response.data.token);
+          const parentId = res.data.parentId;
+          if (parentId) {
+            localStorage.setItem("parentId", parentId);
+          }
           navigate("/homepage");
         } else if (role === "Teacher") {
           axios
