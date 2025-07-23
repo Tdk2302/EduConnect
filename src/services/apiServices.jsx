@@ -252,7 +252,6 @@ const getTermByTermID = async (termID, token) => {
     axios.get(`${BASE_URL}/Term/${termID}`),
     {
       method: "GET",
-
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     }
   );
@@ -271,8 +270,18 @@ const getTeacherSubject = (teacherId) => {
 };
 
 // ------------------ CHATBOT ------------------
-const postChatBotAsk = async (parentId, messageText) => {
-  return axios.post(`${BASE_URL}/ChatBotLog/ask`, { parentId, messageText });
+const postChatBotAsk = async (parentId, messageText, token) => {
+  return axios.post(
+    `${BASE_URL}/ChatBotLog/ask`,
+    {
+      parentId,
+      messageText,
+    },
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      withCredentials: true,
+    }
+  );
 };
 
 // ------------------ EXPORT ------------------

@@ -10,6 +10,7 @@ export const getUserName = () => {
 
 export const logoutUser = () => {
   localStorage.removeItem("accessToken");
+  localStorage.removeItem("parentId");
   localStorage.removeItem("userInfo");
   localStorage.removeItem("teacherId");
   localStorage.removeItem("teacherInfo");
