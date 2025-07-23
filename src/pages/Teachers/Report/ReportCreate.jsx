@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { postTerm, postReport, getToken } from "../../../services/apiServices";
+import { postTerm, getToken, generateReport, postReport } from "../../../services/apiServices";
+import { getUserInfo } from "../../../services/handleStorageApi";
 import {
   Paper,
   Box,
@@ -25,7 +26,23 @@ const MODES = [
   { value: "năm", label: "Năm" },
 ];
 
-const steps = ["Tạo kỳ báo cáo", "Tạo báo cáo"];
+const CLASS_OPTIONS = [
+  { value: "class01", label: "Lớp 01" },
+  { value: "class02", label: "Lớp 02" },
+  { value: "class03", label: "Lớp 03" },
+  { value: "class04", label: "Lớp 04" },
+  { value: "class05", label: "Lớp 05" },
+];
+
+const TEACHER_OPTIONS = [
+  { value: "T001", label: "Nguyễn Văn A" },
+  { value: "T002", label: "Trần Thị B" },
+  { value: "T003", label: "Lê Văn C" },
+  { value: "T004", label: "Phạm Thị D" },
+  { value: "T005", label: "Hoàng Văn E" },
+];
+
+const steps = ["Tạo kỳ báo cáo", "Tạo báo cáo (AI)", "Lưu báo cáo vào hệ thống"];
 
 const ReportCreate = () => {
   // Stepper state
@@ -41,15 +58,26 @@ const ReportCreate = () => {
   const [termSuccess, setTermSuccess] = useState("");
 
   // Step 2: Create Report
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [classId, setClassId] = useState("");
-  const [teacherId, setTeacherId] = useState("");
-  const [teacherName, setTeacherName] = useState("");
-  const [className, setClassName] = useState("");
   const [creatingReport, setCreatingReport] = useState(false);
   const [reportError, setReportError] = useState("");
   const [reportSuccess, setReportSuccess] = useState("");
+  const [reportContent, setReportContent] = useState("");
+
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
+  const [manualTeacherId, setManualTeacherId] = useState("");
+  const [manualTeacherName, setManualTeacherName] = useState("");
+
+  // Parse title/description từ reportContent
+  const lines = reportContent.split('\n').filter(line => line.trim() !== '');
+  const title = lines[0] || '';
+  const description = lines.slice(1).join('\n');
+  const userInfo = getUserInfo();
+  const teacherId = manualTeacherId;
+  const teacherName = manualTeacherName || (TEACHER_OPTIONS.find(opt => opt.value === manualTeacherId)?.label || '');
+  const className = CLASS_OPTIONS.find(opt => opt.value === classId)?.label || classId;
 
   const handleCreateTerm = async (e) => {
     e.preventDefault();
@@ -67,8 +95,7 @@ const ReportCreate = () => {
         endTime: new Date(endTime).toISOString(),
         createdAt: new Date().toISOString(),
       };
-      const token = getToken && getToken();
-      const res = await postTerm(payload, token);
+      const res = await postTerm(payload); // không cần truyền token
       const newTermID =
         res?.data?.termID || res?.data?.termId || res?.data?.id || res?.data;
       setTermID(newTermID);
@@ -88,20 +115,42 @@ const ReportCreate = () => {
     e.preventDefault();
     setReportError("");
     setReportSuccess("");
-    if (
-      !title ||
-      !description ||
-      !classId ||
-      !teacherId ||
-      !teacherName ||
-      !className
-    ) {
-      setReportError("Vui lòng nhập đầy đủ thông tin báo cáo.");
+    setReportContent("");
+    if (!classId) {
+      setReportError("Vui lòng chọn lớp để tạo báo cáo.");
       return;
     }
     setCreatingReport(true);
     try {
-      const payload = {
+      const res = await generateReport(termID, classId);
+      setReportSuccess("Tạo báo cáo thành công!");
+      setReportContent(res.data); // Lưu nội dung trả về
+      // Không tự động quay lại step 1 nữa
+      // setTimeout(() => {
+      //   setActiveStep(0);
+      //   setClassId("");
+      //   setTermID("");
+      //   setReportSuccess("");
+      // }, 1200);
+    } catch (err) {
+      setReportError("Tạo báo cáo thất bại!");
+    } finally {
+      setCreatingReport(false);
+    }
+  };
+
+  // Bước 3: Lưu báo cáo vào hệ thống
+  const handleSaveReport = async () => {
+    setSaveError("");
+    setSaveSuccess("");
+    setSaveLoading(true);
+    if (!teacherId) {
+      setSaveError("Vui lòng nhập mã giáo viên (teacherId)!");
+      setSaveLoading(false);
+      return;
+    }
+    try {
+      await postReport({
         teacherId,
         title,
         description,
@@ -109,25 +158,12 @@ const ReportCreate = () => {
         termID,
         teacherName,
         className,
-      };
-      const token = getToken && getToken();
-      await postReport(payload, token);
-      setReportSuccess("Tạo báo cáo thành công!");
-      setTimeout(() => {
-        setActiveStep(0);
-        setTitle("");
-        setDescription("");
-        setClassId("");
-        setTeacherId("");
-        setTeacherName("");
-        setClassName("");
-        setTermID("");
-        setReportSuccess("");
-      }, 1200);
+      });
+      setSaveSuccess("Lưu báo cáo vào hệ thống thành công!");
     } catch (err) {
-      setReportError("Tạo báo cáo thất bại!");
+      setSaveError("Lưu báo cáo thất bại!");
     } finally {
-      setCreatingReport(false);
+      setSaveLoading(false);
     }
   };
 
@@ -240,96 +276,41 @@ const ReportCreate = () => {
             </Box>
             <form onSubmit={handleCreateReport} autoComplete="off">
               <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
+                <Grid item xs={12} sm={8}>
+                  <Select
                     fullWidth
-                    label="Tiêu đề báo cáo"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Mô tả báo cáo"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    multiline
-                    minRows={3}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Mã lớp"
                     value={classId}
-                    onChange={(e) => setClassId(e.target.value)}
+                    onChange={e => setClassId(e.target.value)}
+                    displayEmpty
                     size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Tên lớp"
-                    value={className}
-                    onChange={(e) => setClassName(e.target.value)}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Mã giáo viên"
-                    value={teacherId}
-                    onChange={(e) => setTeacherId(e.target.value)}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Tên giáo viên"
-                    value={teacherName}
-                    onChange={(e) => setTeacherName(e.target.value)}
-                    size="small"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Kỳ báo cáo (termID)"
-                    value={termID}
-                    disabled
-                    size="small"
-                  />
+                  >
+                    <MenuItem value="" disabled>Chọn lớp</MenuItem>
+                    {CLASS_OPTIONS.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                    ))}
+                  </Select>
                 </Grid>
                 <Grid item xs={12} display="flex" gap={2}>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={handleBack}
-                    disabled={creatingReport}
-                  >
-                    Quay lại
-                  </Button>
                   <Button
                     type="submit"
                     variant="contained"
                     color="secondary"
                     size="large"
-                    startIcon={
-                      creatingReport ? (
-                        <CircularProgress size={20} color="inherit" />
-                      ) : (
-                        <AssignmentIcon />
-                      )
-                    }
+                    startIcon={creatingReport ? (<CircularProgress size={20} color="inherit" />) : (<AssignmentIcon />)}
                     disabled={creatingReport}
                   >
                     {creatingReport ? "Đang tạo..." : "Hoàn thành"}
                   </Button>
+                  {reportSuccess && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleBack}
+                      sx={{ ml: 2 }}
+                    >
+                      Quay lại bước tạo kỳ báo cáo
+                    </Button>
+                  )}
                 </Grid>
                 <Grid item xs={12}>
                   {reportError && (
@@ -342,9 +323,71 @@ const ReportCreate = () => {
                       {reportSuccess}
                     </Alert>
                   )}
+                  {reportContent && (
+                    <Box sx={{ mt: 2, whiteSpace: "pre-line", fontFamily: "monospace", background: "#f8f8f8", p: 2, borderRadius: 2 }}>
+                      {reportContent}
+                    </Box>
+                  )}
                 </Grid>
               </Grid>
             </form>
+            {/* Nếu đã có reportContent, cho phép sang bước 3 */}
+            {reportContent && (
+              <Box sx={{ mt: 2, textAlign: 'right' }}>
+                <Button variant="contained" color="primary" onClick={() => setActiveStep(2)}>
+                  Tiếp tục lưu báo cáo
+                </Button>
+              </Box>
+            )}
+          </>
+        )}
+        {activeStep === 2 && (
+          <>
+            <Box display="flex" alignItems="center" mb={2} gap={1}>
+              <AssignmentIcon color="primary" fontSize="large" />
+              <Typography variant="h5" fontWeight={700} color="primary.main">
+                Lưu báo cáo vào hệ thống
+              </Typography>
+            </Box>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1"><b>Tiêu đề:</b> {title}</Typography>
+              <Typography variant="subtitle1"><b>Lớp:</b> {className} ({classId})</Typography>
+              <Box display="flex" alignItems="center" gap={2} mb={1}>
+                <Select
+                  label="Mã giáo viên (teacherId)"
+                  value={manualTeacherId}
+                  onChange={e => {
+                    setManualTeacherId(e.target.value);
+                    setManualTeacherName(TEACHER_OPTIONS.find(opt => opt.value === e.target.value)?.label || "");
+                  }}
+                  displayEmpty
+                  size="small"
+                  sx={{ minWidth: 180 }}
+                >
+                  <MenuItem value="" disabled>Chọn giáo viên</MenuItem>
+                  {TEACHER_OPTIONS.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>{opt.label} ({opt.value})</MenuItem>
+                  ))}
+                </Select>
+                <Typography variant="subtitle1"><b>Giáo viên:</b> {teacherName}</Typography>
+              </Box>
+              <Typography variant="subtitle1"><b>Kỳ báo cáo (termID):</b> {termID}</Typography>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle1"><b>Nội dung báo cáo:</b></Typography>
+              <Box sx={{ whiteSpace: "pre-line", fontFamily: "monospace", background: "#f8f8f8", p: 2, borderRadius: 2, mb: 2, maxHeight: 320, overflowY: "auto" }}>
+                {description}
+              </Box>
+            </Box>
+            <Box display="flex" gap={2}>
+              <Button variant="outlined" color="primary" onClick={() => setActiveStep(1)} disabled={saveLoading}>
+                Quay lại
+              </Button>
+              <Button variant="contained" color="secondary" onClick={handleSaveReport} disabled={saveLoading}>
+                {saveLoading ? <CircularProgress size={20} color="inherit" /> : "Lưu báo cáo"}
+              </Button>
+            </Box>
+            {saveError && <Alert severity="error" sx={{ mt: 2 }}>{saveError}</Alert>}
+            {saveSuccess && <Alert severity="success" sx={{ mt: 2 }}>{saveSuccess}</Alert>}
           </>
         )}
       </Paper>
