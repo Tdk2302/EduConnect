@@ -68,8 +68,29 @@ const getToken = () => {
   }
 };
 
+// Giải mã JWT token, trả về payload (object) hoặc null nếu lỗi
+const decodeToken = (token) => {
+  if (!token) return null;
+  try {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
 // ------------------ ADMIN ------------------
 const getAllAdminUsers = async (token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Admin/User`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -77,6 +98,7 @@ const getAllAdminUsers = async (token) => {
 };
 
 const putChangeUserRole = async (email, role, token) => {
+  if (!token) token = getToken();
   return axios.put(
     `${BASE_URL}/Admin/users/role`,
     { email, role },
@@ -89,6 +111,7 @@ const putChangeUserRole = async (email, role, token) => {
 
 // ------------------ TEACHER ------------------
 const putUpdateTeacher = async (userId, subjectId, status, token) => {
+  if (!token) token = getToken();
   return axios.put(
     `${BASE_URL}/Teacher/${userId}`,
     { subjectId, status },
@@ -100,6 +123,7 @@ const putUpdateTeacher = async (userId, subjectId, status, token) => {
 };
 
 const deleteTeacher = async (userId, token) => {
+  if (!token) token = getToken();
   return axios.delete(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -107,6 +131,7 @@ const deleteTeacher = async (userId, token) => {
 };
 
 const getTeacherDetail = async (userId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Teacher/${userId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -114,6 +139,7 @@ const getTeacherDetail = async (userId, token) => {
 };
 
 const getTeacherCourses = async (teacherId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Course/teacher/${teacherId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -123,6 +149,7 @@ const getTeacherCourses = async (teacherId, token) => {
 // ------------------ PARENT ------------------
 
 const updateParentProfile = async (formData, token) => {
+  if (!token) token = getToken();
   return axios.put(`${BASE_URL}/Parent/profile`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -133,6 +160,7 @@ const updateParentProfile = async (formData, token) => {
 };
 
 const getStudentByParentEmail = async (token, email) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Parent/students?email=${email}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -140,6 +168,7 @@ const getStudentByParentEmail = async (token, email) => {
 };
 
 const getParentProfile = async (token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Parent/profile`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     withCredentials: true,
@@ -148,6 +177,7 @@ const getParentProfile = async (token) => {
 
 // ------------------ COURSE & ATTENDANCE ------------------
 const postCourse = async (courseData, token) => {
+  if (!token) token = getToken();
   return axios.post(`${BASE_URL}/Course`, courseData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -155,6 +185,7 @@ const postCourse = async (courseData, token) => {
 };
 
 const postAttendance = async (attendanceData, token) => {
+  if (!token) token = getToken();
   return axios.post(`${BASE_URL}/Attendance`, attendanceData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -162,6 +193,7 @@ const postAttendance = async (attendanceData, token) => {
 };
 
 const getStudentSchedule = async (classId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Course/class/${classId}`, {
     method: "GET",
     headers: {
@@ -173,6 +205,7 @@ const getStudentSchedule = async (classId, token) => {
 
 // ------------------ SLOT ------------------
 const getSlots = async (token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Slot/all`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -181,6 +214,7 @@ const getSlots = async (token) => {
 
 // ------------------ ATTENDANCE STATISTICS ------------------
 const getAttendanceByCourse = async (courseId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Attendance/course/${courseId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -188,6 +222,7 @@ const getAttendanceByCourse = async (courseId, token) => {
 };
 
 const updateAttendance = async (attendanceData, token) => {
+  if (!token) token = getToken();
   return axios.put(`${BASE_URL}/Attendance`, attendanceData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -195,6 +230,7 @@ const updateAttendance = async (attendanceData, token) => {
 };
 
 const postScore = async (scoreData, token) => {
+  if (!token) token = getToken();
   return axios.post(`${BASE_URL}/Score`, scoreData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -202,6 +238,7 @@ const postScore = async (scoreData, token) => {
 };
 
 const getScoresByCourse = async (courseId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Score/course/${courseId}`, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -209,6 +246,7 @@ const getScoresByCourse = async (courseId, token) => {
 };
 
 const updateScore = async (scoreData, token) => {
+  if (!token) token = getToken();
   return axios.put(`${BASE_URL}/Score`, scoreData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -217,6 +255,7 @@ const updateScore = async (scoreData, token) => {
 
 // ------------------ REPORT ------------------
 const postReport = async (reportData, token) => {
+  if (!token) token = getToken();
   return axios.post(`${BASE_URL}/Report`, reportData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -224,6 +263,7 @@ const postReport = async (reportData, token) => {
 };
 
 const getReport = async (classId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Report`, {
     params: { classId },
     withCredentials: true,
@@ -232,6 +272,7 @@ const getReport = async (classId, token) => {
 };
 
 const getReportDetail = async (classId, token) => {
+  if (!token) token = getToken();
   return axios.get(`${BASE_URL}/Report`, {
     params: { classId },
     withCredentials: true,
@@ -241,6 +282,7 @@ const getReportDetail = async (classId, token) => {
 
 // ------------------ TERM ------------------
 const postTerm = async (termData, token) => {
+  if (!token) token = getToken();
   return axios.post(`${BASE_URL}/Term`, termData, {
     withCredentials: true,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -248,6 +290,7 @@ const postTerm = async (termData, token) => {
 };
 
 const getTermByTermID = async (termID, token) => {
+  if (!token) token = getToken();
   return (
     axios.get(`${BASE_URL}/Term/${termID}`),
     {
@@ -271,11 +314,23 @@ const getTeacherSubject = (teacherId) => {
 };
 
 // ------------------ CHATBOT ------------------
-const postChatBotAsk = async (parentId, messageText) => {
-  return axios.post(`${BASE_URL}/ChatBotLog/ask`, { parentId, messageText });
+const postChatBotAsk = async (parentId, messageText,token) => {
+  if (!token) token = getToken();
+  return axios.post(`${BASE_URL}/ChatBotLog/ask`, { parentId, messageText }, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
 };
 
 // ------------------ EXPORT ------------------
+const generateReport = async (termId, classId, token) => {
+  if (!token) token = getToken();
+  return axios.post(`${BASE_URL}/Report/generate`, { termId, classId }, {
+    withCredentials: true,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+};
+
 export {
   postSignin,
   postGoogleLogin,
@@ -293,6 +348,7 @@ export {
   getParentProfile,
   getStudentSchedule,
   getToken,
+  decodeToken,
   postCourse,
   postAttendance,
   getSlots,
@@ -307,4 +363,5 @@ export {
   getTeacherSubject,
   getStudentByParentEmail,
   postChatBotAsk,
+  generateReport,
 };

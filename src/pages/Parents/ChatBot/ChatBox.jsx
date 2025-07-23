@@ -268,16 +268,17 @@ export default function ChatBox() {
     });
     try {
       const parentId = localStorage.getItem("parentId");
-      const res = await postChatBotAsk(parentId, input);
+      const res = await postChatBotAsk("P001", input);
       console.log(parentId, input);
       const reply = res?.data?.reply || "Xin lỗi, tôi chưa hiểu ý bạn.";
       const botMsg = { from: "bot", text: reply };
       setMessages((msgs) => [...msgs, botMsg]);
       setChatHistory((prev) => {
         const updated = [...prev];
+        // Chỉ thêm botMsg vào, không thêm lại userMsg
         updated[selectedSession] = {
           ...updated[selectedSession],
-          messages: [...updated[selectedSession].messages, userMsg, botMsg],
+          messages: [...updated[selectedSession].messages, botMsg],
         };
         return updated;
       });
@@ -289,9 +290,10 @@ export default function ChatBox() {
       setMessages((msgs) => [...msgs, botMsg]);
       setChatHistory((prev) => {
         const updated = [...prev];
+        // Chỉ thêm botMsg vào, không thêm lại userMsg
         updated[selectedSession] = {
           ...updated[selectedSession],
-          messages: [...updated[selectedSession].messages, userMsg, botMsg],
+          messages: [...updated[selectedSession].messages, botMsg],
         };
         return updated;
       });
