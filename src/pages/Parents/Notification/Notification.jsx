@@ -554,51 +554,6 @@ export default function Notifications() {
           </Fab>
         </Tooltip>
 
-        {/* {selectedNotiId && (
-          <Dialog
-            open={!!selectedNotiId}
-            onClose={() => {
-              setSelectedNotiId(null);
-              setNotiDetail(null);
-            }}
-            maxWidth="sm"
-            fullWidth
-          >
-            <DialogTitle>Chi tiết thông báo</DialogTitle>
-            <DialogContent>
-              {detailLoading ? (
-                <CircularProgress />
-              ) : notiDetail ? (
-                <Box>
-                  <Typography>
-                    <b>Tiêu đề:</b> {notiDetail.title}
-                  </Typography>
-                  <Typography>
-                    <b>Mô tả:</b> {notiDetail.description}
-                  </Typography>
-                  <Typography>
-                    <b>Giáo viên:</b>{" "}
-                    {notiDetail.teacherName || notiDetail.teacher}
-                  </Typography>
-                  <Typography>
-                    <b>Lớp:</b>{" "}
-                    {notiDetail.className ||
-                      notiDetail.class ||
-                      notiDetail.classId}
-                  </Typography>
-                  <Typography>
-                    <b>Term:</b> {notiDetail.termId || notiDetail.term}
-                  </Typography>
-                </Box>
-              ) : (
-                <Typography>Lỗi khi tải chi tiết thông báo</Typography>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Buttson onClick={() => setSelectedNotiId(null)}>Đóng</Buttson>
-            </DialogActions>
-          </Dialog>
-        )} */}
         {selectedReport && (
           <Dialog
             open={!!selectedReport}
