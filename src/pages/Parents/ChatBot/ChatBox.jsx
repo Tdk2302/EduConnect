@@ -77,7 +77,9 @@ function MessageBubble({ from, text }) {
             position: "relative",
           }}
         >
-          {text}
+          {from === "bot" && Array.isArray(text)
+            ? text
+            : text}
         </Box>
       </Box>
     </Fade>
