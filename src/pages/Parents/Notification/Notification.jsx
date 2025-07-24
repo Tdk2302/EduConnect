@@ -264,6 +264,10 @@ export default function Notifications() {
   };
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
   };
@@ -562,6 +566,9 @@ export default function Notifications() {
               </Typography>
               <Typography variant="body2">
                 Lớp: {selectedReport.class}
+              </Typography>
+              <Typography variant="body2">
+                Term: {selectedReport.termDetails?.name || "Không có thông tin"}
               </Typography>
               <Typography variant="body2">
                 Bắt đầu: {selectedReport.startTime || "Không có thông tin"}

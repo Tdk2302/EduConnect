@@ -67,6 +67,21 @@ export default function ProfileUser() {
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
+  //Validate Image
+  const validateImage = (file) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const maxFileSize = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+      return false;
+    }
+
+    if (file.size > maxFileSize) {
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     async function fetchProfile() {
       if (user.role === "Teacher") {

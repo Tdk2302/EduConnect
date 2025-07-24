@@ -322,6 +322,7 @@ const postChatBotAsk = async (parentId, messageText, token) => {
     }
   );
 };
+// ------------------ CHATBOT ------------------
 
 // ------------------ EXPORT ------------------
 const generateReport = async (termId, classId, token) => {
