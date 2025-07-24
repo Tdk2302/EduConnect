@@ -1,6 +1,16 @@
 // src/component/ProfileUser.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Form, Input, Button, Avatar, Row, Col, Typography, message } from "antd";
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Avatar,
+  Row,
+  Col,
+  Typography,
+  message,
+} from "antd";
 import { UserOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import Header from "./Header";
 import SideBar from "../pages/Teachers/Layout/SideBar";
@@ -12,8 +22,7 @@ import {
 } from "../services/apiServices";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { updateParentProfile, getParentProfile, getTeacherDetail, putUpdateTeacher } from "../services/apiServices";
-
+import "./ProfileUser.scss";
 const { Title, Text } = Typography;
 
 const getUserFromStorage = () => {
@@ -100,11 +109,18 @@ export default function ProfileUser() {
     setIsEditing(false);
     if (user.role === "Teacher") {
       try {
-        await putUpdateTeacher(user.userId, profile.subjectId, profile.status, user.token);
+        await putUpdateTeacher(
+          user.userId,
+          profile.subjectId,
+          profile.status,
+          user.token
+        );
         const newProfile = await getTeacherDetail(user.userId, user.token);
         setProfile((prev) => ({ ...prev, ...newProfile.data }));
         message.success("Cập nhật thành công!");
-        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const currentUser = JSON.parse(
+          localStorage.getItem("userInfo") || "{}"
+        );
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
@@ -129,7 +145,9 @@ export default function ProfileUser() {
           ...updateResponse.data,
         }));
         message.success("Cập nhật thành công!");
-        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
+        const currentUser = JSON.parse(
+          localStorage.getItem("userInfo") || "{}"
+        );
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
@@ -192,7 +210,6 @@ export default function ProfileUser() {
                 <h3>Cài đặt</h3>
                 <ul>
                   <li className="active">Hồ sơ cá nhân</li>
-                  <li>Bảo mật</li>
                 </ul>
               </div>
             )}
@@ -304,9 +321,15 @@ export default function ProfileUser() {
               <h3>Địa chỉ</h3>
               <div className="profile-details">
                 {user.role === "Teacher" ? (
-
                   <>
-                    <Button icon={<SaveOutlined />} type="primary" onClick={handleSave} style={{ marginRight: 8 }}>Lưu</Button>
+                    <Button
+                      icon={<SaveOutlined />}
+                      type="primary"
+                      onClick={handleSave}
+                      style={{ marginRight: 8 }}
+                    >
+                      Lưu
+                    </Button>
                     <Button onClick={handleCancel}>Hủy</Button>
                   </>
                 ) : (
@@ -329,7 +352,6 @@ export default function ProfileUser() {
             </div>
           </div>
         </div>
-
       </div>
     </>
   );
