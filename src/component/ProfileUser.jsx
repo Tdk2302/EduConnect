@@ -10,6 +10,7 @@ import {
   putUpdateTeacher,
 } from "../services/apiServices";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const getUserFromStorage = () => {
   try {
@@ -18,6 +19,20 @@ const getUserFromStorage = () => {
   } catch {
     return {};
   }
+};
+
+// Hàm upload ảnh lên server, trả về url ảnh
+const uploadImageToServer = async (file, token) => {
+  const formData = new FormData();
+  formData.append("File", file);
+  const response = await axios.post(
+    "https://localhost:7064/api/Upload",
+    formData,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+  return response.data.imageUrl;
 };
 
 export default function ProfileUser() {
@@ -34,10 +49,25 @@ export default function ProfileUser() {
     nationalId: user.nationalId || "1234567890",
     country: user.country || "Vietnam",
     city: user.city || "Hà Nội",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+    userImage: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = React.useRef(null);
+
+  //Validate Image
+  const validateImage = (file) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const maxFileSize = 2 * 1024 * 1024; // 2MB
+
+    if (!allowedTypes.includes(file.type)) {
+      return false;
+    }
+
+    if (file.size > maxFileSize) {
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     async function fetchProfile() {
@@ -46,8 +76,12 @@ export default function ProfileUser() {
         setProfile(data.data);
       } else {
         const data = await getParentProfile(user.token);
-        setProfile(data.data);
-        console.log(data.data);
+        let cleanData = { ...data.data };
+        if (!cleanData.userImage || !/^https?:\/\//.test(cleanData.userImage)) {
+          cleanData.userImage = "";
+        }
+        setProfile(cleanData);
+        console.log(cleanData);
       }
     }
     fetchProfile();
@@ -90,26 +124,14 @@ export default function ProfileUser() {
       const formData = new FormData();
       formData.append("FirstName", profile.firstName || "");
       formData.append("PhoneNumber", profile.phone || "");
-      if (fileInputRef.current && fileInputRef.current.files[0]) {
-        formData.append("imageFile", fileInputRef.current.files[0]);
-      }
       formData.append("LastName", profile.lastName || "");
-      formData.append("fullName", profile.fullName || "");
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+      formData.append("ImageUrl", profile.userImage || "");
+
       try {
         const updateResponse = await updateParentProfile(formData, user.token);
-        const backendUrl = "http://localhost:7064";
-        const imageUrl = updateResponse.data.imageUrl
-          ? updateResponse.data.imageUrl.startsWith("http")
-            ? updateResponse.data.imageUrl
-            : `${backendUrl}${updateResponse.data.imageUrl}`
-          : null;
-
         setProfile((prev) => ({
           ...prev,
-          userImage: imageUrl || prev.userImage,
+          userImage: prev.userImage,
           phone: profile.phone,
           role: profile.role,
           fullName: profile.fullName,
@@ -133,17 +155,39 @@ export default function ProfileUser() {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate định dạng và size
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      const maxFileSize = 2 * 1024 * 1024; // 2MB
+      if (!allowedTypes.includes(file.type)) {
+        toast.error("Chỉ chấp nhận file ảnh JPEG, PNG, GIF.");
+        return;
+      }
+      if (file.size > maxFileSize) {
+        toast.error("Kích thước file tối đa là 2MB.");
+        return;
+      }
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        setProfile((prev) => ({ ...prev, avatar: ev.target.result }));
+      reader.onload = async (ev) => {
+        setProfile((prev) => ({
+          ...prev,
+          avatar: ev.target.result,
+        }));
+        try {
+          const imageUrl = await uploadImageToServer(file, user.token);
+          setProfile((prev) => ({
+            ...prev,
+            userImage: imageUrl, // lưu url ảnh đã upload
+          }));
+        } catch (err) {
+          toast.error("Upload ảnh thất bại!");
+        }
       };
       reader.readAsDataURL(file);
     }
   };
-  const backendUrl = "https://localhost:7064";
 
   return (
     <>
@@ -167,12 +211,7 @@ export default function ProfileUser() {
             <div className="profile-main">
               <div className="profile-header">
                 <img
-                  src={
-                    profile.avatar ||
-                    (profile.userImage
-                      ? `${backendUrl}${profile.userImage}`
-                      : "https://randomuser.me/api/portraits/men/1.jpg")
-                  }
+                  src={profile.avatar || profile.userImage}
                   alt="avatar"
                   className="profile-avatar"
                 />
@@ -238,21 +277,11 @@ export default function ProfileUser() {
                 </div>
                 <div>
                   <label>Email</label>
-                  <input
-                    name="email"
-                    value={profile.email}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
+                  <input name="email" value={profile.email} readOnly="true" />
                 </div>
                 <div>
                   <label>Vai trò</label>
-                  <input
-                    name="role"
-                    value={profile.role}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
+                  <input name="role" value={profile.role} readOnly="true" />
                 </div>
                 <div>
                   <label>Số điện thoại</label>
@@ -265,20 +294,14 @@ export default function ProfileUser() {
                 </div>
                 <div>
                   <label>Giới tính</label>
-                  <input
-                    name="gender"
-                    value={profile.gender}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
+                  <input name="gender" value={profile.gender} readOnly="true" />
                 </div>
                 <div>
                   <label>Ngày sinh</label>
                   <input
                     name="dateOfBirth"
                     value={profile.dateOfBirth}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
+                    readOnly="true"
                   />
                 </div>
                 <div>
@@ -286,8 +309,7 @@ export default function ProfileUser() {
                   <input
                     name="nationalId"
                     value={profile.nationalId}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
+                    readOnly="true"
                   />
                 </div>
               </div>
@@ -320,18 +342,12 @@ export default function ProfileUser() {
                       <input
                         name="country"
                         value={profile.country}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
+                        readOnly="true"
                       />
                     </div>
                     <div>
                       <label>Thành phố</label>
-                      <input
-                        name="city"
-                        value={profile.city}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
-                      />
+                      <input name="city" value={profile.city} readOnly="true" />
                     </div>
                   </>
                 )}

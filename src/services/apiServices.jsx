@@ -163,11 +163,8 @@ const postAttendance = async (attendanceData, token) => {
 
 const getStudentSchedule = async (classId, token) => {
   return axios.get(`${BASE_URL}/Course/class/${classId}`, {
-    method: "GET",
-    headers: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      withCredentials: true,
-    },
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    withCredentials: true,
   });
 };
 
@@ -283,6 +280,7 @@ const postChatBotAsk = async (parentId, messageText, token) => {
     }
   );
 };
+// ------------------ CHATBOT ------------------
 
 // ------------------ EXPORT ------------------
 export {
