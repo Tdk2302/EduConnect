@@ -72,15 +72,15 @@ const getToken = () => {
 const decodeToken = (token) => {
   if (!token) return null;
   try {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = token.split(".")[1];
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
       atob(base64)
-        .split('')
-        .map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join('')
+        .join("")
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -311,22 +311,30 @@ const getTeacherSubject = (teacherId) => {
 };
 
 // ------------------ CHATBOT ------------------
-const postChatBotAsk = async (parentId, messageText,token) => {
+const postChatBotAsk = async (parentId, messageText, token) => {
   if (!token) token = getToken();
-  return axios.post(`${BASE_URL}/ChatBotLog/ask`, { parentId, messageText }, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  return axios.post(
+    `${BASE_URL}/ChatBotLog/ask`,
+    { parentId, messageText },
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
 };
 // ------------------ CHATBOT ------------------
 
 // ------------------ EXPORT ------------------
 const generateReport = async (termId, classId, token) => {
   if (!token) token = getToken();
-  return axios.post(`${BASE_URL}/Report/generate`, { termId, classId }, {
-    withCredentials: true,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  return axios.post(
+    `${BASE_URL}/Report/generate`,
+    { termId, classId },
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
 };
 
 export {
