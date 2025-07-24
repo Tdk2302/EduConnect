@@ -51,7 +51,7 @@ export default function TeacherMainLayout() {
   let content;
   switch (selected) {
     case "dashboard":
-      content = <TeacherDashboard />;
+      content = <TeacherDashboard setSelected={setSelected} />;
       break;
     case "notify":
       content = <NotificationDashboard />;
@@ -63,7 +63,7 @@ export default function TeacherMainLayout() {
       content = <ReportCreate />;
       break;
     default:
-      content = <TeacherDashboard />;
+      content = <TeacherDashboard setSelected={setSelected} />;
       break;
   }
 
