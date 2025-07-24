@@ -303,6 +303,7 @@ export default function Notifications() {
     setSelectedReport(notification); // Lưu thông tin báo cáo vào state
   };
 
+  // Thay đổi giá trị value của Select thành studentId
   useEffect(() => {
     let filtered = notifications;
     if (selectedTab === 1) {
@@ -310,13 +311,10 @@ export default function Notifications() {
     } else if (selectedTab === 2) {
       filtered = filtered.filter((n) => n.isRead);
     }
-
     // Lọc theo học sinh đã chọn
     if (selectedStudent) {
       const selectedStudentObj = students.find(
-        (student) =>
-          student.fullName === selectedStudent ||
-          student.studentId === selectedStudent
+        (student) => student.studentId === selectedStudent
       );
       const classId = selectedStudentObj?.classId; // Lấy classId của học sinh đã chọn
       // Lọc thông báo theo classId
@@ -324,16 +322,34 @@ export default function Notifications() {
         filtered = filtered.filter((n) => n.classId === classId);
       }
     }
-    console.log(filtered);
     setFilteredNotifications(filtered);
   }, [notifications, selectedTab, selectedStudent]);
 
+  // Khi fetch students, setSelectedStudent là studentId
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const userInfo = getUserInfo();
+        const res = await getStudentByParentEmail(
+          userInfo.token,
+          userInfo.email
+        );
+        setStudents(res.data || []);
+        if (res.data && res.data.length > 0) {
+          setSelectedStudent(res.data[0].studentId); // Sử dụng studentId
+        }
+      } catch (err) {
+        setStudents([]);
+      }
+    };
+    fetchStudents();
+  }, []);
+
+  // Khi fetch report, tìm student theo studentId
   useEffect(() => {
     if (!selectedStudent) return;
     const selectedStudentObj = students.find(
-      (student) =>
-        student.fullName === selectedStudent ||
-        student.studentId === selectedStudent
+      (student) => student.studentId === selectedStudent
     );
     const classId = selectedStudentObj?.classId || "";
     const fetchReport = async () => {
@@ -368,7 +384,6 @@ export default function Notifications() {
             };
           })
         );
-        console.log("map", mapped);
         setNotifications(mapped);
       } catch (err) {
         setNotifications([]);
@@ -378,25 +393,6 @@ export default function Notifications() {
     };
     fetchReport();
   }, [selectedStudent]);
-
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const userInfo = getUserInfo();
-        const res = await getStudentByParentEmail(
-          userInfo.token,
-          userInfo.email
-        );
-        setStudents(res.data || []);
-        if (res.data && res.data.length > 0) {
-          setSelectedStudent(res.data[0].studentId || res.data[0].id);
-        }
-      } catch (err) {
-        setStudents([]);
-      }
-    };
-    fetchStudents();
-  }, []);
 
   return (
     <>
@@ -470,7 +466,7 @@ export default function Notifications() {
                   {students.map((student) => (
                     <MenuItem
                       key={student.studentId || student.id}
-                      value={student.fullName || student.id}
+                      value={student.studentId} // Sử dụng studentId làm value
                     >
                       {student.fullName}
                     </MenuItem>
