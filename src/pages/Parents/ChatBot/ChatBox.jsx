@@ -273,6 +273,7 @@ export default function ChatBox() {
       const userInfor = getUserInfo();
       const res = await postChatBotAsk(parentId, input, userInfor.token);
       console.log(res);
+
       const reply = res?.data?.reply || "Xin lỗi, tôi chưa hiểu ý bạn.";
       const botMsg = {
         from: "bot",
