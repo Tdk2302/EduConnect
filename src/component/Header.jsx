@@ -1,208 +1,70 @@
-import React, { useState } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  Menu,
-  MenuItem,
-  IconButton,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { styled } from "@mui/material/styles";
+import React from "react";
+import { Layout, Menu, Button, Avatar, Dropdown } from "antd";
+import { UserOutlined, LogoutOutlined, ProfileOutlined, LoginOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getUserInfo, logoutUser } from "../services/handleStorageApi";
 
-const Logo = ({ navigate }) => (
-  <Typography
-    variant="h6"
-    sx={{
-      fontWeight: 700,
-      fontSize: 30,
-      margin: "20px 0px",
-      letterSpacing: 1,
-      color: "#4B1EFF",
-      userSelect: "none",
-      cursor: "pointer",
-    }}
-    onClick={() => navigate("/homepage")}
-  >
-    Edu<span style={{ color: "#E53945" }}>Connect</span>
-  </Typography>
-);
+const { Header: AntHeader } = Layout;
 
 const menuItems = [
-  { label: "Schedule", path: "/student-schedule" },
+  { label: "Lịch học", path: "/student-schedule" },
   { label: "Chat Bot", path: "/chatbot" },
-  { label: "Notifications", path: "/parent-notifications" },
+  { label: "Thông báo", path: "/parent-notifications" },
 ];
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: 8,
-  textTransform: "none",
-  fontWeight: 500,
-  fontSize: 15,
-  marginLeft: theme.spacing(2),
-}));
-
-const Header = () => {
+export default function Header() {
   const navigate = useNavigate();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [activeMenu, setActiveMenu] = useState(null);
   const user = getUserInfo();
   const isLoggedIn = !!user;
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const handleLogout = () => {
-    logoutUser();
-    handleMenuClose();
-    navigate("/signin");
+  const userMenu = {
+    items: [
+      {
+        key: "profile",
+        icon: <ProfileOutlined />,
+        label: "Hồ sơ",
+        onClick: () => navigate("/profile"),
+      },
+      {
+        key: "logout",
+        icon: <LogoutOutlined />,
+        label: "Đăng xuất",
+        onClick: () => {
+          logoutUser();
+          navigate("/signin");
+        },
+      },
+    ],
   };
 
   return (
-    <AppBar
-      position="static"
-      elevation={0}
-      sx={{
-        background: "#fff",
-        color: "#222",
-        boxShadow: "none",
-        borderBottom: "1px solid #f2f2f2",
-      }}
-    >
-      <Toolbar sx={{ justifyContent: "space-between", minHeight: 80 }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Logo navigate={navigate} />
-          <Box sx={{ display: { xs: "none", md: "flex" }, ml: 4, gap: 2 }}>
-            {menuItems.map((item, idx) => (
-              <Box
-                key={item.label}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  ml: 2,
-                  fontSize: 20,
-                  borderRadius: 2,
-                  padding: "10px 20px",
-                  marginRight: 2,
-                  transition: "background 0.2s",
-                  background: activeMenu === idx ? "#f0f0ff" : "transparent",
-                  "&:hover": {
-                    background: "#f5f5f5",
-                  },
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  setActiveMenu(idx);
-                  if (item.path) {
-                    navigate(item.path);
-                  }
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: activeMenu === idx ? 700 : 400,
-                    fontSize: 19,
-                    marginLeft: 5,
-                  }}
-                >
-                  {item.label}
-                </Typography>
-                {item.dropdown && (
-                  <ExpandMoreIcon sx={{ fontSize: 18, ml: 0.5 }} />
-                )}
-              </Box>
-            ))}
-          </Box>
-        </Box>
-        <Box>
+    <AntHeader style={{ background: "#fff", padding: 0, boxShadow: "0 2px 8px #f0f1f2", position: "sticky", top: 0, zIndex: 100 }}>
+      <div style={{ display: "flex", alignItems: "center", height: 64, maxWidth: 1400, margin: "0 auto", padding: "0 24px", justifyContent: "space-between" }}>
+        <div style={{ fontWeight: 700, fontSize: 28, color: "#14448b", letterSpacing: 1, cursor: "pointer" }} onClick={() => navigate("/homepage")}>EduConnect</div>
+        <Menu
+          mode="horizontal"
+          style={{ flex: 1, marginLeft: 40, fontWeight: 600, fontSize: 16, background: "transparent", borderBottom: "none" }}
+          selectable={false}
+        >
+          {menuItems.map((item) => (
+            <Menu.Item key={item.path} onClick={() => navigate(item.path)}>
+              {item.label}
+            </Menu.Item>
+          ))}
+        </Menu>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {!isLoggedIn ? (
             <>
-              <StyledButton
-                variant="outlined"
-                sx={{
-                  borderColor: "#4B1EFF",
-                  color: "#4B1EFF",
-                  mr: 2,
-                  minWidth: 90,
-                }}
-                onClick={() => navigate("/signin")}
-              >
-                Đăng nhập
-              </StyledButton>
-              <StyledButton
-                variant="contained"
-                sx={{
-                  background: "#E53945",
-                  color: "#fff",
-                  minWidth: 100,
-                  boxShadow: "none",
-                  "&:hover": { background: "#c62832" },
-                }}
-                onClick={() => navigate("/register")}
-              >
-                Đăng kí
-              </StyledButton>
+              <Button icon={<LoginOutlined />} style={{ borderRadius: 6, fontWeight: 600 }} onClick={() => navigate("/signin")}>Đăng nhập</Button>
+              <Button type="primary" style={{ borderRadius: 6, fontWeight: 600 }} onClick={() => navigate("/register")}>Đăng ký</Button>
             </>
           ) : (
-            <>
-              <IconButton onClick={handleMenuOpen} color="inherit">
-                <AccountCircleIcon sx={{ fontSize: 40 }} />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
-                sx={{
-                  zIndex: 1300,
-                  fontSize: 20,
-                  fontWeight: 500,
-                }}
-              >
-                <MenuItem
-                  sx={{
-                    fontSize: 18,
-                    fontWeight: 500,
-                    color: "#222",
-                  }}
-                  onClick={() => navigate("/profile")}
-                >
-                  Hồ sơ
-                </MenuItem>
-                <MenuItem
-                  sx={{
-                    fontSize: 18,
-                    fontWeight: 500,
-                    color: "#222",
-                  }}
-                  onClick={handleMenuClose}
-                >
-                  Cài đặt
-                </MenuItem>
-                <MenuItem
-                  sx={{
-                    fontSize: 18,
-                    fontWeight: 500,
-                    color: "#222",
-                  }}
-                  onClick={handleLogout}
-                >
-                  Đăng xuất
-                </MenuItem>
-              </Menu>
-            </>
+            <Dropdown menu={userMenu} placement="bottomRight" trigger={["click"]}>
+              <Avatar style={{ backgroundColor: "#14448b", cursor: "pointer" }} icon={<UserOutlined />} />
+            </Dropdown>
           )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+        </div>
+      </div>
+    </AntHeader>
   );
-};
-
-export default Header;
+}

@@ -1,15 +1,11 @@
 // src/component/ProfileUser.jsx
-import React, { useState, useEffect } from "react";
-import "./ProfileUser.scss";
+import React, { useState, useEffect, useRef } from "react";
+import { Card, Form, Input, Button, Avatar, Row, Col, Typography, message } from "antd";
+import { UserOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import Header from "./Header";
-import SideBar from "../pages/Teachers/Layout/SideBar";
-import {
-  updateParentProfile,
-  getParentProfile,
-  getTeacherDetail,
-  putUpdateTeacher,
-} from "../services/apiServices";
-import { toast } from "react-toastify";
+import { updateParentProfile, getParentProfile, getTeacherDetail, putUpdateTeacher } from "../services/apiServices";
+
+const { Title, Text } = Typography;
 
 const getUserFromStorage = () => {
   try {
@@ -37,7 +33,7 @@ export default function ProfileUser() {
     avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -47,44 +43,28 @@ export default function ProfileUser() {
       } else {
         const data = await getParentProfile(user.token);
         setProfile(data.data);
-        console.log(data.data);
       }
     }
     fetchProfile();
+    // eslint-disable-next-line
   }, []);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  const handleEdit = () => setIsEditing(true);
+  const handleCancel = () => setIsEditing(false);
 
   const handleSave = async () => {
     setIsEditing(false);
-
     if (user.role === "Teacher") {
       try {
-        await putUpdateTeacher(
-          user.userId,
-          profile.subjectId,
-          profile.status,
-          user.token
-        );
+        await putUpdateTeacher(user.userId, profile.subjectId, profile.status, user.token);
         const newProfile = await getTeacherDetail(user.userId, user.token);
-        console.log(newProfile.data);
-
-        setProfile((prev) => ({
-          ...prev,
-          ...newProfile.data,
-        }));
-        toast.success("Cập nhật thành công!");
-
-        const currentUser = JSON.parse(
-          localStorage.getItem("userInfo") || "{}"
-        );
+        setProfile((prev) => ({ ...prev, ...newProfile.data }));
+        message.success("Cập nhật thành công!");
+        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
-        toast.error("Có lỗi xảy ra khi cập nhật!");
-        console.error(error);
+        message.error("Có lỗi xảy ra khi cập nhật!");
       }
     } else {
       const formData = new FormData();
@@ -95,9 +75,6 @@ export default function ProfileUser() {
       }
       formData.append("LastName", profile.lastName || "");
       formData.append("fullName", profile.fullName || "");
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
       try {
         const updateResponse = await updateParentProfile(formData, user.token);
         const backendUrl = "http://localhost:7064";
@@ -106,7 +83,6 @@ export default function ProfileUser() {
             ? updateResponse.data.imageUrl
             : `${backendUrl}${updateResponse.data.imageUrl}`
           : null;
-
         setProfile((prev) => ({
           ...prev,
           userImage: imageUrl || prev.userImage,
@@ -115,15 +91,12 @@ export default function ProfileUser() {
           fullName: profile.fullName,
           ...updateResponse.data,
         }));
-        toast.success("Cập nhật thành công!");
-        const currentUser = JSON.parse(
-          localStorage.getItem("userInfo") || "{}"
-        );
+        message.success("Cập nhật thành công!");
+        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
-        toast.error("Có lỗi xảy ra khi cập nhật!");
-        console.error("Update error:", error);
+        message.error("Có lỗi xảy ra khi cập nhật!");
       }
     }
   };
@@ -143,202 +116,121 @@ export default function ProfileUser() {
       reader.readAsDataURL(file);
     }
   };
-  const backendUrl = "https://localhost:7064";
 
   return (
     <>
-      {user.role !== "Teacher" && <Header />}
-
-      <div style={{ display: "flex", minHeight: "100vh" }}>
-        {user.role === "Teacher" && (
-          <SideBar selected="profile" onSelect={() => {}} />
-        )}
-        <div style={{ flex: 1, display: "flex" }}>
-          <div className="profile-container" style={{ flex: 1 }}>
-            {user.role !== "Teacher" && (
-              <div className="profile-sidebar">
-                <h3>Cài đặt</h3>
-                <ul>
-                  <li className="active">Hồ sơ cá nhân</li>
-                  <li>Bảo mật</li>
-                </ul>
-              </div>
-            )}
-            <div className="profile-main">
-              <div className="profile-header">
-                <img
-                  src={
-                    profile.avatar ||
-                    (profile.userImage
-                      ? `${backendUrl}${profile.userImage}`
-                      : "https://randomuser.me/api/portraits/men/1.jpg")
-                  }
-                  alt="avatar"
-                  className="profile-avatar"
-                />
-                {isEditing && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      ref={fileInputRef}
-                      onChange={handleAvatarChange}
-                    />
-                    <button
-                      className="edit-btn small-btn"
-                      style={{
-                        marginTop: 8,
-                        padding: "4px 10px",
-                        fontSize: "0.9em",
-                      }}
-                      onClick={() =>
-                        fileInputRef.current && fileInputRef.current.click()
-                      }
-                    >
-                      Cập Nhật Ảnh
-                    </button>
-                  </div>
-                )}
-                <div>
-                  <h2>{profile.fullName}</h2>
-                </div>
-                <button
-                  className="edit-btn"
-                  onClick={isEditing ? () => setIsEditing(false) : handleEdit}
-                >
-                  {isEditing ? "Hủy" : "Chỉnh sửa"}
-                </button>
-                {isEditing && (
-                  <button
-                    className="save-btn edit-btn"
-                    onClick={handleSave}
-                    style={{ marginLeft: 8 }}
-                  >
-                    Lưu
-                  </button>
-                )}
-              </div>
-              <h3>Chi tiết cá nhân</h3>
-              <div className="profile-details">
-                <div>
-                  <label>Họ và tên</label>
-                  <input
-                    name="fullName"
-                    value={profile.fullName}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Email</label>
-                  <input
-                    name="email"
-                    value={profile.email}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Vai trò</label>
-                  <input
-                    name="role"
-                    value={profile.role}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Số điện thoại</label>
-                  <input
-                    name="phone"
-                    value={profile.phone}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Giới tính</label>
-                  <input
-                    name="gender"
-                    value={profile.gender}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>Ngày sinh</label>
-                  <input
-                    name="dateOfBirth"
-                    value={profile.dateOfBirth}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label>CMND</label>
-                  <input
-                    name="nationalId"
-                    value={profile.nationalId}
-                    readOnly={!isEditing}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <h3>Địa chỉ</h3>
-              <div className="profile-details">
-                {user.role === "Teacher" ? (
+      <Header />
+      <div style={{ background: "#f7faff", minHeight: "100vh", padding: "32px 0" }}>
+        <Row justify="center">
+          <Col xs={24} md={16} lg={12}>
+            <Card
+              style={{ borderRadius: 16, boxShadow: "0 4px 24px #e0e3e8", marginTop: 32 }}
+              title={<Title level={3} style={{ margin: 0, color: "#14448b" }}>Hồ sơ cá nhân</Title>}
+              extra={
+                isEditing ? (
                   <>
-                    <div>
-                      <label>Ngày tạo</label>
-                      <input
-                        name="createdAt"
-                        value={profile.createdAt || ""}
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label>Mã môn dạy (subjectId)</label>
-                      <input
-                        name="subjectId"
-                        value={profile.subjectId || ""}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
-                      />
-                    </div>
+                    <Button icon={<SaveOutlined />} type="primary" onClick={handleSave} style={{ marginRight: 8 }}>Lưu</Button>
+                    <Button onClick={handleCancel}>Hủy</Button>
                   </>
                 ) : (
-                  <>
-                    <div>
-                      <label>Quốc gia</label>
+                  <Button icon={<EditOutlined />} onClick={handleEdit}>Chỉnh sửa</Button>
+                )
+              }
+            >
+              <Row gutter={[32, 32]} align="middle">
+                <Col xs={24} md={6} style={{ textAlign: "center" }}>
+                  <Avatar
+                    size={96}
+                    src={profile.avatar || profile.userImage || "https://randomuser.me/api/portraits/men/1.jpg"}
+                    icon={<UserOutlined />}
+                    style={{ marginBottom: 16, border: "2px solid #14448b" }}
+                  />
+                  {isEditing && (
+                    <>
                       <input
-                        name="country"
-                        value={profile.country}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        ref={fileInputRef}
+                        onChange={handleAvatarChange}
                       />
-                    </div>
-                    <div>
-                      <label>Thành phố</label>
-                      <input
-                        name="city"
-                        value={profile.city}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+                      <Button size="small" onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ marginTop: 8 }}>
+                        Cập nhật ảnh
+                      </Button>
+                    </>
+                  )}
+                </Col>
+                <Col xs={24} md={18}>
+                  <Form layout="vertical">
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Họ và tên">
+                          <Input name="fullName" value={profile.fullName} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Email">
+                          <Input name="email" value={profile.email} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Vai trò">
+                          <Input name="role" value={profile.role} readOnly onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Số điện thoại">
+                          <Input name="phone" value={profile.phone} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Giới tính">
+                          <Input name="gender" value={profile.gender} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="Ngày sinh">
+                          <Input name="dateOfBirth" value={profile.dateOfBirth} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col xs={24} md={12}>
+                        <Form.Item label="CMND">
+                          <Input name="nationalId" value={profile.nationalId} readOnly={!isEditing} onChange={handleChange} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        {user.role === "Teacher" ? (
+                          <Form.Item label="Mã môn dạy (subjectId)">
+                            <Input name="subjectId" value={profile.subjectId || ""} readOnly={!isEditing} onChange={handleChange} />
+                          </Form.Item>
+                        ) : (
+                          <Form.Item label="Quốc gia">
+                            <Input name="country" value={profile.country} readOnly={!isEditing} onChange={handleChange} />
+                          </Form.Item>
+                        )}
+                      </Col>
+                    </Row>
+                    {user.role !== "Teacher" && (
+                      <Row gutter={16}>
+                        <Col xs={24} md={12}>
+                          <Form.Item label="Thành phố">
+                            <Input name="city" value={profile.city} readOnly={!isEditing} onChange={handleChange} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    )}
+                  </Form>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
       </div>
     </>
   );

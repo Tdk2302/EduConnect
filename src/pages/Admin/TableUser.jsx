@@ -1,114 +1,97 @@
 import React from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Typography, Chip, Avatar, Box, CircularProgress } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Table, Avatar, Button, Tag, Space } from "antd";
+import { EyeOutlined, EditOutlined, DeleteOutlined, SyncOutlined } from "@ant-design/icons";
 
-const AVATAR_URL = "https://randomuser.me/api/portraits/men/32.jpg"; // Ảnh avatar mặc định
+const AVATAR_URL = "https://randomuser.me/api/portraits/men/32.jpg";
 
 function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingEdit }) {
-  return (
-    <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 4px 24px 0 rgba(80,80,80,0.08)', background: '#fff', mt: 3, p: 2 }}>
-      <Table>
-        <TableHead>
-          <TableRow sx={{ bgcolor: '#f4f6fb' }}>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'left' }}>Họ tên</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'center' }}>Vai trò</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'left' }}>Email</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'center' }}>Số điện thoại</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'center' }}>Trạng thái</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'center' }}>Ngày tạo</TableCell>
-            <TableCell sx={{ fontWeight: 800, color: '#3a3a3a', fontSize: 16, textAlign: 'center' }}>Thao tác</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {listUsers.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} align="center">
-                <Typography color="text.secondary">No users found.</Typography>
-              </TableCell>
-            </TableRow>
-          ) : (
-            listUsers.map((user) => (
-              <TableRow
-                key={user.userId || user.email}
-                sx={{
-                  transition: 'background 0.2s',
-                  '&:hover': { background: '#f0f4ff' },
-                }}
-              >
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar src={user.avatar || AVATAR_URL} alt={user.fullName} sx={{ width: 44, height: 44, boxShadow: 2 }} />
-                    <Box>
-                      <Typography variant="body1" fontWeight={700} color="#222">
-                      {user.fullName}
-                    </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {user.email}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Chip label={user.role} color={user.role === 'Admin' ? 'primary' : user.role === 'Teacher' ? 'secondary' : 'default'} sx={{ fontWeight: 600, fontSize: 14 }} />
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.phoneNumber}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={
-                      user.status === "Active" || user.status === 1 || user.status === "1"
-                        ? "Active"
-                        : user.status === "Inactive" || user.status === 0 || user.status === "0"
-                        ? "Inactive"
-                        : user.isActive
-                        ? "Active"
-                        : "Inactive"
-                    }
-                    color={
-                      user.status === "Active" || user.status === 1 || user.status === "1" || user.isActive
-                        ? "success"
-                        : "default"
-                    }
-                    size="small"
-                    sx={{ fontWeight: 600, fontSize: 13, px: 1.5 }}
-                  />
-                </TableCell>
-                <TableCell>{user.createAt ? user.createAt.split('T')[0] : ''}</TableCell>
-                <TableCell align="center">
-                  <IconButton color="primary" onClick={() => onView && onView(user)} sx={{ mx: 0.5, bgcolor: '#e3e8ff', '&:hover': { bgcolor: '#d0d8ff' }, borderRadius: 2 }}>
-                    <VisibilityIcon />
-                  </IconButton>
-                  {user.role === 'Teacher' && (
-                    <>
-                      <IconButton 
-                        color="info" 
-                        onClick={() => onEdit && onEdit(user)} 
-                        disabled={loadingEdit}
-                        sx={{ mx: 0.5, bgcolor: '#e0f7fa', '&:hover': { bgcolor: '#b2ebf2' }, borderRadius: 2 }}
-                      >
-                        {loadingEdit ? <CircularProgress size={20} /> : <EditIcon />}
-                      </IconButton>
-                    </>
-                  )}
-                  {user.role !== 'Teacher' && user.role !== 'Parent' && (
-                    <IconButton color="error" onClick={() => onDelete && onDelete(user)} sx={{ mx: 0.5, bgcolor: '#ffeaea', '&:hover': { bgcolor: '#ffd6d6' }, borderRadius: 2 }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  )}
-                  {user.role !== 'Parent' && (
-                    <IconButton color="secondary" onClick={() => onChangeRole && onChangeRole(user)} sx={{ mx: 0.5, bgcolor: '#f3e8ff', '&:hover': { bgcolor: '#e1d0ff' }, borderRadius: 2 }}>
-                      <span role="img" aria-label="change-role" style={{ fontSize: 20 }}>🔄</span>
-                    </IconButton>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))
+  const columns = [
+    {
+      title: "Họ tên",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (text, user) => (
+        <Space>
+          <Avatar src={user.avatar || AVATAR_URL} />
+          <div>
+            <div style={{ fontWeight: 700 }}>{user.fullName}</div>
+            <div style={{ color: "#888", fontSize: 13 }}>{user.email}</div>
+          </div>
+        </Space>
+      ),
+    },
+    {
+      title: "Vai trò",
+      dataIndex: "role",
+      key: "role",
+      render: (role) => (
+        <Tag color={role === "Admin" ? "blue" : role === "Teacher" ? "purple" : "default"}>{role}</Tag>
+      ),
+      align: "center",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      align: "center",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      key: "status",
+      render: (status, user) => (
+        <Tag color={
+          status === "Active" || status === 1 || status === "1" || user.isActive
+            ? "green"
+            : "default"
+        }>
+          {status === "Active" || status === 1 || status === "1" || user.isActive ? "Active" : "Inactive"}
+        </Tag>
+      ),
+      align: "center",
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createAt",
+      key: "createAt",
+      render: (date) => (date ? date.split("T")[0] : ""),
+      align: "center",
+    },
+    {
+      title: "Thao tác",
+      key: "actions",
+      align: "center",
+      render: (_, user) => (
+        <Space>
+          <Button icon={<EyeOutlined />} onClick={() => onView && onView(user)} />
+          {user.role === "Teacher" && (
+            <Button icon={<EditOutlined />} onClick={() => onEdit && onEdit(user)} loading={loadingEdit} />
           )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          {user.role !== "Teacher" && user.role !== "Parent" && (
+            <Button icon={<DeleteOutlined />} danger onClick={() => onDelete && onDelete(user)} />
+          )}
+          {user.role !== "Parent" && (
+            <Button icon={<SyncOutlined />} onClick={() => onChangeRole && onChangeRole(user)} />
+          )}
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <Table
+      columns={columns}
+      dataSource={listUsers}
+      rowKey={(user) => user.userId || user.email}
+      pagination={{ pageSize: 10 }}
+      style={{ borderRadius: 12, background: "#fff", marginTop: 24 }}
+      scroll={{ x: true }}
+    />
   );
 }
 
