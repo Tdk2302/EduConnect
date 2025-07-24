@@ -1,6 +1,7 @@
 // src/component/ProfileUser.jsx
-import React, { useState, useEffect } from "react";
-import "./ProfileUser.scss";
+import React, { useState, useEffect, useRef } from "react";
+import { Card, Form, Input, Button, Avatar, Row, Col, Typography, message } from "antd";
+import { UserOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 import Header from "./Header";
 import SideBar from "../pages/Teachers/Layout/SideBar";
 import {
@@ -11,6 +12,9 @@ import {
 } from "../services/apiServices";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { updateParentProfile, getParentProfile, getTeacherDetail, putUpdateTeacher } from "../services/apiServices";
+
+const { Title, Text } = Typography;
 
 const getUserFromStorage = () => {
   try {
@@ -52,7 +56,7 @@ export default function ProfileUser() {
     userImage: "https://randomuser.me/api/portraits/men/1.jpg",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = useRef(null);
 
   //Validate Image
   const validateImage = (file) => {
@@ -82,43 +86,29 @@ export default function ProfileUser() {
         }
         setProfile(cleanData);
         console.log(cleanData);
+        setProfile(data.data);
       }
     }
     fetchProfile();
+    // eslint-disable-next-line
   }, []);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  const handleEdit = () => setIsEditing(true);
+  const handleCancel = () => setIsEditing(false);
 
   const handleSave = async () => {
     setIsEditing(false);
-
     if (user.role === "Teacher") {
       try {
-        await putUpdateTeacher(
-          user.userId,
-          profile.subjectId,
-          profile.status,
-          user.token
-        );
+        await putUpdateTeacher(user.userId, profile.subjectId, profile.status, user.token);
         const newProfile = await getTeacherDetail(user.userId, user.token);
-        console.log(newProfile.data);
-
-        setProfile((prev) => ({
-          ...prev,
-          ...newProfile.data,
-        }));
-        toast.success("Cập nhật thành công!");
-
-        const currentUser = JSON.parse(
-          localStorage.getItem("userInfo") || "{}"
-        );
+        setProfile((prev) => ({ ...prev, ...newProfile.data }));
+        message.success("Cập nhật thành công!");
+        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
-        toast.error("Có lỗi xảy ra khi cập nhật!");
-        console.error(error);
+        message.error("Có lỗi xảy ra khi cập nhật!");
       }
     } else {
       const formData = new FormData();
@@ -129,6 +119,7 @@ export default function ProfileUser() {
 
       try {
         const updateResponse = await updateParentProfile(formData, user.token);
+
         setProfile((prev) => ({
           ...prev,
           userImage: prev.userImage,
@@ -137,15 +128,12 @@ export default function ProfileUser() {
           fullName: profile.fullName,
           ...updateResponse.data,
         }));
-        toast.success("Cập nhật thành công!");
-        const currentUser = JSON.parse(
-          localStorage.getItem("userInfo") || "{}"
-        );
+        message.success("Cập nhật thành công!");
+        const currentUser = JSON.parse(localStorage.getItem("userInfo") || "{}");
         currentUser.phoneNumber = profile.phone;
         localStorage.setItem("userInfo", JSON.stringify(currentUser));
       } catch (error) {
-        toast.error("Có lỗi xảy ra khi cập nhật!");
-        console.error("Update error:", error);
+        message.error("Có lỗi xảy ra khi cập nhật!");
       }
     }
   };
@@ -316,24 +304,10 @@ export default function ProfileUser() {
               <h3>Địa chỉ</h3>
               <div className="profile-details">
                 {user.role === "Teacher" ? (
+
                   <>
-                    <div>
-                      <label>Ngày tạo</label>
-                      <input
-                        name="createdAt"
-                        value={profile.createdAt || ""}
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label>Mã môn dạy (subjectId)</label>
-                      <input
-                        name="subjectId"
-                        value={profile.subjectId || ""}
-                        readOnly={!isEditing}
-                        onChange={handleChange}
-                      />
-                    </div>
+                    <Button icon={<SaveOutlined />} type="primary" onClick={handleSave} style={{ marginRight: 8 }}>Lưu</Button>
+                    <Button onClick={handleCancel}>Hủy</Button>
                   </>
                 ) : (
                   <>
@@ -355,6 +329,7 @@ export default function ProfileUser() {
             </div>
           </div>
         </div>
+
       </div>
     </>
   );

@@ -113,8 +113,7 @@ const TeacherSchedule = () => {
         }
         // Lấy thông tin giáo viên
         const teacherRes = await getTeacherDetail(
-          userInfo.userId,
-          userInfo.token
+          userInfo.userId
         );
         const teacher = teacherRes.data;
         setTeacherInfo(teacher);
@@ -124,10 +123,10 @@ const TeacherSchedule = () => {
           setLoading(false);
           return;
         }
-        const teacherID = localStorage.getItem("teacherId");
+        const teacherID = teacher.teacherId;
         console.log(teacherID);
         // Lấy lịch dạy
-        const scheduleRes = await getTeacherCourses(teacherID, userInfo.token);
+        const scheduleRes = await getTeacherCourses(teacherID);
         console.log(scheduleRes);
         let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
         // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
@@ -143,7 +142,7 @@ const TeacherSchedule = () => {
         courses.forEach((course) => {
           // Lấy ngày của course (dd/MM)
           const courseDate = course.startTime
-            ? new Date(course.startTime)
+            ? new Date(course.startTime + "Z")
             : null;
           if (!courseDate) return;
           const dateStr = courseDate.toLocaleDateString("en-GB", {
@@ -158,7 +157,7 @@ const TeacherSchedule = () => {
               subject: course.subjectName ?? null,
               subjectCode: course.subjectId || "-",
               class: course.classId || "-",
-              time: `${course.startTime ? new Date(course.startTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
+              time: `${course.startTime ? new Date(course.startTime + "Z").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime + "Z").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
               status: course.status || "nostatus",
               courseId: course.courseId,
             });

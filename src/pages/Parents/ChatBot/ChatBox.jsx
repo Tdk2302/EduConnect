@@ -30,6 +30,13 @@ const BOT_AVATAR = "https://cdn-icons-png.flaticon.com/512/4712/4712035.png";
 const USER_AVATAR = "https://randomuser.me/api/portraits/men/32.jpg";
 const BRAND_COLOR = "#2563eb";
 
+function getParentIdFromUser() {
+  const user = getUserInfo();
+  if (!user || !user.userId) return "";
+  if (user.userId === "U002") return "P001";
+  return "P001";
+}
+
 function MessageBubble({ from, text }) {
   return (
     <Fade in timeout={400}>
@@ -70,7 +77,7 @@ function MessageBubble({ from, text }) {
             position: "relative",
           }}
         >
-          {text} {/* text có thể là một mảng các phần tử React */}
+          {text}
         </Box>
       </Box>
     </Fade>
@@ -248,7 +255,7 @@ export default function ChatBox() {
     if (!input.trim() || loading) return;
     const userMsg = { from: "user", text: input };
     const newMessages = [...messages, userMsg];
-    // setMessages(newMessages);
+    setMessages(newMessages);
     setInput("");
     setLoading(true);
     setChatHistory((prev) => {
@@ -261,27 +268,17 @@ export default function ChatBox() {
     });
     try {
       const parentId = localStorage.getItem("parentId");
-      const userInfor = getUserInfo();
-      const res = await postChatBotAsk(parentId, input, userInfor.token);
-      console.log(res);
-
+      const res = await postChatBotAsk("P001", input);
+      console.log(parentId, input);
       const reply = res?.data?.reply || "Xin lỗi, tôi chưa hiểu ý bạn.";
-      const botMsg = {
-        from: "bot",
-        text: reply.split("\n").map((line, index) => (
-          <span key={index}>
-            {line}
-            <br />
-          </span>
-        )),
-      };
-
+      const botMsg = { from: "bot", text: reply };
       setMessages((msgs) => [...msgs, botMsg]);
       setChatHistory((prev) => {
         const updated = [...prev];
+        // Chỉ thêm botMsg vào, không thêm lại userMsg
         updated[selectedSession] = {
           ...updated[selectedSession],
-          messages: [...updated[selectedSession].messages, userMsg, botMsg],
+          messages: [...updated[selectedSession].messages, botMsg],
         };
         return updated;
       });
@@ -293,9 +290,10 @@ export default function ChatBox() {
       setMessages((msgs) => [...msgs, botMsg]);
       setChatHistory((prev) => {
         const updated = [...prev];
+        // Chỉ thêm botMsg vào, không thêm lại userMsg
         updated[selectedSession] = {
           ...updated[selectedSession],
-          messages: [...updated[selectedSession].messages, userMsg, botMsg],
+          messages: [...updated[selectedSession].messages, botMsg],
         };
         return updated;
       });
