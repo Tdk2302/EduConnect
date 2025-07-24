@@ -331,6 +331,19 @@ const generateReport = async (termId, classId, token) => {
   });
 };
 
+// ------------------ COURSE STATUS ------------------
+const updateCourseStatus = async (courseId, status, token) => {
+  if (!token) token = getToken();
+  return axios.put(
+    `${BASE_URL}/Course/status`,
+    { courseId, status },
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
 export {
   postSignin,
   postGoogleLogin,
@@ -364,4 +377,5 @@ export {
   getStudentByParentEmail,
   postChatBotAsk,
   generateReport,
+  updateCourseStatus,
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Table, Input, Select, Button, Spin, Alert, message, Tabs, Row, Col } from "antd";
 import { UserOutlined, CheckCircleOutlined, EditOutlined, BookOutlined, StarFilled } from "@ant-design/icons";
 import { getToken } from "../../../services/apiServices";
+import { updateCourseStatus } from "../../../services/apiServices";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
@@ -23,7 +24,7 @@ const FOCUS_OPTIONS = [
 const PARTICIPATION_OPTIONS = [
   "Vắng mặt",
   "Có mặt",
-  "Đi trễ"
+  "Đi muộn"
 ];
 const STUDENT_IDS = [
   "stu001", "stu002", "stu003", "stu004",
@@ -33,44 +34,67 @@ const STUDENT_IDS = [
 // Danh sách học sinh theo từng lớp
 const STUDENTS_BY_CLASS = {
   class01: [
-    { studentId: 'stu001', name: 'Nguyễn Văn A', dob: '2010-05-15', classId: 'class01', parentId: 'P001' },
-    { studentId: 'stu002', name: 'Trần Thị B', dob: '2011-08-20', classId: 'class01', parentId: 'P001' },
-    { studentId: 'stu003', name: 'Lê Hoàng C', dob: '2010-12-01', classId: 'class01', parentId: null },
-    { studentId: 'stu004', name: 'Phạm Minh D', dob: '2011-03-30', classId: 'class01', parentId: null },
-    { studentId: 'stu005', name: 'Đỗ Nhật E', dob: '2012-07-09', classId: 'class01', parentId: null },
-    { studentId: 'stu006', name: 'Ngô Thị F', dob: '2010-10-12', classId: 'class01', parentId: null },
-    { studentId: 'stu007', name: 'Bùi Văn G', dob: '2011-11-21', classId: 'class01', parentId: null },
-    { studentId: 'stu008', name: 'Hoàng Mai H', dob: '2010-01-05', classId: 'class01', parentId: null },
-    { studentId: 'stu009', name: 'Tạ Công I', dob: '2011-06-09', classId: 'class01', parentId: null },
-    { studentId: 'stu010', name: 'Lý Minh J', dob: '2012-03-18', classId: 'class01', parentId: null },
+    { studentId: 'stu001'},
+    { studentId: 'stu002'},
+    { studentId: 'stu003'},
+    { studentId: 'stu004'},
+    { studentId: 'stu005'},
+    { studentId: 'stu006'},
+    { studentId: 'stu007'},
+    { studentId: 'stu008'},
+    { studentId: 'stu009'},
+    { studentId: 'stu010'},
   ],
   class02: [
-    { studentId: 'stu011', name: 'Trịnh Quốc K', dob: '2009-07-22', classId: 'class02', parentId: null },
-    { studentId: 'stu012', name: 'Vũ Thị L', dob: '2009-04-17', classId: 'class02', parentId: null },
-    { studentId: 'stu013', name: 'Nguyễn Gia M', dob: '2009-12-10', classId: 'class02', parentId: null },
-    { studentId: 'stu014', name: 'Đặng Hải N', dob: '2010-02-02', classId: 'class02', parentId: null },
-    { studentId: 'stu015', name: 'Lương Thị O', dob: '2009-11-29', classId: 'class02', parentId: null },
-    { studentId: 'stu016', name: 'Tô Văn P', dob: '2009-06-15', classId: 'class02', parentId: null },
-    { studentId: 'stu017', name: 'Dương Thị Q', dob: '2009-09-08', classId: 'class02', parentId: null },
-    { studentId: 'stu018', name: 'Phan Đình R', dob: '2010-01-26', classId: 'class02', parentId: null },
-    { studentId: 'stu019', name: 'Mai Nhật S', dob: '2009-03-30', classId: 'class02', parentId: null },
-    { studentId: 'stu020', name: 'Huỳnh Thị T', dob: '2009-05-07', classId: 'class02', parentId: null },
+    { studentId: 'stu011'},
+    { studentId: 'stu012'},
+    { studentId: 'stu013'},
+    { studentId: 'stu014'},
+    { studentId: 'stu015'},
+    { studentId: 'stu016'},
+    { studentId: 'stu017'},
+    { studentId: 'stu018'},
+    { studentId: 'stu019'},
+    { studentId: 'stu020'},
   ],
   class03: [
-    { studentId: 'stu021', name: 'Trần Lâm U', dob: '2008-04-11', classId: 'class03', parentId: null },
-    { studentId: 'stu022', name: 'Nguyễn Hồng V', dob: '2008-06-25', classId: 'class03', parentId: null },
-    { studentId: 'stu023', name: 'Hoàng Văn W', dob: '2008-10-30', classId: 'class03', parentId: null },
-    { studentId: 'stu024', name: 'Phạm Thị X', dob: '2008-02-14', classId: 'class03', parentId: null },
-    { studentId: 'stu025', name: 'Lê Minh Y', dob: '2008-07-03', classId: 'class03', parentId: null },
-    { studentId: 'stu026', name: 'Bùi Thanh Z', dob: '2008-12-28', classId: 'class03', parentId: null },
-    { studentId: 'stu027', name: 'Nguyễn Hải AA', dob: '2008-01-19', classId: 'class03', parentId: null },
-    { studentId: 'stu028', name: 'Trịnh Quốc AB', dob: '2008-09-06', classId: 'class03', parentId: null },
-    { studentId: 'stu029', name: 'Vũ Thị AC', dob: '2008-03-13', classId: 'class03', parentId: null },
-    { studentId: 'stu030', name: 'Đặng Minh AD', dob: '2008-05-23', classId: 'class03', parentId: null },
+    { studentId: 'stu021'},
+    { studentId: 'stu022'},
+    { studentId: 'stu023'},
+    { studentId: 'stu024'},
+    { studentId: 'stu025'},
+    { studentId: 'stu026'},
+    { studentId: 'stu027'},
+    { studentId: 'stu028'},
+    { studentId: 'stu029'},
+    { studentId: 'stu030'},
+  ],
+  class04: [
+    { studentId: 'stu031'},
+    { studentId: 'stu032'},
+    { studentId: 'stu033'},
+    { studentId: 'stu034'},
+    { studentId: 'stu035'},
+    { studentId: 'stu036'},
+    { studentId: 'stu037'},
+    { studentId: 'stu038'},
+    { studentId: 'stu039'},
+    { studentId: 'stu040'},
+  ],
+  class05: [
+    { studentId: 'stu041'},
+    { studentId: 'stu042'},
+    { studentId: 'stu043'},
+    { studentId: 'stu044'},
+    { studentId: 'stu045'},
+    { studentId: 'stu046'},
+    { studentId: 'stu047'},
+    { studentId: 'stu048'},
+    { studentId: 'stu049'},
+    { studentId: 'stu050'},
   ],
 };
 
-// Xác định classId từ courseId (giả định courseId có dạng chứa classId, hoặc cần truyền classId vào AttendancePage)
 function getClassIdFromCourse(courseId) {
   if (!courseId) return 'class01';
   if (courseId.toLowerCase().includes('class01')) return 'class01';
@@ -79,7 +103,6 @@ function getClassIdFromCourse(courseId) {
   return 'class01';
 }
 
-// Thêm danh sách môn học
 const SUBJECTS = [
   { label: 'Toán', value: 'SUB001' },
   { label: 'Văn', value: 'SUB002' },
@@ -88,7 +111,7 @@ const SUBJECTS = [
   { label: 'Hóa', value: 'SUB005' },
 ];
 
-const AttendancePage = ({ courseId, visible, onClose }) => {
+const AttendancePage = ({ courseId, classId, visible, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState([]); // danh sách attendance đã có
@@ -120,9 +143,9 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
         const attendedIds = attendances
           .filter(a => a.participation || a.note || a.homework || a.focus)
           .map(a => a.studentId);
-        // Lấy danh sách học sinh theo class
-        const classId = getClassIdFromCourse(courseId);
-        const students = STUDENTS_BY_CLASS[classId] || [];
+        // Lấy danh sách học sinh theo class (ưu tiên prop classId nếu có)
+        const usedClassId = classId || getClassIdFromCourse(courseId);
+        const students = STUDENTS_BY_CLASS[usedClassId] || [];
         setEditRows(
           attendances.filter(a => attendedIds.includes(a.studentId))
         );
@@ -146,7 +169,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       }
     };
     fetchAttendance();
-  }, [courseId, visible]);
+  }, [courseId, visible, classId]);
 
   // Xử lý thay đổi cho từng dòng
   const handleChange = (rows, setRows, idx, field, value) => {
@@ -175,6 +198,14 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
+
+      if (courseId) {
+        try {
+          await updateCourseStatus(courseId, 'present');
+        } catch (e) {
+          message.warning('Tạo điểm danh thành công nhưng cập nhật trạng thái khoá học thất bại!');
+        }
+      }
       message.success("Tạo điểm danh thành công!");
       onClose(true);
     } catch (err) {
@@ -211,6 +242,14 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           )
         )
       );
+      // Update course status to 'present' after attendance update
+      if (courseId) {
+        try {
+          await updateCourseStatus(courseId, 'present', token);
+        } catch (e) {
+          message.warning('Cập nhật điểm danh thành công nhưng cập nhật trạng thái khoá học thất bại!');
+        }
+      }
       message.success("Cập nhật điểm danh thành công!");
       onClose(true);
     } catch (err) {
@@ -353,6 +392,14 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     },
   ];
 
+  // Sắp xếp editRows theo studentId tăng dần trước khi render bảng sửa điểm danh
+  const sortedEditRows = [...editRows].sort((a, b) => {
+    // So sánh số sau 'stu' để đảm bảo đúng thứ tự số
+    const numA = parseInt(a.studentId.replace('stu', ''), 10);
+    const numB = parseInt(b.studentId.replace('stu', ''), 10);
+    return numA - numB;
+  });
+
   return (
     <Modal
       open={visible}
@@ -471,7 +518,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
               </Row>
               <Table
                 columns={getColumns(editRows, setEditRows, true)}
-                dataSource={editRows}
+                dataSource={sortedEditRows}
                 rowKey="studentId"
                 pagination={false}
                 bordered
@@ -484,7 +531,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                 </Button>
               </div>
             </TabPane>
-            <TabPane tab="Nhập điểm" key="score">
+            {/* <TabPane tab="Nhập điểm" key="score">
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
                 <span style={{ fontWeight: 600 }}>Môn học:</span>
                 <Select
@@ -528,7 +575,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                   Lưu điểm
                 </Button>
               </div>
-            </TabPane>
+            </TabPane> */}
           </Tabs>
         </Spin>
       </div>

@@ -26,11 +26,6 @@ const navItems = [
     label: "Dashboard",
   },
   {
-    key: "notify",
-    icon: <NotificationOutlined />,
-    label: "Thông Báo",
-  },
-  {
     key: "schedule",
     icon: <CalendarOutlined />,
     label: "Thời khóa biểu",

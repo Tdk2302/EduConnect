@@ -77,7 +77,9 @@ function MessageBubble({ from, text }) {
             position: "relative",
           }}
         >
-          {text}
+          {from === "bot" && Array.isArray(text)
+            ? text
+            : text}
         </Box>
       </Box>
     </Fade>
@@ -268,10 +270,19 @@ export default function ChatBox() {
     });
     try {
       const parentId = localStorage.getItem("parentId");
-      const res = await postChatBotAsk("P001", input);
-      console.log(parentId, input);
+      const userInfor = getUserInfo();
+      const res = await postChatBotAsk(parentId, input, userInfor.token);
+      console.log(res);
       const reply = res?.data?.reply || "Xin lỗi, tôi chưa hiểu ý bạn.";
-      const botMsg = { from: "bot", text: reply };
+      const botMsg = {
+        from: "bot",
+        text: reply.split("\n").map((line, index) => (
+          <span key={index}>
+            {line}
+            <br />
+          </span>
+        )),
+      };
       setMessages((msgs) => [...msgs, botMsg]);
       setChatHistory((prev) => {
         const updated = [...prev];
