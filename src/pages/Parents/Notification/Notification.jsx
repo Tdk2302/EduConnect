@@ -82,12 +82,11 @@ function NotificationItem({
   onMarkRead,
   onDelete,
   onArchive,
-  onShowDetail, // Thêm vào đây
+  onShowDetail,
   menuOpen,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
-  // Khởi tạo typeInfo
   const typeInfo = notificationTypes[notification.type];
   const typeColor = notificationTypes[notification.color];
 
@@ -240,7 +239,6 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] =
     useState(notifications);
-  // const [searchTerm, setSearchTerm] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [selectedType, setSelectedType] = useState("all");
   const [selectedPriority, setSelectedPriority] = useState("all");

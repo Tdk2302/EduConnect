@@ -65,7 +65,7 @@ const Homepage = () => {
                     className="signup-button"
                     onClick={() => navigate("/register")}
                   >
-                    Sign up for free
+                    Đăng ký
                   </StyledButton>
                   <StyledButton
                     variant="outlined"

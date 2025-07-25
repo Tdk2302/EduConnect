@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// const BASE_URL = "https://swd-backend-web.onrender.com/api";
+// const BASE_URL = "https://educonnect-qz6g.onrender.com/api";
 const BASE_URL = "https://localhost:7064/api";
 
 // ------------------ AUTH ------------------
@@ -218,6 +218,18 @@ const getAttendanceByCourse = async (courseId, token) => {
   });
 };
 
+const updateCourseStatus = async (courseId, status, token) => {
+  if (!token) token = getToken();
+  return axios.put(
+    `${BASE_URL}/Course/status`,
+    { courseId, status },
+    {
+      withCredentials: true,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+};
+
 const updateAttendance = async (attendanceData, token) => {
   if (!token) token = getToken();
   return axios.put(`${BASE_URL}/Attendance`, attendanceData, {
@@ -361,6 +373,7 @@ export {
   getAttendanceByCourse,
   updateAttendance,
   postScore,
+  updateCourseStatus,
   getScoresByCourse,
   updateScore,
   postReport,

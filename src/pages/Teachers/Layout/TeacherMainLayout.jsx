@@ -6,7 +6,7 @@ import {
   FileTextOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  LogoutOutlined
+  LogoutOutlined,
 } from "@ant-design/icons";
 import React, { useState } from "react";
 import TeacherDashboard from "../Dashboard/TeacherDashboard";
@@ -25,11 +25,11 @@ const navItems = [
     icon: <DashboardOutlined />,
     label: "Dashboard",
   },
-  {
-    key: "notify",
-    icon: <NotificationOutlined />,
-    label: "Thông Báo",
-  },
+  // {
+  //   key: "notify",
+  //   icon: <NotificationOutlined />,
+  //   label: "Thông Báo",
+  // },
   {
     key: "schedule",
     icon: <CalendarOutlined />,
@@ -88,9 +88,9 @@ export default function TeacherMainLayout() {
             bottom: 0,
             height: "100vh",
             zIndex: 100,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
           <div>
@@ -103,24 +103,48 @@ export default function TeacherMainLayout() {
                 justifyContent: collapsed ? "center" : "flex-start",
                 padding: collapsed ? "0" : "0 16px",
                 borderBottom: "1px solid #f0f1f2",
-                position: "relative"
+                position: "relative",
               }}
             >
               {collapsed ? (
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontWeight: 700, fontSize: 22, color: "#14448b", letterSpacing: 1 }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 22,
+                      color: "#14448b",
+                      letterSpacing: 1,
+                    }}
+                  >
                     E
                   </span>
-                  <span onClick={() => setCollapsed(!collapsed)} style={{ cursor: "pointer", fontSize: 20 }}>
+                  <span
+                    onClick={() => setCollapsed(!collapsed)}
+                    style={{ cursor: "pointer", fontSize: 20 }}
+                  >
                     <MenuUnfoldOutlined />
                   </span>
                 </div>
               ) : (
                 <>
-                  <span style={{ fontWeight: 700, fontSize: 22, color: "#14448b", letterSpacing: 1 }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: 22,
+                      color: "#14448b",
+                      letterSpacing: 1,
+                    }}
+                  >
                     EduConnect
                   </span>
-                  <span onClick={() => setCollapsed(!collapsed)} style={{ cursor: "pointer", fontSize: 20, marginLeft: "auto" }}>
+                  <span
+                    onClick={() => setCollapsed(!collapsed)}
+                    style={{
+                      cursor: "pointer",
+                      fontSize: 20,
+                      marginLeft: "auto",
+                    }}
+                  >
                     <MenuFoldOutlined />
                   </span>
                 </>
@@ -129,7 +153,12 @@ export default function TeacherMainLayout() {
             <Menu
               mode="inline"
               selectedKeys={[selected]}
-              style={{ borderRight: 0, fontWeight: 600, fontSize: 16, marginTop: 8 }}
+              style={{
+                borderRight: 0,
+                fontWeight: 600,
+                fontSize: 16,
+                marginTop: 8,
+              }}
               items={navItems.map((item) => ({
                 key: item.key,
                 icon: item.icon,
@@ -141,33 +170,74 @@ export default function TeacherMainLayout() {
           {/* Sidebar Footer: User Info above, Logout at the very bottom */}
           <div
             style={{
-              width: '100%',
+              width: "100%",
               padding: collapsed ? 8 : 16,
-              borderTop: '1px solid #f0f1f2',
-              background: '#fff',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
+              borderTop: "1px solid #f0f1f2",
+              background: "#fff",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               gap: collapsed ? 12 : 8,
               marginBottom: 0,
               minHeight: collapsed ? 100 : 80,
-              justifyContent: 'center',
+              justifyContent: "center",
             }}
           >
-            <Avatar size={collapsed ? 32 : 36} style={{ backgroundColor: "#2563eb" }}>
+            <Avatar
+              size={collapsed ? 32 : 36}
+              style={{ backgroundColor: "#2563eb" }}
+            >
               {user?.fullName ? user.fullName[0] : "U"}
             </Avatar>
             {!collapsed && (
-              <div style={{ lineHeight: 1.1, flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <Text strong style={{ fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.fullName || "Teacher"}</Text>
-                <Text type="secondary" style={{ fontSize: 12, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email || ""}</Text>
+              <div
+                style={{
+                  lineHeight: 1.1,
+                  flex: 1,
+                  minWidth: 0,
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <Text
+                  strong
+                  style={{
+                    fontSize: 15,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {user?.fullName || "Teacher"}
+                </Text>
+                <Text
+                  type="secondary"
+                  style={{
+                    fontSize: 12,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {user?.email || ""}
+                </Text>
               </div>
             )}
             <Button
               type="text"
               icon={<LogoutOutlined style={{ color: "#e11d48" }} />}
-              style={{ color: "#e11d48", fontWeight: 600, width: collapsed ? undefined : '100%' }}
-              onClick={() => { logoutUser(); navigate("/signin"); }}
+              style={{
+                color: "#e11d48",
+                fontWeight: 600,
+                width: collapsed ? undefined : "100%",
+              }}
+              onClick={() => {
+                logoutUser();
+                navigate("/signin");
+              }}
             >
               {!collapsed && "Đăng xuất"}
             </Button>
@@ -177,16 +247,32 @@ export default function TeacherMainLayout() {
           style={{
             marginLeft: siderWidth,
             minHeight: "100vh",
-            transition: 'margin-left 0.3s cubic-bezier(0.4,0,0.2,1)',
+            transition: "margin-left 0.3s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
-          <Content style={{ margin: 0, background: "#f7faff", minHeight: "100vh", padding: 0 }}>
+          <Content
+            style={{
+              margin: 0,
+              background: "#f7faff",
+              minHeight: "100vh",
+              padding: 0,
+            }}
+          >
             {content}
           </Content>
         </Layout>
       </Layout>
       {/* Simple page footer */}
-      <div style={{ width: '100%', textAlign: 'center', padding: 16, background: '#f8fafc', color: '#888', fontSize: 14 }}>
+      <div
+        style={{
+          width: "100%",
+          textAlign: "center",
+          padding: 16,
+          background: "#f8fafc",
+          color: "#888",
+          fontSize: 14,
+        }}
+      >
         © {new Date().getFullYear()} EduConnect. All rights reserved.
       </div>
     </>

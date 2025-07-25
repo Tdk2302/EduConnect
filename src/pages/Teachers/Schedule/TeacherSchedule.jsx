@@ -48,6 +48,8 @@ function getWeekDates(date) {
 }
 
 const STATUS_COLORS = {
+  present: { bg: "#bbf7d0", color: "#16a34a" }, // green
+  unpresent: { bg: "#f3f4f6", color: "#64748b" }, // gray
   "On-going": { bg: "#e0f2fe", color: "#0284c7" },
   Finished: { bg: "#fee2e2", color: "#dc2626" },
   Canceled: { bg: "#fef9c3", color: "#eab308" },
@@ -57,6 +59,10 @@ const STATUS_COLORS = {
 
 const getStatusText = (status) => {
   switch (status) {
+    case "present":
+      return "Đã điểm danh";
+    case "unpresent":
+      return "Chưa điểm danh";
     case "On-going":
       return "Đang diễn ra";
     case "Finished":
@@ -87,6 +93,17 @@ function getSlotNameByTime(startTime) {
   return "Slot 1";
 }
 
+// Helper: format time as HH:mm in local time
+function formatTimeLocal(dateString) {
+  if (!dateString) return "";
+  const d = new Date(dateString);
+  return d.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
 const TeacherSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -97,6 +114,7 @@ const TeacherSchedule = () => {
   const [attendanceModal, setAttendanceModal] = useState({
     open: false,
     courseId: null,
+    classId: null,
   });
 
   useEffect(() => {
@@ -112,9 +130,7 @@ const TeacherSchedule = () => {
           return;
         }
         // Lấy thông tin giáo viên
-        const teacherRes = await getTeacherDetail(
-          userInfo.userId
-        );
+        const teacherRes = await getTeacherDetail(userInfo.userId);
         const teacher = teacherRes.data;
         setTeacherInfo(teacher);
         if (!teacher.teacherId) {
@@ -142,7 +158,7 @@ const TeacherSchedule = () => {
         courses.forEach((course) => {
           // Lấy ngày của course (dd/MM)
           const courseDate = course.startTime
-            ? new Date(course.startTime + "Z")
+            ? new Date(course.startTime)
             : null;
           if (!courseDate) return;
           const dateStr = courseDate.toLocaleDateString("en-GB", {
@@ -157,7 +173,7 @@ const TeacherSchedule = () => {
               subject: course.subjectName ?? null,
               subjectCode: course.subjectId || "-",
               class: course.classId || "-",
-              time: `${course.startTime ? new Date(course.startTime + "Z").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""} - ${course.endTime ? new Date(course.endTime + "Z").toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}`,
+              time: `${formatTimeLocal(course.startTime)} - ${formatTimeLocal(course.endTime)}`,
               status: course.status || "nostatus",
               courseId: course.courseId,
             });
@@ -309,6 +325,7 @@ const TeacherSchedule = () => {
                                     setAttendanceModal({
                                       open: true,
                                       courseId: data.courseId,
+                                      classId: data.class,
                                     })
                                   }
                                   title="Bấm để điểm danh"
@@ -349,8 +366,11 @@ const TeacherSchedule = () => {
       </Spin>
       <AttendancePage
         courseId={attendanceModal.courseId}
+        classId={attendanceModal.classId}
         visible={attendanceModal.open}
-        onClose={() => setAttendanceModal({ open: false, courseId: null })}
+        onClose={() =>
+          setAttendanceModal({ open: false, courseId: null, classId: null })
+        }
       />
     </div>
   );

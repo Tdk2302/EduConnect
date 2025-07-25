@@ -1,7 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Table, Input, Select, Button, Spin, Alert, message, Tabs, Row, Col } from "antd";
-import { UserOutlined, CheckCircleOutlined, EditOutlined, BookOutlined, StarFilled } from "@ant-design/icons";
+import {
+  Modal,
+  Table,
+  Input,
+  Select,
+  Button,
+  Spin,
+  Alert,
+  message,
+  Tabs,
+  Row,
+  Col,
+} from "antd";
+import {
+  UserOutlined,
+  CheckCircleOutlined,
+  EditOutlined,
+  BookOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import { getToken } from "../../../services/apiServices";
+import { updateCourseStatus } from "../../../services/apiServices";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,89 +31,108 @@ const HOMEWORK_OPTIONS = [
   "Hoàn thành bài tốt",
   "Có chuẩn bị bài",
   "Cần cải thiện điểm",
-  "Chưa chuẩn bị bài"
+  "Chưa chuẩn bị bài",
 ];
-const FOCUS_OPTIONS = [
-  "Tốt",
-  "Rất tốt",
-  "Trung Bình",
-  "Kém"
-];
-const PARTICIPATION_OPTIONS = [
-  "Vắng mặt",
-  "Có mặt",
-  "Đi trễ"
-];
+const FOCUS_OPTIONS = ["Tốt", "Rất tốt", "Trung Bình", "Kém"];
+const PARTICIPATION_OPTIONS = ["Vắng mặt", "Có mặt", "Đi muộn"];
 const STUDENT_IDS = [
-  "stu001", "stu002", "stu003", "stu004",
-  "stu005", "stu006", "stu007", "stu008"
+  "stu001",
+  "stu002",
+  "stu003",
+  "stu004",
+  "stu005",
+  "stu006",
+  "stu007",
+  "stu008",
 ];
 
 // Danh sách học sinh theo từng lớp
 const STUDENTS_BY_CLASS = {
   class01: [
-    { studentId: 'stu001', name: 'Nguyễn Văn A', dob: '2010-05-15', classId: 'class01', parentId: 'P001' },
-    { studentId: 'stu002', name: 'Trần Thị B', dob: '2011-08-20', classId: 'class01', parentId: 'P001' },
-    { studentId: 'stu003', name: 'Lê Hoàng C', dob: '2010-12-01', classId: 'class01', parentId: null },
-    { studentId: 'stu004', name: 'Phạm Minh D', dob: '2011-03-30', classId: 'class01', parentId: null },
-    { studentId: 'stu005', name: 'Đỗ Nhật E', dob: '2012-07-09', classId: 'class01', parentId: null },
-    { studentId: 'stu006', name: 'Ngô Thị F', dob: '2010-10-12', classId: 'class01', parentId: null },
-    { studentId: 'stu007', name: 'Bùi Văn G', dob: '2011-11-21', classId: 'class01', parentId: null },
-    { studentId: 'stu008', name: 'Hoàng Mai H', dob: '2010-01-05', classId: 'class01', parentId: null },
-    { studentId: 'stu009', name: 'Tạ Công I', dob: '2011-06-09', classId: 'class01', parentId: null },
-    { studentId: 'stu010', name: 'Lý Minh J', dob: '2012-03-18', classId: 'class01', parentId: null },
+    { studentId: "stu001" },
+    { studentId: "stu002" },
+    { studentId: "stu003" },
+    { studentId: "stu004" },
+    { studentId: "stu005" },
+    { studentId: "stu006" },
+    { studentId: "stu007" },
+    { studentId: "stu008" },
+    { studentId: "stu009" },
+    { studentId: "stu010" },
   ],
   class02: [
-    { studentId: 'stu011', name: 'Trịnh Quốc K', dob: '2009-07-22', classId: 'class02', parentId: null },
-    { studentId: 'stu012', name: 'Vũ Thị L', dob: '2009-04-17', classId: 'class02', parentId: null },
-    { studentId: 'stu013', name: 'Nguyễn Gia M', dob: '2009-12-10', classId: 'class02', parentId: null },
-    { studentId: 'stu014', name: 'Đặng Hải N', dob: '2010-02-02', classId: 'class02', parentId: null },
-    { studentId: 'stu015', name: 'Lương Thị O', dob: '2009-11-29', classId: 'class02', parentId: null },
-    { studentId: 'stu016', name: 'Tô Văn P', dob: '2009-06-15', classId: 'class02', parentId: null },
-    { studentId: 'stu017', name: 'Dương Thị Q', dob: '2009-09-08', classId: 'class02', parentId: null },
-    { studentId: 'stu018', name: 'Phan Đình R', dob: '2010-01-26', classId: 'class02', parentId: null },
-    { studentId: 'stu019', name: 'Mai Nhật S', dob: '2009-03-30', classId: 'class02', parentId: null },
-    { studentId: 'stu020', name: 'Huỳnh Thị T', dob: '2009-05-07', classId: 'class02', parentId: null },
+    { studentId: "stu011" },
+    { studentId: "stu012" },
+    { studentId: "stu013" },
+    { studentId: "stu014" },
+    { studentId: "stu015" },
+    { studentId: "stu016" },
+    { studentId: "stu017" },
+    { studentId: "stu018" },
+    { studentId: "stu019" },
+    { studentId: "stu020" },
   ],
   class03: [
-    { studentId: 'stu021', name: 'Trần Lâm U', dob: '2008-04-11', classId: 'class03', parentId: null },
-    { studentId: 'stu022', name: 'Nguyễn Hồng V', dob: '2008-06-25', classId: 'class03', parentId: null },
-    { studentId: 'stu023', name: 'Hoàng Văn W', dob: '2008-10-30', classId: 'class03', parentId: null },
-    { studentId: 'stu024', name: 'Phạm Thị X', dob: '2008-02-14', classId: 'class03', parentId: null },
-    { studentId: 'stu025', name: 'Lê Minh Y', dob: '2008-07-03', classId: 'class03', parentId: null },
-    { studentId: 'stu026', name: 'Bùi Thanh Z', dob: '2008-12-28', classId: 'class03', parentId: null },
-    { studentId: 'stu027', name: 'Nguyễn Hải AA', dob: '2008-01-19', classId: 'class03', parentId: null },
-    { studentId: 'stu028', name: 'Trịnh Quốc AB', dob: '2008-09-06', classId: 'class03', parentId: null },
-    { studentId: 'stu029', name: 'Vũ Thị AC', dob: '2008-03-13', classId: 'class03', parentId: null },
-    { studentId: 'stu030', name: 'Đặng Minh AD', dob: '2008-05-23', classId: 'class03', parentId: null },
+    { studentId: "stu021" },
+    { studentId: "stu022" },
+    { studentId: "stu023" },
+    { studentId: "stu024" },
+    { studentId: "stu025" },
+    { studentId: "stu026" },
+    { studentId: "stu027" },
+    { studentId: "stu028" },
+    { studentId: "stu029" },
+    { studentId: "stu030" },
+  ],
+  class04: [
+    { studentId: "stu031" },
+    { studentId: "stu032" },
+    { studentId: "stu033" },
+    { studentId: "stu034" },
+    { studentId: "stu035" },
+    { studentId: "stu036" },
+    { studentId: "stu037" },
+    { studentId: "stu038" },
+    { studentId: "stu039" },
+    { studentId: "stu040" },
+  ],
+  class05: [
+    { studentId: "stu041" },
+    { studentId: "stu042" },
+    { studentId: "stu043" },
+    { studentId: "stu044" },
+    { studentId: "stu045" },
+    { studentId: "stu046" },
+    { studentId: "stu047" },
+    { studentId: "stu048" },
+    { studentId: "stu049" },
+    { studentId: "stu050" },
   ],
 };
 
-// Xác định classId từ courseId (giả định courseId có dạng chứa classId, hoặc cần truyền classId vào AttendancePage)
 function getClassIdFromCourse(courseId) {
-  if (!courseId) return 'class01';
-  if (courseId.toLowerCase().includes('class01')) return 'class01';
-  if (courseId.toLowerCase().includes('class02')) return 'class02';
-  if (courseId.toLowerCase().includes('class03')) return 'class03';
-  return 'class01';
+  if (!courseId) return "class01";
+  if (courseId.toLowerCase().includes("class01")) return "class01";
+  if (courseId.toLowerCase().includes("class02")) return "class02";
+  if (courseId.toLowerCase().includes("class03")) return "class03";
+  return "class01";
 }
 
-// Thêm danh sách môn học
 const SUBJECTS = [
-  { label: 'Toán', value: 'SUB001' },
-  { label: 'Văn', value: 'SUB002' },
-  { label: 'Tiếng Anh', value: 'SUB003' },
-  { label: 'Lý', value: 'SUB004' },
-  { label: 'Hóa', value: 'SUB005' },
+  { label: "Toán", value: "SUB001" },
+  { label: "Văn", value: "SUB002" },
+  { label: "Tiếng Anh", value: "SUB003" },
+  { label: "Lý", value: "SUB004" },
+  { label: "Hóa", value: "SUB005" },
 ];
 
-const AttendancePage = ({ courseId, visible, onClose }) => {
+const AttendancePage = ({ courseId, classId, visible, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState([]); // danh sách attendance đã có
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState("create");
-  const [scoreTabSubject, setScoreTabSubject] = useState('SUB001');
+  const [scoreTabSubject, setScoreTabSubject] = useState("SUB001");
   const [scoreRows, setScoreRows] = useState([]); // {studentId, name, score1}
   const [savingScore, setSavingScore] = useState(false);
   const [createRows, setCreateRows] = useState([]); // học sinh chưa có attendance
@@ -118,39 +156,50 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
         setData(attendances);
         // Phân loại học sinh đã/ chưa có attendance
         const attendedIds = attendances
-          .filter(a => a.participation || a.note || a.homework || a.focus)
-          .map(a => a.studentId);
-        // Lấy danh sách học sinh theo class
-        const classId = getClassIdFromCourse(courseId);
-        const students = STUDENTS_BY_CLASS[classId] || [];
+          .filter((a) => a.participation || a.note || a.homework || a.focus)
+          .map((a) => a.studentId);
+        // Lấy danh sách học sinh theo class (ưu tiên prop classId nếu có)
+        const usedClassId = classId || getClassIdFromCourse(courseId);
+        const students = STUDENTS_BY_CLASS[usedClassId] || [];
         setEditRows(
-          attendances.filter(a => attendedIds.includes(a.studentId))
+          attendances.filter((a) => attendedIds.includes(a.studentId))
         );
         setCreateRows(
-          students.filter(stu => !attendedIds.includes(stu.studentId)).map(stu => ({
-            studentId: stu.studentId,
-            participation: "",
-            note: "",
-            homework: "",
-            focus: ""
-          }))
+          students
+            .filter((stu) => !attendedIds.includes(stu.studentId))
+            .map((stu) => ({
+              studentId: stu.studentId,
+              participation: "",
+              note: "",
+              homework: "",
+              focus: "",
+            }))
         );
         // Chuẩn bị dữ liệu nhập điểm
         setScoreRows(
-          students.map(stu => ({ studentId: stu.studentId, name: stu.name, score1: '' }))
+          students.map((stu) => ({
+            studentId: stu.studentId,
+            name: stu.name,
+            score1: "",
+          }))
         );
       } catch (err) {
-        setError("Lỗi khi tải dữ liệu điểm danh: " + (err?.response?.data?.message || err.message));
+        setError(
+          "Lỗi khi tải dữ liệu điểm danh: " +
+            (err?.response?.data?.message || err.message)
+        );
       } finally {
         setLoading(false);
       }
     };
     fetchAttendance();
-  }, [courseId, visible]);
+  }, [courseId, visible, classId]);
 
   // Xử lý thay đổi cho từng dòng
   const handleChange = (rows, setRows, idx, field, value) => {
-    setRows(prev => prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row)));
+    setRows((prev) =>
+      prev.map((row, i) => (i === idx ? { ...row, [field]: value } : row))
+    );
   };
 
   // POST cho học sinh chưa có attendance
@@ -161,7 +210,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       const token = getToken();
       await axios.post(
         `https://localhost:7064/api/Attendance`,
-        createRows.map(row => ({
+        createRows.map((row) => ({
           atID: "",
           studentId: row.studentId,
           courseId: courseId,
@@ -175,11 +224,27 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
+
+      if (courseId) {
+        try {
+          await updateCourseStatus(courseId, "present");
+        } catch (e) {
+          message.warning(
+            "Tạo điểm danh thành công nhưng cập nhật trạng thái khoá học thất bại!"
+          );
+        }
+      }
       message.success("Tạo điểm danh thành công!");
       onClose(true);
     } catch (err) {
-      setError("Lỗi khi tạo điểm danh: " + (err?.response?.data?.message || err.message));
-      message.error("Lỗi khi tạo điểm danh: " + (err?.response?.data?.message || err.message));
+      setError(
+        "Lỗi khi tạo điểm danh: " +
+          (err?.response?.data?.message || err.message)
+      );
+      message.error(
+        "Lỗi khi tạo điểm danh: " +
+          (err?.response?.data?.message || err.message)
+      );
     } finally {
       setSaving(false);
     }
@@ -192,7 +257,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     try {
       const token = getToken();
       await Promise.all(
-        editRows.map(row =>
+        editRows.map((row) =>
           axios.put(
             `https://localhost:7064/api/Attendance`,
             {
@@ -211,11 +276,27 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
           )
         )
       );
+      // Update course status to 'present' after attendance update
+      if (courseId) {
+        try {
+          await updateCourseStatus(courseId, "present", token);
+        } catch (e) {
+          message.warning(
+            "Cập nhật điểm danh thành công nhưng cập nhật trạng thái khoá học thất bại!"
+          );
+        }
+      }
       message.success("Cập nhật điểm danh thành công!");
       onClose(true);
     } catch (err) {
-      setError("Lỗi khi lưu điểm danh: " + (err?.response?.data?.message || err.message));
-      message.error("Lỗi khi lưu điểm danh: " + (err?.response?.data?.message || err.message));
+      setError(
+        "Lỗi khi lưu điểm danh: " +
+          (err?.response?.data?.message || err.message)
+      );
+      message.error(
+        "Lỗi khi lưu điểm danh: " +
+          (err?.response?.data?.message || err.message)
+      );
     } finally {
       setSaving(false);
     }
@@ -223,16 +304,26 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
 
   // Hàm áp dụng giá trị cho tất cả các dòng
   const applyAll = (rows, setRows, values) => {
-    setRows(prev => prev.map(row => ({ ...row, ...values })));
+    setRows((prev) => prev.map((row) => ({ ...row, ...values })));
   };
 
   // State cho control áp dụng tất cả
-  const [bulkCreate, setBulkCreate] = useState({ participation: '', homework: '', focus: '' });
-  const [bulkEdit, setBulkEdit] = useState({ participation: '', homework: '', focus: '' });
+  const [bulkCreate, setBulkCreate] = useState({
+    participation: "",
+    homework: "",
+    focus: "",
+  });
+  const [bulkEdit, setBulkEdit] = useState({
+    participation: "",
+    homework: "",
+    focus: "",
+  });
 
   // Xử lý thay đổi điểm số
   const handleScoreChange = (idx, value) => {
-    setScoreRows(prev => prev.map((row, i) => i === idx ? { ...row, score1: value } : row));
+    setScoreRows((prev) =>
+      prev.map((row, i) => (i === idx ? { ...row, score1: value } : row))
+    );
   };
 
   // Gửi điểm lên API
@@ -242,7 +333,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     try {
       const token = getToken();
       await Promise.all(
-        scoreRows.map(row =>
+        scoreRows.map((row) =>
           axios.post(
             `https://localhost:7064/api/Score`,
             {
@@ -258,10 +349,14 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
         )
       );
       message.success("Lưu điểm thành công!");
-      setTab('create');
+      setTab("create");
     } catch (err) {
-      setError("Lỗi khi lưu điểm: " + (err?.response?.data?.message || err.message));
-      message.error("Lỗi khi lưu điểm: " + (err?.response?.data?.message || err.message));
+      setError(
+        "Lỗi khi lưu điểm: " + (err?.response?.data?.message || err.message)
+      );
+      message.error(
+        "Lỗi khi lưu điểm: " + (err?.response?.data?.message || err.message)
+      );
     } finally {
       setSavingScore(false);
     }
@@ -270,21 +365,33 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
   // Cột chung cho cả 2 tab
   const getColumns = (rows, setRows, isEdit) => [
     {
-      title: <span><UserOutlined style={{ color: '#2563eb', marginRight: 6 }} />Mã học sinh</span>,
+      title: (
+        <span>
+          <UserOutlined style={{ color: "#2563eb", marginRight: 6 }} />
+          Mã học sinh
+        </span>
+      ),
       dataIndex: "studentId",
       key: "studentId",
       align: "center",
       width: 120,
     },
     {
-      title: <span><CheckCircleOutlined style={{ color: '#10B981', marginRight: 6 }} />Tham gia</span>,
+      title: (
+        <span>
+          <CheckCircleOutlined style={{ color: "#10B981", marginRight: 6 }} />
+          Tham gia
+        </span>
+      ),
       dataIndex: "participation",
       key: "participation",
       align: "center",
       render: (text, row, idx) => (
         <Select
           value={text}
-          onChange={(value) => handleChange(rows, setRows, idx, "participation", value)}
+          onChange={(value) =>
+            handleChange(rows, setRows, idx, "participation", value)
+          }
           style={{ width: 180 }}
           placeholder="Chọn trạng thái"
         >
@@ -297,29 +404,49 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       ),
     },
     {
-      title: <span><EditOutlined style={{ color: '#f59e0b', marginRight: 6 }} />Ghi chú</span>,
+      title: (
+        <span>
+          <EditOutlined style={{ color: "#f59e0b", marginRight: 6 }} />
+          Ghi chú
+        </span>
+      ),
       dataIndex: "note",
       key: "note",
       align: "center",
       render: (text, row, idx) => (
         <Input.TextArea
           value={text}
-          onChange={(e) => handleChange(rows, setRows, idx, "note", e.target.value)}
+          onChange={(e) =>
+            handleChange(rows, setRows, idx, "note", e.target.value)
+          }
           placeholder="Nhập ghi chú"
           autoSize={false}
-          style={{ resize: 'none', minWidth: 180, maxWidth: 220, minHeight: 32, height: 32 }}
+          style={{
+            resize: "none",
+            minWidth: 180,
+            maxWidth: 220,
+            minHeight: 32,
+            height: 32,
+          }}
         />
       ),
     },
     {
-      title: <span><BookOutlined style={{ color: '#6366f1', marginRight: 6 }} />Bài tập về nhà</span>,
+      title: (
+        <span>
+          <BookOutlined style={{ color: "#6366f1", marginRight: 6 }} />
+          Bài tập về nhà
+        </span>
+      ),
       dataIndex: "homework",
       key: "homework",
       align: "center",
       render: (text, row, idx) => (
         <Select
           value={text}
-          onChange={(value) => handleChange(rows, setRows, idx, "homework", value)}
+          onChange={(value) =>
+            handleChange(rows, setRows, idx, "homework", value)
+          }
           style={{ width: 180 }}
           placeholder="Chọn trạng thái bài tập"
         >
@@ -332,7 +459,12 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
       ),
     },
     {
-      title: <span><StarFilled style={{ color: '#facc15', marginRight: 6 }} />Tập trung</span>,
+      title: (
+        <span>
+          <StarFilled style={{ color: "#facc15", marginRight: 6 }} />
+          Tập trung
+        </span>
+      ),
       dataIndex: "focus",
       key: "focus",
       align: "center",
@@ -353,20 +485,37 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
     },
   ];
 
+  // Sắp xếp editRows theo studentId tăng dần trước khi render bảng sửa điểm danh
+  const sortedEditRows = [...editRows].sort((a, b) => {
+    // So sánh số sau 'stu' để đảm bảo đúng thứ tự số
+    const numA = parseInt(a.studentId.replace("stu", ""), 10);
+    const numB = parseInt(b.studentId.replace("stu", ""), 10);
+    return numA - numB;
+  });
+
   return (
     <Modal
       open={visible}
       onCancel={() => onClose(false)}
-      title={<span style={{ fontWeight: 700, color: '#2563eb', fontSize: 20 }}>Điểm danh lớp học</span>}
+      title={
+        <span style={{ fontWeight: 700, color: "#2563eb", fontSize: 20 }}>
+          Điểm danh lớp học
+        </span>
+      }
       width={1200}
       footer={null}
-      bodyStyle={{ padding: 24, background: '#f8fafc', borderRadius: 12 }}
+      bodyStyle={{ padding: 24, background: "#f8fafc", borderRadius: 12 }}
       style={{ top: 40 }}
       destroyOnClose
     >
-      {error && <Alert type="error" message={error} style={{ marginBottom: 16 }} />}
-      <div style={{ maxHeight: 600, overflow: 'auto' }}>
-        <Spin spinning={loading || saving} tip={saving ? "Đang lưu..." : "Đang tải..."}>
+      {error && (
+        <Alert type="error" message={error} style={{ marginBottom: 16 }} />
+      )}
+      <div style={{ maxHeight: 600, overflow: "auto" }}>
+        <Spin
+          spinning={loading || saving}
+          tip={saving ? "Đang lưu..." : "Đang tải..."}
+        >
           <Tabs activeKey={tab} onChange={setTab} style={{ marginBottom: 16 }}>
             <TabPane tab="Tạo điểm danh" key="create">
               {/* Control áp dụng tất cả */}
@@ -374,38 +523,61 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                 <Col>
                   <Select
                     value={bulkCreate.participation}
-                    onChange={v => setBulkCreate(b => ({ ...b, participation: v }))}
+                    onChange={(v) =>
+                      setBulkCreate((b) => ({ ...b, participation: v }))
+                    }
                     style={{ width: 150 }}
                     placeholder="Tham gia (tất cả)"
                   >
-                    {PARTICIPATION_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {PARTICIPATION_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Select
                     value={bulkCreate.homework}
-                    onChange={v => setBulkCreate(b => ({ ...b, homework: v }))}
+                    onChange={(v) =>
+                      setBulkCreate((b) => ({ ...b, homework: v }))
+                    }
                     style={{ width: 170 }}
                     placeholder="Bài tập (tất cả)"
                   >
-                    {HOMEWORK_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {HOMEWORK_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Select
                     value={bulkCreate.focus}
-                    onChange={v => setBulkCreate(b => ({ ...b, focus: v }))}
+                    onChange={(v) => setBulkCreate((b) => ({ ...b, focus: v }))}
                     style={{ width: 150 }}
                     placeholder="Tập trung (tất cả)"
                   >
-                    {FOCUS_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {FOCUS_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Button
-                    onClick={() => applyAll(createRows, setCreateRows, bulkCreate)}
+                    onClick={() =>
+                      applyAll(createRows, setCreateRows, bulkCreate)
+                    }
                     type="primary"
-                    disabled={createRows.length === 0 || (!bulkCreate.participation && !bulkCreate.homework && !bulkCreate.focus)}
+                    disabled={
+                      createRows.length === 0 ||
+                      (!bulkCreate.participation &&
+                        !bulkCreate.homework &&
+                        !bulkCreate.focus)
+                    }
                   >
                     Áp dụng cho tất cả
                   </Button>
@@ -417,11 +589,17 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                 rowKey="studentId"
                 pagination={false}
                 bordered
-                style={{ background: '#fff', borderRadius: 12 }}
+                style={{ background: "#fff", borderRadius: 12 }}
                 scroll={{ y: 350 }}
               />
-              <div style={{ textAlign: 'right', marginTop: 24 }}>
-                <Button type="primary" onClick={handleCreate} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={createRows.length === 0}>
+              <div style={{ textAlign: "right", marginTop: 24 }}>
+                <Button
+                  type="primary"
+                  onClick={handleCreate}
+                  loading={saving}
+                  style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}
+                  disabled={createRows.length === 0}
+                >
                   Tạo điểm danh
                 </Button>
               </div>
@@ -432,38 +610,59 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                 <Col>
                   <Select
                     value={bulkEdit.participation}
-                    onChange={v => setBulkEdit(b => ({ ...b, participation: v }))}
+                    onChange={(v) =>
+                      setBulkEdit((b) => ({ ...b, participation: v }))
+                    }
                     style={{ width: 150 }}
                     placeholder="Tham gia (tất cả)"
                   >
-                    {PARTICIPATION_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {PARTICIPATION_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Select
                     value={bulkEdit.homework}
-                    onChange={v => setBulkEdit(b => ({ ...b, homework: v }))}
+                    onChange={(v) =>
+                      setBulkEdit((b) => ({ ...b, homework: v }))
+                    }
                     style={{ width: 170 }}
                     placeholder="Bài tập (tất cả)"
                   >
-                    {HOMEWORK_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {HOMEWORK_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Select
                     value={bulkEdit.focus}
-                    onChange={v => setBulkEdit(b => ({ ...b, focus: v }))}
+                    onChange={(v) => setBulkEdit((b) => ({ ...b, focus: v }))}
                     style={{ width: 150 }}
                     placeholder="Tập trung (tất cả)"
                   >
-                    {FOCUS_OPTIONS.map(opt => <Option key={opt} value={opt}>{opt}</Option>)}
+                    {FOCUS_OPTIONS.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col>
                   <Button
                     onClick={() => applyAll(editRows, setEditRows, bulkEdit)}
                     type="primary"
-                    disabled={editRows.length === 0 || (!bulkEdit.participation && !bulkEdit.homework && !bulkEdit.focus)}
+                    disabled={
+                      editRows.length === 0 ||
+                      (!bulkEdit.participation &&
+                        !bulkEdit.homework &&
+                        !bulkEdit.focus)
+                    }
                   >
                     Áp dụng cho tất cả
                   </Button>
@@ -471,20 +670,26 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
               </Row>
               <Table
                 columns={getColumns(editRows, setEditRows, true)}
-                dataSource={editRows}
+                dataSource={sortedEditRows}
                 rowKey="studentId"
                 pagination={false}
                 bordered
-                style={{ background: '#fff', borderRadius: 12 }}
+                style={{ background: "#fff", borderRadius: 12 }}
                 scroll={{ y: 350 }}
               />
-              <div style={{ textAlign: 'right', marginTop: 24 }}>
-                <Button type="primary" onClick={handleSave} loading={saving} style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }} disabled={editRows.length === 0}>
+              <div style={{ textAlign: "right", marginTop: 24 }}>
+                <Button
+                  type="primary"
+                  onClick={handleSave}
+                  loading={saving}
+                  style={{ minWidth: 120, fontWeight: 600, fontSize: 16 }}
+                  disabled={editRows.length === 0}
+                >
                   Lưu điểm danh
                 </Button>
               </div>
             </TabPane>
-            <TabPane tab="Nhập điểm" key="score">
+            {/* <TabPane tab="Nhập điểm" key="score">
               <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
                 <span style={{ fontWeight: 600 }}>Môn học:</span>
                 <Select
@@ -528,7 +733,7 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
                   Lưu điểm
                 </Button>
               </div>
-            </TabPane>
+            </TabPane> */}
           </Tabs>
         </Spin>
       </div>
@@ -536,4 +741,4 @@ const AttendancePage = ({ courseId, visible, onClose }) => {
   );
 };
 
-export default AttendancePage; 
+export default AttendancePage;

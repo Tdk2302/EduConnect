@@ -318,7 +318,6 @@ export default function TeacherDashboard({ setSelected }) {
 
       {/* Analytics Section */}
 
-
       {/* Lịch dạy hôm nay và Phân tích môn học, full width of content, edge to edge, no maxWidth */}
       <Grid container spacing={2} mb={2} alignItems="stretch" justifyContent="center" style={{ width: '100%' }}>
         <Grid item xs={12} md={6} style={{ width: '50%' }}>
