@@ -116,6 +116,8 @@ const TeacherSchedule = () => {
     courseId: null,
     classId: null,
   });
+  // Thêm state reload để trigger fetch lại dữ liệu
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -140,10 +142,8 @@ const TeacherSchedule = () => {
           return;
         }
         const teacherID = teacher.teacherId;
-        console.log(teacherID);
         // Lấy lịch dạy
         const scheduleRes = await getTeacherCourses(teacherID);
-        console.log(scheduleRes);
         let courses = Array.isArray(scheduleRes.data) ? scheduleRes.data : [];
         // Mapping dữ liệu thành lưới slot/ngày, mỗi ô là mảng course
         const grid = {};
@@ -195,7 +195,7 @@ const TeacherSchedule = () => {
     };
     fetchData();
     // eslint-disable-next-line
-  }, [selectedWeek]);
+  }, [selectedWeek, reload]);
 
   const handleWeekChange = (direction) => {
     const newDate = new Date(currentDate);
@@ -368,9 +368,10 @@ const TeacherSchedule = () => {
         courseId={attendanceModal.courseId}
         classId={attendanceModal.classId}
         visible={attendanceModal.open}
-        onClose={() =>
-          setAttendanceModal({ open: false, courseId: null, classId: null })
-        }
+        onClose={(shouldReload) => {
+          setAttendanceModal({ open: false, courseId: null, classId: null });
+          if (shouldReload) setReload((r) => !r);
+        }}
       />
     </div>
   );
