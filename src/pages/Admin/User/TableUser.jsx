@@ -1,10 +1,23 @@
 import React from "react";
 import { Table, Avatar, Button, Tag, Space } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined, SyncOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 
-const AVATAR_URL = "https://randomuser.me/api/portraits/men/32.jpg";
+const AVATAR_URL =
+  "https://cdn2.fptshop.com.vn/small/avatar_trang_1_cd729c335b.jpg";
 
-function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingEdit }) {
+function TableUser({
+  listUsers,
+  onView,
+  onEdit,
+  onDelete,
+  onChangeRole,
+  loadingEdit,
+}) {
   const columns = [
     {
       title: "Họ tên",
@@ -25,7 +38,17 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingE
       dataIndex: "role",
       key: "role",
       render: (role) => (
-        <Tag color={role === "Admin" ? "blue" : role === "Teacher" ? "purple" : "default"}>{role}</Tag>
+        <Tag
+          color={
+            role === "Admin"
+              ? "blue"
+              : role === "Teacher"
+                ? "purple"
+                : "default"
+          }
+        >
+          {role}
+        </Tag>
       ),
       align: "center",
     },
@@ -45,12 +68,22 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingE
       dataIndex: "status",
       key: "status",
       render: (status, user) => (
-        <Tag color={
-          status === "Active" || status === 1 || status === "1" || user.isActive
-            ? "green"
-            : "default"
-        }>
-          {status === "Active" || status === 1 || status === "1" || user.isActive ? "Active" : "Inactive"}
+        <Tag
+          color={
+            status === "Active" ||
+            status === 1 ||
+            status === "1" ||
+            user.isActive
+              ? "green"
+              : "default"
+          }
+        >
+          {status === "Active" ||
+          status === 1 ||
+          status === "1" ||
+          user.isActive
+            ? "Active"
+            : "Inactive"}
         </Tag>
       ),
       align: "center",
@@ -68,15 +101,29 @@ function TableUser({ listUsers, onView, onEdit, onDelete, onChangeRole, loadingE
       align: "center",
       render: (_, user) => (
         <Space>
-          <Button icon={<EyeOutlined />} onClick={() => onView && onView(user)} />
+          <Button
+            icon={<EyeOutlined />}
+            onClick={() => onView && onView(user)}
+          />
           {user.role === "Teacher" && (
-            <Button icon={<EditOutlined />} onClick={() => onEdit && onEdit(user)} loading={loadingEdit} />
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => onEdit && onEdit(user)}
+              loading={loadingEdit}
+            />
           )}
           {user.role !== "Teacher" && user.role !== "Parent" && (
-            <Button icon={<DeleteOutlined />} danger onClick={() => onDelete && onDelete(user)} />
+            <Button
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => onDelete && onDelete(user)}
+            />
           )}
           {user.role !== "Parent" && (
-            <Button icon={<SyncOutlined />} onClick={() => onChangeRole && onChangeRole(user)} />
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => onChangeRole && onChangeRole(user)}
+            />
           )}
         </Space>
       ),

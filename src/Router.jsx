@@ -12,12 +12,12 @@ import ParentNotifications from "./pages/Parents/Notification/Notification";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import StudentSchedule from "./pages/Parents/Schedule/StudentSchedule";
 import TeacherSchedule from "./pages/Teachers/Schedule/TeacherSchedule";
-import AdminMainLayout from "./pages/Admin/AdminMainLayout";
-import TeacherScheduleCreate from "./pages/Admin/TeacherScheduleCreate";
-import TeacherCourseCreate from "./pages/Admin/TeacherCourseCreate";
-import TeacherAttendanceCreate from "./pages/Admin/TeacherAttendanceCreate";
+import AdminMainLayout from "./pages/Admin/Layouts/AdminMainLayout";
+import TeacherScheduleCreate from "./pages/Admin/Courses/TeacherScheduleCreate";
+import TeacherCourseCreate from "./pages/Admin/Courses/TeacherCourseCreate";
+import TeacherAttendanceCreate from "./pages/Admin/Courses/TeacherAttendanceCreate";
 import { getUserInfo } from "./services/handleStorageApi";
-import ManageUser from "./pages/Admin/ManageUser";
+import ManageUser from "./pages/Admin/User/ManageUser";
 import AdminSettings from "./pages/Admin/AdminSettings";
 
 function ProtectedRoute({ allowedRoles, children }) {
